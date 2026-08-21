@@ -9,6 +9,7 @@ var _spell_caster: SpellCaster
 var _spell_loadout: SpellLoadout
 var _active_spell: SpellData
 var _dash: DashComponent
+var _wave_director: WaveDirector
 
 @onready var _health_bar: ProgressBar = get_node("%HealthBar") as ProgressBar
 @onready var _health_label: Label = get_node("%HealthLabel") as Label
@@ -19,10 +20,22 @@ var _dash: DashComponent
 @onready var _slot_label: Label = get_node("%SlotLabel") as Label
 @onready var _dash_label: Label = get_node("%DashLabel") as Label
 @onready var _dash_bar: ProgressBar = get_node("%DashBar") as ProgressBar
+@onready var _wave_label: Label = get_node("%WaveLabel") as Label
 
 
 func _ready() -> void:
 	_bind_player()
+	_bind_wave_director()
+
+
+func _bind_wave_director() -> void:
+	_wave_director = get_tree().get_first_node_in_group(&"wave_director") as WaveDirector
+	if not is_instance_valid(_wave_director):
+		_wave_label.text = "WAVE  —"
+		return
+	_wave_director.wave_started.connect(_on_wave_started)
+	_wave_director.enemy_count_changed.connect(_on_enemy_count_changed)
+	_on_enemy_count_changed(_wave_director.get_remaining_count())
 
 
 func _bind_player() -> void:
@@ -83,3 +96,12 @@ func _on_dash_cooldown_changed(remaining: float, total: float) -> void:
 	_dash_bar.max_value = total
 	_dash_bar.value = total - remaining
 	_dash_label.text = "DASH  READY" if remaining <= 0.0 else "DASH  %.1fs" % remaining
+
+
+func _on_wave_started(wave_number: int, wave_name: String, total_enemies: int) -> void:
+	_wave_label.text = "WAVE %d/3  •  %s  •  %d LEFT" % [wave_number, wave_name.to_upper(), total_enemies]
+
+
+func _on_enemy_count_changed(remaining: int) -> void:
+	var wave_number: int = _wave_director.get_current_wave_number() if is_instance_valid(_wave_director) else 0
+	_wave_label.text = "WAVE %d/3  •  %d LEFT" % [wave_number, remaining]

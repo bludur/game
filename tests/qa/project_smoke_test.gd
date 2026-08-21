@@ -55,6 +55,9 @@ func _run_checks() -> void:
 			failures.append("No active Camera3D was found.")
 		if main_instance.get_node_or_null("ArenaAudioDirector") == null:
 			failures.append("Arena audio director is missing.")
+		var wave_director: WaveDirector = main_instance.get_node_or_null("WaveDirector") as WaveDirector
+		if wave_director == null or wave_director.get_wave_count() != 3:
+			failures.append("Wave director with three waves is missing.")
 		if get_nodes_in_group(&"training_target").size() != 3:
 			failures.append("Expected three training targets in the main scene.")
 		var enemies: Array[Node] = get_nodes_in_group(&"enemy")

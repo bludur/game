@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/wave_data.gd" id="1_wave"]
+
+[resource]
+script = ExtResource("1_wave")
+wave_id = &"mixed"
+display_name = "Broken Circle"
+chaser_count = 2
+cultist_count = 1
+spawn_interval = 0.35

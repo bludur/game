@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/cameras/top_down_camera.tscn" id="2_camera"]
 [ext_resource type="PackedScene" path="res://scenes/targets/training_target.tscn" id="3_target"]
 [ext_resource type="PackedScene" path="res://scenes/ui/mage_hud.tscn" id="4_hud"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/chaser_enemy.tscn" id="5_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/waves/wave_director.tscn" id="5_waves"]
 [ext_resource type="Script" path="res://scripts/navigation/arena_navigation.gd" id="6_navigation"]
 [ext_resource type="PackedScene" path="res://scenes/audio/arena_audio_director.tscn" id="7_audio"]
 
@@ -99,8 +99,7 @@ script = ExtResource("6_navigation")
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 
-[node name="ShadeStalker" parent="." instance=ExtResource("5_enemy")]
-position = Vector3(8, 0, -7)
+[node name="WaveDirector" parent="." instance=ExtResource("5_waves")]
 
 [node name="TopDownCamera" parent="." instance=ExtResource("2_camera")]
 

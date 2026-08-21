@@ -4,6 +4,7 @@ extends CharacterBody3D
 signal state_changed(previous_state: int, next_state: int)
 signal attacked(damage: float)
 signal respawned()
+signal defeated(enemy: Node)
 
 enum State {
 	IDLE,
@@ -23,6 +24,7 @@ enum State {
 @export_range(1.0, 100.0, 1.0) var attack_damage: float = 8.0
 @export_range(0.2, 5.0, 0.05) var attack_cooldown: float = 1.0
 @export_range(0.5, 10.0, 0.1) var respawn_delay: float = 3.5
+@export var respawns: bool = true
 
 var current_state: State = State.IDLE
 var _target: MagePlayer
@@ -267,7 +269,9 @@ func _on_died() -> void:
 	collision_layer = 0
 	_hurtbox.set_deferred("monitoring", false)
 	_hurtbox.set_deferred("monitorable", false)
-	_respawn_timer.start(respawn_delay)
+	defeated.emit(self)
+	if respawns:
+		_respawn_timer.start(respawn_delay)
 
 
 func _on_respawn_timeout() -> void:
@@ -291,7 +295,10 @@ func _on_animation_finished(animation_name: StringName) -> void:
 	if animation_name == &"attack" and current_state == State.ATTACK:
 		_animation_player.play(&"idle", 0.08)
 	elif animation_name == &"death" and current_state == State.DEAD:
-		_visuals.visible = false
+		if respawns:
+			_visuals.visible = false
+		else:
+			queue_free()
 
 
 func _build_placeholder_animations() -> void:
