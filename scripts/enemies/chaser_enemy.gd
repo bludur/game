@@ -29,12 +29,18 @@ var _target: MagePlayer
 var _spawn_transform: Transform3D
 var _original_collision_layer: int
 var _gravity: float = float(ProjectSettings.get_setting("physics/3d/default_gravity", 18.0))
+var _hurt_sound: AudioStreamWAV
+var _death_sound: AudioStreamWAV
+var _attack_sound: AudioStreamWAV
+var _glow_tween: Tween
 
 @onready var _navigation_agent: NavigationAgent3D = get_node("NavigationAgent3D") as NavigationAgent3D
 @onready var _health: HealthComponent = get_node("HealthComponent") as HealthComponent
 @onready var _hurtbox: HurtboxComponent = get_node("HurtboxComponent") as HurtboxComponent
 @onready var _visuals: Node3D = get_node("Visuals") as Node3D
 @onready var _animation_player: AnimationPlayer = get_node("AnimationPlayer") as AnimationPlayer
+@onready var _glow: OmniLight3D = get_node("Visuals/Glow") as OmniLight3D
+@onready var _sfx_pool: SfxPool3D = get_node("SfxPool3D") as SfxPool3D
 @onready var _attack_timer: Timer = get_node("AttackTimer") as Timer
 @onready var _target_refresh_timer: Timer = get_node("TargetRefreshTimer") as Timer
 @onready var _respawn_timer: Timer = get_node("RespawnTimer") as Timer
@@ -44,6 +50,9 @@ func _ready() -> void:
 	_spawn_transform = global_transform
 	_original_collision_layer = collision_layer
 	_hurtbox.bind_health(_health)
+	_hurt_sound = SyntheticAudio.create_hurt()
+	_death_sound = SyntheticAudio.create_death()
+	_attack_sound = SyntheticAudio.create_enemy_attack()
 	_health.damaged.connect(_on_damaged)
 	_health.died.connect(_on_died)
 	_target_refresh_timer.timeout.connect(_refresh_navigation_target)
@@ -118,6 +127,7 @@ func try_attack() -> bool:
 
 	_animation_player.stop()
 	_animation_player.play(&"attack", 0.08)
+	_sfx_pool.play_sfx(_attack_sound, -2.0)
 	_attack_timer.start(attack_cooldown)
 	attacked.emit(attack_damage)
 	return true
@@ -234,11 +244,18 @@ func _exit_state(_state: State) -> void:
 
 
 func _on_damaged(_amount: float) -> void:
+	_sfx_pool.play_sfx(_hurt_sound, -3.0)
+	if _glow_tween != null:
+		_glow_tween.kill()
+	_glow.light_energy = 4.5
+	_glow_tween = create_tween()
+	_glow_tween.tween_property(_glow, "light_energy", 1.8, 0.2)
 	if current_state == State.IDLE and is_instance_valid(_target):
 		_transition_to(State.CHASE)
 
 
 func _on_died() -> void:
+	_sfx_pool.play_sfx(_death_sound)
 	_transition_to(State.DEAD)
 	collision_layer = 0
 	_hurtbox.set_deferred("monitoring", false)

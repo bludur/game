@@ -18,6 +18,9 @@ func _run_checks() -> void:
 		failures.append("Forward Plus is not selected in project features.")
 	if not bool(ProjectSettings.get_setting("physics/common/physics_interpolation", false)):
 		failures.append("Physics interpolation is disabled.")
+	for bus_name: StringName in [&"Music", &"SFX", &"Ambience"]:
+		if AudioServer.get_bus_index(bus_name) < 0:
+			failures.append("Missing audio bus: %s." % bus_name)
 
 	var main_scene: PackedScene = MAIN_SCENE
 	if main_scene == null:
@@ -44,6 +47,8 @@ func _run_checks() -> void:
 			failures.append("Player group member is not a MagePlayer.")
 		if root.get_camera_3d() == null:
 			failures.append("No active Camera3D was found.")
+		if main_instance.get_node_or_null("ArenaAudioDirector") == null:
+			failures.append("Arena audio director is missing.")
 		if get_nodes_in_group(&"training_target").size() != 3:
 			failures.append("Expected three training targets in the main scene.")
 		var enemies: Array[Node] = get_nodes_in_group(&"enemy")

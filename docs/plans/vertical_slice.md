@@ -20,7 +20,7 @@
 Подробный план, архитектурные решения и критерии готовности находятся в
 [`docs/godot-prompter/plans/next_five_stages.md`](../godot-prompter/plans/next_five_stages.md).
 
-- [ ] Звук и обратная связь боя.
+- [x] Звук и обратная связь боя.
   Skills: `audio-system`, `assets-pipeline`, `animation-system`, `godot-testing`
 - [ ] Второе заклинание — круг замедления.
   Skills: `resource-pattern`, `component-system`, `input-handling`, `particles-vfx`, `hud-system`, `godot-testing`

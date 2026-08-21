@@ -1,6 +1,7 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/vfx/arcane_impact.gd" id="1_impact"]
+[ext_resource type="PackedScene" path="res://scenes/components/sfx_pool_3d.tscn" id="2_sfx"]
 
 [sub_resource type="Gradient" id="Gradient_impact"]
 offsets = PackedFloat32Array(0, 0.35, 1)
@@ -52,3 +53,5 @@ script = ExtResource("1_impact")
 
 [node name="CleanupTimer" type="Timer" parent="."]
 one_shot = true
+
+[node name="SfxPool3D" parent="." instance=ExtResource("2_sfx")]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/characters/player.gd" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/components/player_controller.tscn" id="2_controller"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/components/mana_component.tscn" id="4_mana"]
 [ext_resource type="PackedScene" path="res://scenes/components/spell_caster.tscn" id="5_caster"]
 [ext_resource type="PackedScene" path="res://scenes/components/hurtbox_component.tscn" id="6_hurtbox"]
+[ext_resource type="PackedScene" path="res://scenes/components/sfx_pool_3d.tscn" id="7_sfx"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
 radius = 0.42
@@ -65,6 +66,9 @@ invulnerability_seconds = 0.35
 faction = &"player"
 
 [node name="SpellCaster" parent="." instance=ExtResource("5_caster")]
+
+[node name="SfxPool3D" parent="." instance=ExtResource("7_sfx")]
+position = Vector3(0, 1, 0)
 
 [node name="CastOrigin" type="Marker3D" parent="."]
 position = Vector3(0, 1.25, 0)
