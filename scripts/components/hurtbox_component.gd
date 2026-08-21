@@ -4,6 +4,7 @@ extends Area3D
 signal hit_received(damage: float)
 
 @export_range(0.0, 5.0, 0.05) var invulnerability_seconds: float = 0.0
+@export var faction: StringName = &"neutral"
 
 var health_component: HealthComponent
 var _invulnerable: bool = false
@@ -17,6 +18,10 @@ func _ready() -> void:
 
 func bind_health(component: HealthComponent) -> void:
 	health_component = component
+
+
+func belongs_to(source_faction: StringName) -> bool:
+	return source_faction != &"" and faction == source_faction
 
 
 func receive_hit(damage: float) -> bool:

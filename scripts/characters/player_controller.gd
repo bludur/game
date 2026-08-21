@@ -10,6 +10,7 @@ extends Node
 var _gravity: float = float(ProjectSettings.get_setting("physics/3d/default_gravity", 18.0))
 var _body: CharacterBody3D
 var _visuals: Node3D
+var _enabled: bool = true
 
 
 func _ready() -> void:
@@ -19,7 +20,14 @@ func _ready() -> void:
 func bind(body: CharacterBody3D, visuals: Node3D) -> void:
 	_body = body
 	_visuals = visuals
-	set_physics_process(true)
+	set_physics_process(_enabled)
+
+
+func set_enabled(enabled: bool) -> void:
+	_enabled = enabled
+	set_physics_process(enabled and is_instance_valid(_body))
+	if not enabled and is_instance_valid(_body):
+		_body.velocity = Vector3.ZERO
 
 
 func _physics_process(delta: float) -> void:

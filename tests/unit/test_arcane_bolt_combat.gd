@@ -24,7 +24,8 @@ func test_arcane_bolt_spends_mana_and_damages_target() -> void:
 		player,
 		player.get_node("CastOrigin") as Marker3D,
 		mana,
-		world
+		world,
+		&"player"
 	)
 	assert_true(caster.cast_at(target.global_position))
 	assert_eq(mana.current_mana, mana_before - caster.spell_data.mana_cost)
@@ -33,3 +34,4 @@ func test_arcane_bolt_spends_mana_and_damages_target() -> void:
 		await get_tree().physics_frame
 
 	assert_eq(target_health.current_health, health_before - caster.spell_data.damage)
+	assert_eq(player.get_health_component().current_health, player.get_health_component().max_health)

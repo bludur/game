@@ -9,6 +9,7 @@ const FAILURE_NOT_CONFIGURED: StringName = &"not_configured"
 const FAILURE_COOLDOWN: StringName = &"cooldown"
 const FAILURE_MANA: StringName = &"mana"
 const FAILURE_INVALID_TARGET: StringName = &"invalid_target"
+const FAILURE_DISABLED: StringName = &"disabled"
 
 @export var spell_data: SpellData
 
@@ -16,6 +17,8 @@ var caster_body: Node3D
 var cast_origin: Marker3D
 var mana_component: ManaComponent
 var projectile_parent: Node
+var caster_faction: StringName = &"neutral"
+var _enabled: bool = true
 
 @onready var _cooldown_timer: Timer = get_node("CooldownTimer") as Timer
 
@@ -29,16 +32,28 @@ func bind(
 	body: Node3D,
 	origin: Marker3D,
 	mana: ManaComponent,
-	spawn_parent: Node = null
+	spawn_parent: Node = null,
+	faction: StringName = &"neutral"
 ) -> void:
 	caster_body = body
 	cast_origin = origin
 	mana_component = mana
 	projectile_parent = spawn_parent
+	caster_faction = faction
+
+
+func set_enabled(enabled: bool) -> void:
+	_enabled = enabled
+	set_process_unhandled_input(enabled)
+	if enabled:
+		return
+	_cooldown_timer.stop()
+	set_process(false)
+	cooldown_changed.emit(0.0, _cooldown_timer.wait_time)
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not event.is_action_pressed(&"primary_spell"):
+	if not _enabled or not event.is_action_pressed(&"primary_spell"):
 		return
 
 	var target_position: Variant = _get_mouse_ground_position(get_viewport().get_mouse_position())
@@ -54,6 +69,9 @@ func _process(_delta: float) -> void:
 
 
 func cast_at(target_position: Vector3) -> bool:
+	if not _enabled:
+		cast_failed.emit(FAILURE_DISABLED)
+		return false
 	if not _is_configured():
 		cast_failed.emit(FAILURE_NOT_CONFIGURED)
 		return false
@@ -88,7 +106,7 @@ func cast_at(target_position: Vector3) -> bool:
 		return false
 	spawn_parent.add_child(projectile)
 	projectile.global_position = cast_origin.global_position
-	projectile.configure(direction.normalized(), spell_data, caster_body)
+	projectile.configure(direction.normalized(), spell_data, caster_body, caster_faction)
 
 	_cooldown_timer.start(spell_data.cooldown_seconds)
 	set_process(true)

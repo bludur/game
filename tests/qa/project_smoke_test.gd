@@ -46,6 +46,14 @@ func _run_checks() -> void:
 			failures.append("No active Camera3D was found.")
 		if get_nodes_in_group(&"training_target").size() != 3:
 			failures.append("Expected three training targets in the main scene.")
+		var enemies: Array[Node] = get_nodes_in_group(&"enemy")
+		if enemies.size() != 1 or enemies[0] is not ChaserEnemy:
+			failures.append("Expected one ChaserEnemy in the main scene.")
+		var navigation_region: ArenaNavigation = main_instance.get_node_or_null("ArenaNavigation") as ArenaNavigation
+		if navigation_region == null or navigation_region.navigation_mesh == null:
+			failures.append("Arena navigation mesh was not created.")
+		elif navigation_region.navigation_mesh.get_polygon_count() == 0:
+			failures.append("Arena navigation mesh has no walkable polygons.")
 		if get_nodes_in_group(&"projectile").is_empty():
 			failures.append("Arcane Bolt projectile was not spawned.")
 

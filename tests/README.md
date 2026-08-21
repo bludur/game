@@ -1,19 +1,16 @@
 # Tests
 
 - `qa/project_smoke_test.gd` проверяет загрузку основной сцены, игрока, камеры,
-  целей и создание снаряда без графического окна.
-- `unit/` содержит тесты GUT для ресурсов, здоровья, маны и интеграции попадания.
+  целей, врага, навигации и создание снаряда без графического окна.
+- `qa/enemy_chase_test.gd` за четыре секунды подтверждает реальную погоню и
+  успешную ближнюю атаку по магу.
+- `unit/` содержит тесты GUT для ресурсов, здоровья, маны, фракций, возрождения
+  игрока и интеграции попадания.
 - `visual/combat_preview.tscn` автоматически выпускает `Arcane Bolt` для ручной
   проверки камеры, HUD, VFX и читаемости боя.
 
-Запуск smoke-теста:
+Запуск всех проверок:
 
 ```powershell
-.\tools\godot.ps1 -Console --headless --path . --script res://tests/qa/project_smoke_test.gd
-```
-
-Запуск GUT:
-
-```powershell
-.\tools\godot.ps1 -Console --headless --path . -s addons/gut/gut_cmdln.gd -gexit
+.\tools\qa\run_checks.ps1
 ```

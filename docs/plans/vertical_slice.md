@@ -10,7 +10,7 @@
   Skills: `component-system`, `resource-pattern`, `godot-testing`
 - [x] Магический снаряд с попаданием и уроном.
   Skills: `component-system`, `physics-system`, `particles-vfx`, `shader-basics`
-- [ ] Первый преследующий противник.
+- [x] Первый преследующий противник.
   Skills: `ai-navigation`, `state-machine`, `animation-system`
 - [x] HUD здоровья, маны и кулдауна.
   Skills: `godot-ui`, `hud-system`, `responsive-ui`

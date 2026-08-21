@@ -1,10 +1,11 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/characters/player.gd" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/components/player_controller.tscn" id="2_controller"]
 [ext_resource type="PackedScene" path="res://scenes/components/health_component.tscn" id="3_health"]
 [ext_resource type="PackedScene" path="res://scenes/components/mana_component.tscn" id="4_mana"]
 [ext_resource type="PackedScene" path="res://scenes/components/spell_caster.tscn" id="5_caster"]
+[ext_resource type="PackedScene" path="res://scenes/components/hurtbox_component.tscn" id="6_hurtbox"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
 radius = 0.42
@@ -58,6 +59,11 @@ script = ExtResource("1_player")
 max_mana = 100.0
 regeneration_per_second = 14.0
 
+[node name="HurtboxComponent" parent="." instance=ExtResource("6_hurtbox")]
+position = Vector3(0, 0.9, 0)
+invulnerability_seconds = 0.35
+faction = &"player"
+
 [node name="SpellCaster" parent="." instance=ExtResource("5_caster")]
 
 [node name="CastOrigin" type="Marker3D" parent="."]
@@ -84,3 +90,6 @@ mesh = SubResource("CylinderMesh_brim")
 [node name="HatCrown" type="MeshInstance3D" parent="Visuals"]
 position = Vector3(0, 2.22, 0)
 mesh = SubResource("CylinderMesh_crown")
+
+[node name="RespawnTimer" type="Timer" parent="."]
+one_shot = true
