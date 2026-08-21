@@ -14,7 +14,19 @@
   Skills: `ai-navigation`, `state-machine`, `animation-system`
 - [x] HUD здоровья, маны и кулдауна.
   Skills: `godot-ui`, `hud-system`, `responsive-ui`
-- [ ] Звук попаданий и фоновой атмосферы.
-  Skills: `audio-system`
-- [ ] Полировка, экспорт Windows-сборки и тестовая сессия.
-  Skills: `godot-optimization`, `export-pipeline`, `godot-code-review`
+
+## Следующие пять этапов
+
+Подробный план, архитектурные решения и критерии готовности находятся в
+[`docs/godot-prompter/plans/next_five_stages.md`](../godot-prompter/plans/next_five_stages.md).
+
+- [ ] Звук и обратная связь боя.
+  Skills: `audio-system`, `assets-pipeline`, `animation-system`, `godot-testing`
+- [ ] Второе заклинание — круг замедления.
+  Skills: `resource-pattern`, `component-system`, `input-handling`, `particles-vfx`, `hud-system`, `godot-testing`
+- [ ] Рывок мага.
+  Skills: `player-controller`, `input-handling`, `state-machine`, `physics-system`, `particles-vfx`, `hud-system`, `godot-testing`
+- [ ] Дальний враг и система волн.
+  Skills: `ai-navigation`, `state-machine`, `resource-pattern`, `component-system`, `animation-system`, `godot-testing`
+- [ ] Улучшение, финал сессии и Windows-сборка.
+  Skills: `resource-pattern`, `godot-ui`, `responsive-ui`, `state-machine`, `godot-optimization`, `export-pipeline`, `godot-code-review`, `godot-testing`
