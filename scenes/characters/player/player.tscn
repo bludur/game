@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://scripts/characters/player.gd" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/components/player_controller.tscn" id="2_controller"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/components/hurtbox_component.tscn" id="6_hurtbox"]
 [ext_resource type="PackedScene" path="res://scenes/components/sfx_pool_3d.tscn" id="7_sfx"]
 [ext_resource type="PackedScene" path="res://scenes/components/spell_loadout.tscn" id="8_loadout"]
+[ext_resource type="PackedScene" path="res://scenes/components/dash_component.tscn" id="9_dash"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
 radius = 0.42
@@ -47,6 +48,40 @@ top_radius = 0.04
 bottom_radius = 0.43
 height = 0.78
 
+[sub_resource type="Gradient" id="Gradient_dash"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.72, 0.4, 1, 0.75, 0.18, 0.05, 0.5, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture_dash"]
+gradient = SubResource("Gradient_dash")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dash"]
+emission_shape = 1
+emission_sphere_radius = 0.38
+gravity = Vector3(0, 0.45, 0)
+initial_velocity_min = 0.15
+initial_velocity_max = 0.8
+damping_min = 1.0
+damping_max = 2.5
+scale_min = 0.45
+scale_max = 1.2
+color_ramp = SubResource("GradientTexture_dash")
+
+[sub_resource type="StandardMaterial3D" id="Material_dash"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+emission_enabled = true
+emission = Color(0.5, 0.16, 1, 1)
+emission_energy_multiplier = 2.5
+
+[sub_resource type="SphereMesh" id="SphereMesh_dash"]
+material = SubResource("Material_dash")
+radius = 0.075
+height = 0.15
+radial_segments = 6
+rings = 3
+
 [node name="Player" type="CharacterBody3D" groups=["player"]]
 collision_layer = 2
 collision_mask = 1
@@ -69,6 +104,8 @@ faction = &"player"
 [node name="SpellCaster" parent="." instance=ExtResource("5_caster")]
 
 [node name="SpellLoadout" parent="." instance=ExtResource("8_loadout")]
+
+[node name="DashComponent" parent="." instance=ExtResource("9_dash")]
 
 [node name="SfxPool3D" parent="." instance=ExtResource("7_sfx")]
 position = Vector3(0, 1, 0)
@@ -97,6 +134,16 @@ mesh = SubResource("CylinderMesh_brim")
 [node name="HatCrown" type="MeshInstance3D" parent="Visuals"]
 position = Vector3(0, 2.22, 0)
 mesh = SubResource("CylinderMesh_crown")
+
+[node name="DashTrail" type="GPUParticles3D" parent="."]
+position = Vector3(0, 0.85, 0)
+emitting = false
+amount = 28
+lifetime = 0.4
+fixed_fps = 30
+local_coords = false
+process_material = SubResource("ParticleProcessMaterial_dash")
+draw_pass_1 = SubResource("SphereMesh_dash")
 
 [node name="RespawnTimer" type="Timer" parent="."]
 one_shot = true

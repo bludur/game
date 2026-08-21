@@ -24,7 +24,7 @@
   Skills: `audio-system`, `assets-pipeline`, `animation-system`, `godot-testing`
 - [x] Второе заклинание — круг замедления.
   Skills: `resource-pattern`, `component-system`, `input-handling`, `particles-vfx`, `hud-system`, `godot-testing`
-- [ ] Рывок мага.
+- [x] Рывок мага.
   Skills: `player-controller`, `input-handling`, `state-machine`, `physics-system`, `particles-vfx`, `hud-system`, `godot-testing`
 - [ ] Дальний враг и система волн.
   Skills: `ai-navigation`, `state-machine`, `resource-pattern`, `component-system`, `animation-system`, `godot-testing`

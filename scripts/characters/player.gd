@@ -12,6 +12,7 @@ var _hit_tween: Tween
 var _cast_sound: AudioStreamWAV
 var _hurt_sound: AudioStreamWAV
 var _death_sound: AudioStreamWAV
+var _dash_sound: AudioStreamWAV
 
 @onready var _controller: PlayerController = get_node("PlayerController") as PlayerController
 @onready var _health: HealthComponent = get_node("HealthComponent") as HealthComponent
@@ -19,16 +20,18 @@ var _death_sound: AudioStreamWAV
 @onready var _hurtbox: HurtboxComponent = get_node("HurtboxComponent") as HurtboxComponent
 @onready var _spell_caster: SpellCaster = get_node("SpellCaster") as SpellCaster
 @onready var _spell_loadout: SpellLoadout = get_node("SpellLoadout") as SpellLoadout
+@onready var _dash: DashComponent = get_node("DashComponent") as DashComponent
 @onready var _cast_origin: Marker3D = get_node("CastOrigin") as Marker3D
 @onready var _visuals: Node3D = get_node("Visuals") as Node3D
 @onready var _respawn_timer: Timer = get_node("RespawnTimer") as Timer
 @onready var _sfx_pool: SfxPool3D = get_node("SfxPool3D") as SfxPool3D
+@onready var _dash_trail: GPUParticles3D = get_node("DashTrail") as GPUParticles3D
 
 
 func _ready() -> void:
 	_spawn_transform = global_transform
 	_original_collision_layer = collision_layer
-	_controller.bind(self, _visuals)
+	_controller.bind(self, _visuals, _dash)
 	_hurtbox.bind_health(_health)
 	var spawn_parent: Node = get_tree().current_scene
 	if not is_instance_valid(spawn_parent):
@@ -38,9 +41,12 @@ func _ready() -> void:
 	_cast_sound = SyntheticAudio.create_spell_cast()
 	_hurt_sound = SyntheticAudio.create_hurt()
 	_death_sound = SyntheticAudio.create_death()
+	_dash_sound = SyntheticAudio.create_dash()
 	_health.damaged.connect(_on_damaged)
 	_health.died.connect(_on_died)
 	_spell_caster.spell_cast.connect(_on_spell_cast)
+	_dash.dash_started.connect(_on_dash_started)
+	_dash.dash_finished.connect(_on_dash_finished)
 	_respawn_timer.timeout.connect(_on_respawn_timeout)
 
 
@@ -64,6 +70,14 @@ func get_spell_loadout() -> SpellLoadout:
 	return _spell_loadout
 
 
+func get_dash_component() -> DashComponent:
+	return _dash
+
+
+func request_dash(direction: Vector3 = Vector3.ZERO) -> bool:
+	return _controller.request_dash(direction)
+
+
 func _on_spell_cast(_spell: SpellData) -> void:
 	_sfx_pool.play_sfx(_cast_sound, -2.0)
 
@@ -79,11 +93,23 @@ func _on_damaged(_amount: float) -> void:
 	_hit_tween.tween_property(_visuals, "scale", Vector3.ONE, 0.16)
 
 
+func _on_dash_started(_direction: Vector3) -> void:
+	_hurtbox.grant_invulnerability(_dash.dash_duration + 0.05)
+	_dash_trail.restart()
+	_dash_trail.emitting = true
+	_sfx_pool.play_sfx(_dash_sound, -2.0)
+
+
+func _on_dash_finished() -> void:
+	_dash_trail.emitting = false
+
+
 func _on_died() -> void:
 	_sfx_pool.play_sfx(_death_sound, -1.0)
 	_controller.set_enabled(false)
 	_spell_caster.set_enabled(false)
 	_spell_loadout.set_enabled(false)
+	_dash.set_enabled(false)
 	velocity = Vector3.ZERO
 	_visuals.visible = false
 	collision_layer = 0
@@ -106,4 +132,5 @@ func _on_respawn_timeout() -> void:
 	_controller.set_enabled(true)
 	_spell_caster.set_enabled(true)
 	_spell_loadout.set_enabled(true)
+	_dash.set_enabled(true)
 	respawned.emit()

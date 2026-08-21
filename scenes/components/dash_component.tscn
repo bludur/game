@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/components/dash_component.gd" id="1_dash"]
+
+[node name="DashComponent" type="Node"]
+script = ExtResource("1_dash")
+
+[node name="DurationTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="CooldownTimer" type="Timer" parent="."]
+one_shot = true

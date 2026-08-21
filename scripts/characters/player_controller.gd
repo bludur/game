@@ -1,6 +1,14 @@
 class_name PlayerController
 extends Node
 
+signal movement_state_changed(state_name: StringName)
+
+enum State {
+	MOVE,
+	DASH,
+	DISABLED,
+}
+
 @export_group("Movement")
 @export_range(1.0, 20.0, 0.1) var move_speed: float = 6.0
 @export_range(1.0, 60.0, 0.5) var acceleration: float = 28.0
@@ -10,16 +18,25 @@ extends Node
 var _gravity: float = float(ProjectSettings.get_setting("physics/3d/default_gravity", 18.0))
 var _body: CharacterBody3D
 var _visuals: Node3D
+var _dash: DashComponent
 var _enabled: bool = true
+var _state: State = State.MOVE
+var _last_move_direction: Vector3 = Vector3.FORWARD
 
 
 func _ready() -> void:
 	set_physics_process(false)
 
 
-func bind(body: CharacterBody3D, visuals: Node3D) -> void:
+func bind(body: CharacterBody3D, visuals: Node3D, dash: DashComponent = null) -> void:
 	_body = body
 	_visuals = visuals
+	_dash = dash
+	if is_instance_valid(_dash) and not _dash.dash_requested.is_connected(_on_dash_requested):
+		_dash.dash_requested.connect(_on_dash_requested)
+		_dash.dash_started.connect(_on_dash_started)
+		_dash.dash_finished.connect(_on_dash_finished)
+	_transition_to(State.MOVE)
 	set_physics_process(_enabled)
 
 
@@ -28,10 +45,19 @@ func set_enabled(enabled: bool) -> void:
 	set_physics_process(enabled and is_instance_valid(_body))
 	if not enabled and is_instance_valid(_body):
 		_body.velocity = Vector3.ZERO
+	_transition_to(State.MOVE if enabled else State.DISABLED)
 
 
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(_body) or not is_instance_valid(_visuals):
+		return
+
+	if _state == State.DASH and is_instance_valid(_dash) and _dash.is_dashing:
+		_apply_gravity(delta)
+		_body.velocity.x = _dash.dash_direction.x * _dash.dash_speed
+		_body.velocity.z = _dash.dash_direction.z * _dash.dash_speed
+		_body.move_and_slide()
+		_rotate_visuals(_dash.dash_direction, delta)
 		return
 
 	var input_vector: Vector2 = Input.get_vector(
@@ -41,6 +67,8 @@ func _physics_process(delta: float) -> void:
 		&"move_backward"
 	)
 	var move_direction: Vector3 = _camera_relative_direction(input_vector)
+	if move_direction != Vector3.ZERO:
+		_last_move_direction = move_direction
 	var horizontal_velocity: Vector3 = Vector3(_body.velocity.x, 0.0, _body.velocity.z)
 	var target_velocity: Vector3 = move_direction * move_speed
 	var change_rate: float = acceleration if move_direction != Vector3.ZERO else deceleration
@@ -49,14 +77,64 @@ func _physics_process(delta: float) -> void:
 	_body.velocity.x = horizontal_velocity.x
 	_body.velocity.z = horizontal_velocity.z
 
+	_apply_gravity(delta)
+
+	_body.move_and_slide()
+	_rotate_visuals(move_direction, delta)
+
+
+func request_dash(direction: Vector3 = Vector3.ZERO) -> bool:
+	if not _enabled or not is_instance_valid(_dash):
+		return false
+	var requested_direction: Vector3 = direction
+	if requested_direction.length_squared() <= 0.001:
+		var input_vector: Vector2 = Input.get_vector(
+			&"move_left", &"move_right", &"move_forward", &"move_backward"
+		)
+		requested_direction = _camera_relative_direction(input_vector)
+	if requested_direction.length_squared() <= 0.001:
+		requested_direction = _last_move_direction
+	return _dash.try_begin(requested_direction)
+
+
+func get_state_name() -> StringName:
+	match _state:
+		State.MOVE:
+			return &"move"
+		State.DASH:
+			return &"dash"
+		State.DISABLED:
+			return &"disabled"
+		_:
+			return &"unknown"
+
+
+func _apply_gravity(delta: float) -> void:
 	if _body.is_on_floor():
 		if _body.velocity.y < 0.0:
 			_body.velocity.y = -0.5
 	else:
 		_body.velocity.y -= _gravity * delta
 
-	_body.move_and_slide()
-	_rotate_visuals(move_direction, delta)
+
+func _on_dash_requested() -> void:
+	request_dash()
+
+
+func _on_dash_started(_direction: Vector3) -> void:
+	_transition_to(State.DASH)
+
+
+func _on_dash_finished() -> void:
+	if _enabled:
+		_transition_to(State.MOVE)
+
+
+func _transition_to(next_state: State) -> void:
+	if _state == next_state:
+		return
+	_state = next_state
+	movement_state_changed.emit(get_state_name())
 
 
 func _camera_relative_direction(input_vector: Vector2) -> Vector3:

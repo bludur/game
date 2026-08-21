@@ -57,6 +57,10 @@ static func create_enemy_attack() -> AudioStreamWAV:
 	return _create_chirp(110.0, 420.0, 0.16, 0.25)
 
 
+static func create_dash() -> AudioStreamWAV:
+	return _create_chirp(260.0, 1180.0, 0.18, 0.22)
+
+
 static func create_ambience() -> AudioStreamWAV:
 	var duration: float = 6.0
 	var sample_count: int = ceili(duration * float(MIX_RATE))
