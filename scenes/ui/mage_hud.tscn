@@ -64,7 +64,7 @@ layout_mode = 0
 offset_left = 24.0
 offset_top = 24.0
 offset_right = 354.0
-offset_bottom = 202.0
+offset_bottom = 228.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBox_panel")
 
@@ -130,6 +130,14 @@ theme_override_styles/fill = SubResource("StyleBox_cooldown_fill")
 show_percentage = false
 step = 0.0
 
+[node name="SlotLabel" type="Label" parent="Root/StatusPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+text = "[1] ARCANE BOLT    [2] FROST CIRCLE    ACTIVE: 1"
+theme_override_colors/font_color = Color(0.68, 0.82, 1, 1)
+theme_override_font_sizes/font_size = 12
+
 [node name="Instructions" type="Label" parent="Root"]
 layout_mode = 0
 anchors_preset = 7
@@ -144,7 +152,7 @@ offset_bottom = -22.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
-text = "WASD — MOVE     •     LEFT CLICK — ARCANE BOLT"
+text = "WASD — MOVE   •   1/2 — SPELL   •   LEFT CLICK — CAST"
 horizontal_alignment = 1
 theme_override_colors/font_color = Color(0.82, 0.78, 0.92, 0.88)
 theme_override_colors/font_outline_color = Color(0.03, 0.02, 0.06, 0.9)

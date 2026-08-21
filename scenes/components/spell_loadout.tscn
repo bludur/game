@@ -1,0 +1,10 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/components/spell_loadout.gd" id="1_loadout"]
+[ext_resource type="Resource" path="res://resources/spells/arcane_bolt.tres" id="2_bolt"]
+[ext_resource type="Resource" path="res://resources/spells/frost_circle.tres" id="3_frost"]
+
+[node name="SpellLoadout" type="Node"]
+script = ExtResource("1_loadout")
+primary_spell = ExtResource("2_bolt")
+secondary_spell = ExtResource("3_frost")

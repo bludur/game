@@ -52,6 +52,14 @@ func set_enabled(enabled: bool) -> void:
 	cooldown_changed.emit(0.0, _cooldown_timer.wait_time)
 
 
+func set_spell(spell: SpellData) -> bool:
+	if spell == null or not spell.is_valid_definition():
+		return false
+	spell_data = spell
+	cooldown_changed.emit(_cooldown_timer.time_left, spell_data.cooldown_seconds)
+	return true
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not _enabled or not event.is_action_pressed(&"primary_spell"):
 		return
@@ -81,32 +89,47 @@ func cast_at(target_position: Vector3) -> bool:
 
 	var direction: Vector3 = target_position - cast_origin.global_position
 	direction.y = 0.0
-	if direction.length_squared() < 0.001:
+	if spell_data.targeting_type == SpellData.TargetingType.PROJECTILE \
+			and direction.length_squared() < 0.001:
 		cast_failed.emit(FAILURE_INVALID_TARGET)
 		return false
+	var resolved_target: Vector3 = target_position
+	if direction.length() > spell_data.range_meters:
+		resolved_target = cast_origin.global_position + direction.normalized() * spell_data.range_meters
+	resolved_target.y = 0.05
 	if not mana_component.try_spend(spell_data.mana_cost):
 		cast_failed.emit(FAILURE_MANA)
 		return false
 
-	var projectile_node: Node = spell_data.projectile_scene.instantiate()
-	if projectile_node is not ArcaneBolt:
-		projectile_node.queue_free()
-		mana_component.restore(spell_data.mana_cost)
-		cast_failed.emit(FAILURE_NOT_CONFIGURED)
-		return false
-	var projectile: ArcaneBolt = projectile_node as ArcaneBolt
+	var effect_node: Node = spell_data.projectile_scene.instantiate()
 
 	var spawn_parent: Node = projectile_parent
 	if not is_instance_valid(spawn_parent):
 		spawn_parent = get_tree().current_scene
 	if not is_instance_valid(spawn_parent):
 		mana_component.restore(spell_data.mana_cost)
-		projectile.queue_free()
+		effect_node.queue_free()
 		cast_failed.emit(FAILURE_NOT_CONFIGURED)
 		return false
-	spawn_parent.add_child(projectile)
-	projectile.global_position = cast_origin.global_position
-	projectile.configure(direction.normalized(), spell_data, caster_body, caster_faction)
+	spawn_parent.add_child(effect_node)
+	match spell_data.targeting_type:
+		SpellData.TargetingType.PROJECTILE:
+			if effect_node is not ArcaneBolt:
+				_refund_invalid_effect(effect_node)
+				return false
+			var projectile: ArcaneBolt = effect_node as ArcaneBolt
+			projectile.global_position = cast_origin.global_position
+			projectile.configure(direction.normalized(), spell_data, caster_body, caster_faction)
+		SpellData.TargetingType.AREA:
+			if effect_node is not FrostCircle:
+				_refund_invalid_effect(effect_node)
+				return false
+			var area_effect: FrostCircle = effect_node as FrostCircle
+			area_effect.global_position = resolved_target
+			area_effect.configure(spell_data, caster_faction)
+		_:
+			_refund_invalid_effect(effect_node)
+			return false
 
 	_cooldown_timer.start(spell_data.cooldown_seconds)
 	set_process(true)
@@ -137,6 +160,12 @@ func _is_configured() -> bool:
 		and is_instance_valid(caster_body) \
 		and is_instance_valid(cast_origin) \
 		and is_instance_valid(mana_component)
+
+
+func _refund_invalid_effect(effect_node: Node) -> void:
+	mana_component.restore(spell_data.mana_cost)
+	effect_node.queue_free()
+	cast_failed.emit(FAILURE_NOT_CONFIGURED)
 
 
 func _on_cooldown_finished() -> void:

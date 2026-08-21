@@ -37,6 +37,7 @@ var _glow_tween: Tween
 @onready var _navigation_agent: NavigationAgent3D = get_node("NavigationAgent3D") as NavigationAgent3D
 @onready var _health: HealthComponent = get_node("HealthComponent") as HealthComponent
 @onready var _hurtbox: HurtboxComponent = get_node("HurtboxComponent") as HurtboxComponent
+@onready var _movement_modifier: MovementModifierComponent = get_node("MovementModifierComponent") as MovementModifierComponent
 @onready var _visuals: Node3D = get_node("Visuals") as Node3D
 @onready var _animation_player: AnimationPlayer = get_node("AnimationPlayer") as AnimationPlayer
 @onready var _glow: OmniLight3D = get_node("Visuals/Glow") as OmniLight3D
@@ -95,6 +96,10 @@ func get_hurtbox_component() -> HurtboxComponent:
 	return _hurtbox
 
 
+func get_movement_multiplier() -> float:
+	return _movement_modifier.get_multiplier()
+
+
 func get_state_name() -> StringName:
 	match current_state:
 		State.IDLE:
@@ -134,8 +139,9 @@ func try_attack() -> bool:
 
 
 func _update_idle() -> void:
-	velocity.x = move_toward(velocity.x, 0.0, move_speed)
-	velocity.z = move_toward(velocity.z, 0.0, move_speed)
+	var effective_speed: float = move_speed * _movement_modifier.get_multiplier()
+	velocity.x = move_toward(velocity.x, 0.0, effective_speed)
+	velocity.z = move_toward(velocity.z, 0.0, effective_speed)
 	if _target_is_in_range(aggro_range):
 		_transition_to(State.CHASE)
 
@@ -167,8 +173,9 @@ func _update_chase(delta: float) -> void:
 		return
 
 	direction = direction.normalized()
-	velocity.x = direction.x * move_speed
-	velocity.z = direction.z * move_speed
+	var effective_speed: float = move_speed * _movement_modifier.get_multiplier()
+	velocity.x = direction.x * effective_speed
+	velocity.z = direction.z * effective_speed
 	_face_direction(direction, delta)
 
 
@@ -267,6 +274,7 @@ func _on_respawn_timeout() -> void:
 	global_transform = _spawn_transform
 	reset_physics_interpolation()
 	_health.reset()
+	_movement_modifier.clear()
 	_visuals.position = Vector3.ZERO
 	_visuals.rotation = Vector3.ZERO
 	_visuals.scale = Vector3.ONE

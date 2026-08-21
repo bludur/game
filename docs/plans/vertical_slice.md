@@ -22,7 +22,7 @@
 
 - [x] Звук и обратная связь боя.
   Skills: `audio-system`, `assets-pipeline`, `animation-system`, `godot-testing`
-- [ ] Второе заклинание — круг замедления.
+- [x] Второе заклинание — круг замедления.
   Skills: `resource-pattern`, `component-system`, `input-handling`, `particles-vfx`, `hud-system`, `godot-testing`
 - [ ] Рывок мага.
   Skills: `player-controller`, `input-handling`, `state-machine`, `physics-system`, `particles-vfx`, `hud-system`, `godot-testing`

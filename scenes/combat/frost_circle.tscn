@@ -1,0 +1,96 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/frost_circle.gd" id="1_frost"]
+
+[sub_resource type="SphereShape3D" id="SphereShape_frost"]
+radius = 2.5
+
+[sub_resource type="StandardMaterial3D" id="Material_frost_disc"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.12, 0.7, 1, 0.22)
+emission_enabled = true
+emission = Color(0.04, 0.42, 1, 1)
+emission_energy_multiplier = 1.8
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_frost_disc"]
+material = SubResource("Material_frost_disc")
+top_radius = 2.5
+bottom_radius = 2.5
+height = 0.025
+radial_segments = 48
+rings = 1
+
+[sub_resource type="Gradient" id="Gradient_frost"]
+offsets = PackedFloat32Array(0, 0.65, 1)
+colors = PackedColorArray(0.75, 0.95, 1, 0.9, 0.16, 0.65, 1, 0.65, 0.05, 0.25, 0.9, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture_frost"]
+gradient = SubResource("Gradient_frost")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_frost"]
+emission_shape = 3
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 0.1
+emission_ring_radius = 2.4
+emission_ring_inner_radius = 1.65
+direction = Vector3(0, 1, 0)
+spread = 18.0
+gravity = Vector3(0, 0.25, 0)
+initial_velocity_min = 0.25
+initial_velocity_max = 0.8
+scale_min = 0.45
+scale_max = 1.1
+color_ramp = SubResource("GradientTexture_frost")
+
+[sub_resource type="StandardMaterial3D" id="Material_frost_particle"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.55, 0.9, 1, 0.8)
+emission_enabled = true
+emission = Color(0.18, 0.65, 1, 1)
+emission_energy_multiplier = 2.4
+
+[sub_resource type="SphereMesh" id="SphereMesh_frost_particle"]
+material = SubResource("Material_frost_particle")
+radius = 0.055
+height = 0.11
+radial_segments = 6
+rings = 3
+
+[node name="FrostCircle" type="Area3D" groups=["spell_effect"]]
+collision_layer = 0
+collision_mask = 16
+monitoring = true
+monitorable = false
+script = ExtResource("1_frost")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.15, 0)
+shape = SubResource("SphereShape_frost")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="Disc" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.025, 0)
+mesh = SubResource("CylinderMesh_frost_disc")
+
+[node name="FrostParticles" type="GPUParticles3D" parent="Visuals"]
+amount = 48
+lifetime = 1.4
+preprocess = 1.4
+fixed_fps = 30
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_frost")
+draw_pass_1 = SubResource("SphereMesh_frost_particle")
+
+[node name="Glow" type="OmniLight3D" parent="Visuals"]
+position = Vector3(0, 0.45, 0)
+light_color = Color(0.18, 0.62, 1, 1)
+light_energy = 1.2
+omni_range = 4.5
+shadow_enabled = false
+
+[node name="LifetimeTimer" type="Timer" parent="."]
+one_shot = true

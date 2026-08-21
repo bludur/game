@@ -18,6 +18,7 @@ var _death_sound: AudioStreamWAV
 @onready var _mana: ManaComponent = get_node("ManaComponent") as ManaComponent
 @onready var _hurtbox: HurtboxComponent = get_node("HurtboxComponent") as HurtboxComponent
 @onready var _spell_caster: SpellCaster = get_node("SpellCaster") as SpellCaster
+@onready var _spell_loadout: SpellLoadout = get_node("SpellLoadout") as SpellLoadout
 @onready var _cast_origin: Marker3D = get_node("CastOrigin") as Marker3D
 @onready var _visuals: Node3D = get_node("Visuals") as Node3D
 @onready var _respawn_timer: Timer = get_node("RespawnTimer") as Timer
@@ -33,6 +34,7 @@ func _ready() -> void:
 	if not is_instance_valid(spawn_parent):
 		spawn_parent = get_parent()
 	_spell_caster.bind(self, _cast_origin, _mana, spawn_parent, &"player")
+	_spell_loadout.bind(_spell_caster)
 	_cast_sound = SyntheticAudio.create_spell_cast()
 	_hurt_sound = SyntheticAudio.create_hurt()
 	_death_sound = SyntheticAudio.create_death()
@@ -58,6 +60,10 @@ func get_spell_caster() -> SpellCaster:
 	return _spell_caster
 
 
+func get_spell_loadout() -> SpellLoadout:
+	return _spell_loadout
+
+
 func _on_spell_cast(_spell: SpellData) -> void:
 	_sfx_pool.play_sfx(_cast_sound, -2.0)
 
@@ -77,6 +83,7 @@ func _on_died() -> void:
 	_sfx_pool.play_sfx(_death_sound, -1.0)
 	_controller.set_enabled(false)
 	_spell_caster.set_enabled(false)
+	_spell_loadout.set_enabled(false)
 	velocity = Vector3.ZERO
 	_visuals.visible = false
 	collision_layer = 0
@@ -98,4 +105,5 @@ func _on_respawn_timeout() -> void:
 	_hurtbox.set_deferred("monitorable", true)
 	_controller.set_enabled(true)
 	_spell_caster.set_enabled(true)
+	_spell_loadout.set_enabled(true)
 	respawned.emit()

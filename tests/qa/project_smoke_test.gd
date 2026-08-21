@@ -38,6 +38,9 @@ func _run_checks() -> void:
 			var mage: MagePlayer = player as MagePlayer
 			var mana: ManaComponent = mage.get_mana_component()
 			var caster: SpellCaster = mage.get_spell_caster()
+			var loadout: SpellLoadout = mage.get_spell_loadout()
+			if loadout.get_spell(0) == null or loadout.get_spell(1) == null:
+				failures.append("Player spell loadout does not contain two spells.")
 			var mana_before: float = mana.current_mana
 			if not caster.cast_at(mage.global_position + Vector3(0.0, 0.0, -4.0)):
 				failures.append("Arcane Bolt could not be cast through the public API.")

@@ -1,9 +1,10 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/chaser_enemy.gd" id="1_enemy"]
 [ext_resource type="PackedScene" path="res://scenes/components/health_component.tscn" id="2_health"]
 [ext_resource type="PackedScene" path="res://scenes/components/hurtbox_component.tscn" id="3_hurtbox"]
 [ext_resource type="PackedScene" path="res://scenes/components/sfx_pool_3d.tscn" id="4_sfx"]
+[ext_resource type="PackedScene" path="res://scenes/components/movement_modifier_component.tscn" id="5_modifier"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_enemy"]
 radius = 0.46
@@ -88,6 +89,8 @@ max_health = 36.0
 [node name="HurtboxComponent" parent="." instance=ExtResource("3_hurtbox")]
 position = Vector3(0, 0.82, 0)
 faction = &"enemy"
+
+[node name="MovementModifierComponent" parent="." instance=ExtResource("5_modifier")]
 
 [node name="SfxPool3D" parent="." instance=ExtResource("4_sfx")]
 position = Vector3(0, 0.9, 0)
