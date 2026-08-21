@@ -1,0 +1,30 @@
+name: Godot checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke-test:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Download Godot 4.7.2
+        shell: pwsh
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'godot.zip'
+          $destination = Join-Path $env:RUNNER_TEMP 'godot'
+          Invoke-WebRequest -Uri 'https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_win64.exe.zip' -OutFile $archive
+          Expand-Archive -LiteralPath $archive -DestinationPath $destination
+          $destination | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Import and smoke test
+        shell: pwsh
+        run: |
+          Godot_v4.7.2-stable_win64.exe --headless --editor --path . --log-file .godot/ci_import.log --quit-after 180
+          Godot_v4.7.2-stable_win64.exe --headless --path . --log-file .godot/ci_smoke.log --script res://tests/qa/project_smoke_test.gd
+          Godot_v4.7.2-stable_win64.exe --headless --path . --log-file .godot/ci_gut.log -s addons/gut/gut_cmdln.gd -gexit

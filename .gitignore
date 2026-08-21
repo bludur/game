@@ -1,0 +1,29 @@
+# Godot editor cache
+.godot/
+.import/
+
+# Export artifacts
+build/
+export/
+*.apk
+*.aab
+*.ipa
+*.exe
+*.pck
+*.zip
+*.x86_32
+*.x86_64
+*.arm32
+*.arm64
+
+# IDE and operating-system files
+.idea/
+.vs/
+.vscode/settings.json
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local logs and test output
+logs/
+test-results/
