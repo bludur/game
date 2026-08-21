@@ -1,5 +1,5 @@
 class_name PlayerController
-extends CharacterBody3D
+extends Node
 
 @export_group("Movement")
 @export_range(1.0, 20.0, 0.1) var move_speed: float = 6.0
@@ -7,34 +7,47 @@ extends CharacterBody3D
 @export_range(1.0, 60.0, 0.5) var deceleration: float = 34.0
 @export_range(1.0, 30.0, 0.5) var visual_turn_speed: float = 14.0
 
-@onready var _visuals: Node3D = get_node("Visuals") as Node3D
-
 var _gravity: float = float(ProjectSettings.get_setting("physics/3d/default_gravity", 18.0))
+var _body: CharacterBody3D
+var _visuals: Node3D
+
+
+func _ready() -> void:
+	set_physics_process(false)
+
+
+func bind(body: CharacterBody3D, visuals: Node3D) -> void:
+	_body = body
+	_visuals = visuals
+	set_physics_process(true)
 
 
 func _physics_process(delta: float) -> void:
+	if not is_instance_valid(_body) or not is_instance_valid(_visuals):
+		return
+
 	var input_vector: Vector2 = Input.get_vector(
-		"move_left",
-		"move_right",
-		"move_forward",
-		"move_backward"
+		&"move_left",
+		&"move_right",
+		&"move_forward",
+		&"move_backward"
 	)
 	var move_direction: Vector3 = _camera_relative_direction(input_vector)
-	var horizontal_velocity: Vector3 = Vector3(velocity.x, 0.0, velocity.z)
+	var horizontal_velocity: Vector3 = Vector3(_body.velocity.x, 0.0, _body.velocity.z)
 	var target_velocity: Vector3 = move_direction * move_speed
 	var change_rate: float = acceleration if move_direction != Vector3.ZERO else deceleration
 
 	horizontal_velocity = horizontal_velocity.move_toward(target_velocity, change_rate * delta)
-	velocity.x = horizontal_velocity.x
-	velocity.z = horizontal_velocity.z
+	_body.velocity.x = horizontal_velocity.x
+	_body.velocity.z = horizontal_velocity.z
 
-	if is_on_floor():
-		if velocity.y < 0.0:
-			velocity.y = -0.5
+	if _body.is_on_floor():
+		if _body.velocity.y < 0.0:
+			_body.velocity.y = -0.5
 	else:
-		velocity.y -= _gravity * delta
+		_body.velocity.y -= _gravity * delta
 
-	move_and_slide()
+	_body.move_and_slide()
 	_rotate_visuals(move_direction, delta)
 
 

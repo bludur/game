@@ -8,8 +8,10 @@ Main (Node3D)
 ├── Sun
 ├── Arena (StaticBody3D)
 ├── Player (CharacterBody3D instance)
-└── TopDownCamera (Node3D instance)
-    └── Camera3D
+├── TopDownCamera (Node3D instance)
+│   └── Camera3D
+├── TrainingTarget × 3
+└── MageHud (CanvasLayer)
 ```
 
 `Main` — composition root. Он размещает мир и экземпляры, но не содержит игровой логики.
@@ -18,6 +20,11 @@ Main (Node3D)
 
 ```text
 Player (CharacterBody3D)
+├── PlayerController
+├── HealthComponent
+├── ManaComponent
+├── SpellCaster
+├── CastOrigin
 ├── CollisionShape3D
 └── Visuals
     ├── Body
@@ -26,19 +33,25 @@ Player (CharacterBody3D)
     └── HatCrown
 ```
 
-`PlayerController` владеет только перемещением и поворотом визуальной модели. Заклинания, здоровье и состояния будут подключаться отдельными компонентами.
+`MagePlayer` — композиционный корень, который связывает прямых детей.
+`PlayerController` владеет только перемещением и поворотом визуальной модели.
+`HealthComponent`, `ManaComponent` и `SpellCaster` являются переиспользуемыми сценами.
 
 ## Data flow
 
 ```text
 Input Map -> PlayerController -> CharacterBody3D.velocity -> move_and_slide()
 Player group -> TopDownCamera -> smoothed world position
-SpellData (.tres) -> future SpellCaster component -> projectile/VFX scene
+primary_spell -> SpellCaster -> ManaComponent.try_spend()
+SpellData (.tres) -> ArcaneBolt (Area3D) -> HurtboxComponent -> HealthComponent
+Health/Mana/SpellCaster signals -> MageHud
 ```
 
 ## Data ownership
 
 - `SpellData` — неизменяемое описание заклинания.
-- Будущий `SpellCaster` — кулдауны, текущая мана и активное применение.
+- `SpellCaster` — кулдаун, прицеливание и создание снаряда.
+- `ManaComponent` — текущая мана и восстановление.
+- `HealthComponent` — изменяемое здоровье конкретной сущности.
 - `PlayerController` — скорость и текущее направление движения.
 - `TopDownCamera` — параметры визуального слежения.

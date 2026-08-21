@@ -1,0 +1,62 @@
+class_name ManaComponent
+extends Node
+
+signal mana_changed(current: float, maximum: float)
+signal mana_spent(amount: float)
+signal spend_failed(required: float, available: float)
+
+@export_range(1.0, 10000.0, 1.0) var max_mana: float = 100.0
+@export_range(0.0, 1000.0, 0.5) var regeneration_per_second: float = 12.0
+
+var current_mana: float = 0.0
+
+
+func _ready() -> void:
+	reset()
+	set_process(false)
+
+
+func _process(delta: float) -> void:
+	if current_mana >= max_mana:
+		return
+
+	var previous_mana: float = current_mana
+	current_mana = minf(current_mana + regeneration_per_second * delta, max_mana)
+	if not is_equal_approx(previous_mana, current_mana):
+		mana_changed.emit(current_mana, max_mana)
+	if current_mana >= max_mana:
+		set_process(false)
+
+
+func try_spend(amount: float) -> bool:
+	if amount <= 0.0:
+		return true
+	if current_mana + 0.001 < amount:
+		spend_failed.emit(amount, current_mana)
+		return false
+
+	current_mana -= amount
+	set_process(regeneration_per_second > 0.0)
+	mana_spent.emit(amount)
+	mana_changed.emit(current_mana, max_mana)
+	return true
+
+
+func restore(amount: float) -> bool:
+	if amount <= 0.0 or current_mana >= max_mana:
+		return false
+
+	current_mana = minf(current_mana + amount, max_mana)
+	mana_changed.emit(current_mana, max_mana)
+	set_process(regeneration_per_second > 0.0 and current_mana < max_mana)
+	return true
+
+
+func reset() -> void:
+	current_mana = max_mana
+	set_process(false)
+	mana_changed.emit(current_mana, max_mana)
+
+
+func get_mana_ratio() -> float:
+	return current_mana / max_mana if max_mana > 0.0 else 0.0

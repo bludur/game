@@ -24,6 +24,7 @@ enum TargetingType {
 
 @export_group("Presentation")
 @export var cast_color: Color = Color(0.55, 0.3, 1.0, 1.0)
+@export var projectile_scene: PackedScene
 
 
 func is_valid_definition() -> bool:
@@ -31,4 +32,7 @@ func is_valid_definition() -> bool:
 		and not display_name.is_empty() \
 		and mana_cost >= 0.0 \
 		and cooldown_seconds >= 0.0 \
-		and damage >= 0.0
+		and damage >= 0.0 \
+		and projectile_speed > 0.0 \
+		and range_meters > 0.0 \
+		and projectile_scene != null

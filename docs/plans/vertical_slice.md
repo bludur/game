@@ -6,13 +6,13 @@
   Skills: `3d-essentials`, `scene-organization`, `player-controller`, `camera-system`, `input-handling`
 - [x] Типизированное описание заклинания.
   Skills: `resource-pattern`
-- [ ] Компоненты здоровья и маны.
+- [x] Компоненты здоровья и маны.
   Skills: `component-system`, `resource-pattern`, `godot-testing`
-- [ ] Магический снаряд с попаданием и уроном.
+- [x] Магический снаряд с попаданием и уроном.
   Skills: `component-system`, `physics-system`, `particles-vfx`, `shader-basics`
 - [ ] Первый преследующий противник.
   Skills: `ai-navigation`, `state-machine`, `animation-system`
-- [ ] HUD здоровья, маны и кулдауна.
+- [x] HUD здоровья, маны и кулдауна.
   Skills: `godot-ui`, `hud-system`, `responsive-ui`
 - [ ] Звук попаданий и фоновой атмосферы.
   Skills: `audio-system`

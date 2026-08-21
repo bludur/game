@@ -1,7 +1,9 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/characters/player/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/cameras/top_down_camera.tscn" id="2_camera"]
+[ext_resource type="PackedScene" path="res://scenes/targets/training_target.tscn" id="3_target"]
+[ext_resource type="PackedScene" path="res://scenes/ui/mage_hud.tscn" id="4_hud"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_main"]
 sky_top_color = Color(0.055, 0.075, 0.14, 1)
@@ -89,3 +91,16 @@ shape = SubResource("BoxShape_obstacle")
 [node name="Player" parent="." instance=ExtResource("1_player")]
 
 [node name="TopDownCamera" parent="." instance=ExtResource("2_camera")]
+
+[node name="TrainingTargetA" parent="." instance=ExtResource("3_target")]
+position = Vector3(0, 0, -6)
+
+[node name="TrainingTargetB" parent="." instance=ExtResource("3_target")]
+position = Vector3(6, 0, 3)
+rotation_speed_degrees = -34.0
+
+[node name="TrainingTargetC" parent="." instance=ExtResource("3_target")]
+position = Vector3(-6, 0, -2)
+rotation_speed_degrees = 40.0
+
+[node name="MageHud" parent="." instance=ExtResource("4_hud")]

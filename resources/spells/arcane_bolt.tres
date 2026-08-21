@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="SpellData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="SpellData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/spell_data.gd" id="1_spell"]
+[ext_resource type="PackedScene" path="res://scenes/combat/arcane_bolt.tscn" id="2_projectile"]
 
 [resource]
 script = ExtResource("1_spell")
@@ -14,3 +15,4 @@ damage = 14.0
 projectile_speed = 18.0
 range_meters = 20.0
 cast_color = Color(0.55, 0.3, 1, 1)
+projectile_scene = ExtResource("2_projectile")

@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/components/hurtbox_component.gd" id="1_hurtbox"]
+
+[sub_resource type="SphereShape3D" id="SphereShape_hurtbox"]
+radius = 0.85
+
+[node name="HurtboxComponent" type="Area3D"]
+collision_layer = 16
+collision_mask = 32
+monitoring = true
+monitorable = true
+script = ExtResource("1_hurtbox")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape_hurtbox")
+
+[node name="InvulnerabilityTimer" type="Timer" parent="."]
+one_shot = true

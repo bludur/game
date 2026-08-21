@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/components/spell_caster.gd" id="1_caster"]
+[ext_resource type="Resource" path="res://resources/spells/arcane_bolt.tres" id="2_spell"]
+
+[node name="SpellCaster" type="Node"]
+script = ExtResource("1_caster")
+spell_data = ExtResource("2_spell")
+
+[node name="CooldownTimer" type="Timer" parent="."]
+one_shot = true

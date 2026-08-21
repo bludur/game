@@ -1,0 +1,152 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/mage_hud.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_panel"]
+content_margin_left = 14.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+bg_color = Color(0.035, 0.025, 0.075, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.42, 0.22, 0.7, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_health_bg"]
+bg_color = Color(0.11, 0.035, 0.065, 0.95)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_health_fill"]
+bg_color = Color(0.74, 0.12, 0.28, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_mana_fill"]
+bg_color = Color(0.22, 0.34, 0.92, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_cooldown_fill"]
+bg_color = Color(0.56, 0.24, 0.88, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="MageHud" type="CanvasLayer"]
+layer = 1
+script = ExtResource("1_hud")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="StatusPanel" type="PanelContainer" parent="Root"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 354.0
+offset_bottom = 202.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_panel")
+
+[node name="Content" type="VBoxContainer" parent="Root/StatusPanel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Title" type="Label" parent="Root/StatusPanel/Content"]
+layout_mode = 2
+mouse_filter = 2
+text = "THE WITCH'S FOCUS"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.84, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 18
+
+[node name="HealthLabel" type="Label" parent="Root/StatusPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+text = "HEALTH  100 / 100"
+
+[node name="HealthBar" type="ProgressBar" parent="Root/StatusPanel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 14)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBox_health_bg")
+theme_override_styles/fill = SubResource("StyleBox_health_fill")
+show_percentage = false
+step = 0.0
+value = 100.0
+
+[node name="ManaLabel" type="Label" parent="Root/StatusPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+text = "MANA  100 / 100"
+
+[node name="ManaBar" type="ProgressBar" parent="Root/StatusPanel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 14)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBox_health_bg")
+theme_override_styles/fill = SubResource("StyleBox_mana_fill")
+show_percentage = false
+step = 0.0
+value = 100.0
+
+[node name="SpellLabel" type="Label" parent="Root/StatusPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+text = "ARCANE BOLT  READY"
+
+[node name="CooldownBar" type="ProgressBar" parent="Root/StatusPanel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 10)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBox_health_bg")
+theme_override_styles/fill = SubResource("StyleBox_cooldown_fill")
+show_percentage = false
+step = 0.0
+
+[node name="Instructions" type="Label" parent="Root"]
+layout_mode = 0
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -230.0
+offset_top = -54.0
+offset_right = 230.0
+offset_bottom = -22.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+text = "WASD — MOVE     •     LEFT CLICK — ARCANE BOLT"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.82, 0.78, 0.92, 0.88)
+theme_override_colors/font_outline_color = Color(0.03, 0.02, 0.06, 0.9)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 16

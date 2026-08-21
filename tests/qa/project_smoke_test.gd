@@ -1,7 +1,7 @@
 extends SceneTree
 
-const MAIN_SCENE_PATH: String = "res://scenes/main/main.tscn"
-const SPELL_PATH: String = "res://resources/spells/arcane_bolt.tres"
+const MAIN_SCENE: PackedScene = preload("res://scenes/main/main.tscn")
+const ARCANE_BOLT: SpellData = preload("res://resources/spells/arcane_bolt.tres")
 
 
 func _initialize() -> void:
@@ -19,7 +19,7 @@ func _run_checks() -> void:
 	if not bool(ProjectSettings.get_setting("physics/common/physics_interpolation", false)):
 		failures.append("Physics interpolation is disabled.")
 
-	var main_scene: PackedScene = load(MAIN_SCENE_PATH) as PackedScene
+	var main_scene: PackedScene = MAIN_SCENE
 	if main_scene == null:
 		failures.append("Main scene could not be loaded.")
 	else:
@@ -31,13 +31,28 @@ func _run_checks() -> void:
 		var player: Node = get_first_node_in_group(&"player")
 		if player == null:
 			failures.append("Player group has no member.")
+		elif player is MagePlayer:
+			var mage: MagePlayer = player as MagePlayer
+			var mana: ManaComponent = mage.get_mana_component()
+			var caster: SpellCaster = mage.get_spell_caster()
+			var mana_before: float = mana.current_mana
+			if not caster.cast_at(mage.global_position + Vector3(0.0, 0.0, -4.0)):
+				failures.append("Arcane Bolt could not be cast through the public API.")
+			elif not is_equal_approx(mana.current_mana, mana_before - caster.spell_data.mana_cost):
+				failures.append("Casting Arcane Bolt did not spend mana.")
+		else:
+			failures.append("Player group member is not a MagePlayer.")
 		if root.get_camera_3d() == null:
 			failures.append("No active Camera3D was found.")
+		if get_nodes_in_group(&"training_target").size() != 3:
+			failures.append("Expected three training targets in the main scene.")
+		if get_nodes_in_group(&"projectile").is_empty():
+			failures.append("Arcane Bolt projectile was not spawned.")
 
 		main_instance.queue_free()
 		await process_frame
 
-	var spell: Resource = load(SPELL_PATH)
+	var spell: Resource = ARCANE_BOLT
 	if spell == null:
 		failures.append("Arcane Bolt resource could not be loaded.")
 	elif not bool(spell.call("is_valid_definition")):

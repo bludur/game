@@ -1,12 +1,12 @@
 extends GutTest
 
-const SPELL_PATH: String = "res://resources/spells/arcane_bolt.tres"
+const ARCANE_BOLT: SpellData = preload("res://resources/spells/arcane_bolt.tres")
 
 var _spell: SpellData
 
 
 func before_each() -> void:
-	_spell = load(SPELL_PATH) as SpellData
+	_spell = ARCANE_BOLT
 
 
 func test_arcane_bolt_loads() -> void:
@@ -26,3 +26,7 @@ func test_arcane_bolt_combat_values_are_positive() -> void:
 	assert_gt(_spell.damage, 0.0)
 	assert_gt(_spell.projectile_speed, 0.0)
 	assert_gt(_spell.range_meters, 0.0)
+
+
+func test_arcane_bolt_has_a_projectile_scene() -> void:
+	assert_not_null(_spell.projectile_scene)
