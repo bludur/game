@@ -45,3 +45,16 @@ gh auth login
 ```
 
 Команда запускает главную сцену, проектный smoke-тест и модульные тесты GUT.
+
+## Windows-сборка
+
+Один раз установите совпадающие с редактором шаблоны через
+`Editor → Manage Export Templates`, затем выполните:
+
+```powershell
+.\tools\build_windows.ps1
+```
+
+Скрипт использует зафиксированный preset `Windows Desktop`, создаёт
+`build/windows/MagePrototype.exe` со встроенным `.pck` и упаковывает его в
+`build/MagePrototype-Windows-x86_64.zip`. Каталог `build/` намеренно исключён из Git.

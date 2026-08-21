@@ -26,7 +26,7 @@
   Skills: `resource-pattern`, `component-system`, `input-handling`, `particles-vfx`, `hud-system`, `godot-testing`
 - [x] Рывок мага.
   Skills: `player-controller`, `input-handling`, `state-machine`, `physics-system`, `particles-vfx`, `hud-system`, `godot-testing`
-- [ ] Дальний враг и система волн.
+- [x] Дальний враг и система волн.
   Skills: `ai-navigation`, `state-machine`, `resource-pattern`, `component-system`, `animation-system`, `godot-testing`
-- [ ] Улучшение, финал сессии и Windows-сборка.
+- [x] Улучшение, финал сессии и Windows-сборка.
   Skills: `resource-pattern`, `godot-ui`, `responsive-ui`, `state-machine`, `godot-optimization`, `export-pipeline`, `godot-code-review`, `godot-testing`

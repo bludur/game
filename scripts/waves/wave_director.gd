@@ -108,7 +108,7 @@ func get_spawned_enemies() -> Array[Node]:
 	return alive_enemies
 
 
-func stop_and_clear() -> void:
+func stop_and_clear(reset_progress: bool = true) -> void:
 	_spawn_timer.stop()
 	_inter_wave_timer.stop()
 	_pending_enemy_types.clear()
@@ -118,7 +118,8 @@ func stop_and_clear() -> void:
 	_spawned_enemies.clear()
 	_defeated_instance_ids.clear()
 	_remaining_enemies = 0
-	_current_wave_index = -1
+	if reset_progress:
+		_current_wave_index = -1
 	_wave_active = false
 	enemy_count_changed.emit(0)
 

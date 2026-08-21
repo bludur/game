@@ -35,6 +35,11 @@ func is_invulnerable() -> bool:
 	return _invulnerable
 
 
+func clear_invulnerability() -> void:
+	_invulnerability_timer.stop()
+	_invulnerable = false
+
+
 func receive_hit(damage: float) -> bool:
 	if _invulnerable or damage <= 0.0 or not is_instance_valid(health_component):
 		return false

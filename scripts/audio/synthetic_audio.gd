@@ -8,6 +8,15 @@ enum Waveform {
 	TRIANGLE,
 }
 
+static var _spell_cast_cache: AudioStreamWAV
+static var _arcane_impact_cache: AudioStreamWAV
+static var _hurt_cache: AudioStreamWAV
+static var _death_cache: AudioStreamWAV
+static var _enemy_attack_cache: AudioStreamWAV
+static var _dash_cache: AudioStreamWAV
+static var _ambience_cache: AudioStreamWAV
+static var _music_cache: AudioStreamWAV
+
 
 static func create_tone(
 	frequency: float,
@@ -38,30 +47,44 @@ static func create_tone(
 
 
 static func create_spell_cast() -> AudioStreamWAV:
-	return _create_chirp(360.0, 920.0, 0.22, 0.28)
+	if _spell_cast_cache == null:
+		_spell_cast_cache = _create_chirp(360.0, 920.0, 0.22, 0.28)
+	return _spell_cast_cache
 
 
 static func create_arcane_impact() -> AudioStreamWAV:
-	return _create_chirp(680.0, 120.0, 0.24, 0.34)
+	if _arcane_impact_cache == null:
+		_arcane_impact_cache = _create_chirp(680.0, 120.0, 0.24, 0.34)
+	return _arcane_impact_cache
 
 
 static func create_hurt() -> AudioStreamWAV:
-	return _create_chirp(170.0, 75.0, 0.18, 0.28)
+	if _hurt_cache == null:
+		_hurt_cache = _create_chirp(170.0, 75.0, 0.18, 0.28)
+	return _hurt_cache
 
 
 static func create_death() -> AudioStreamWAV:
-	return _create_chirp(260.0, 42.0, 0.5, 0.32)
+	if _death_cache == null:
+		_death_cache = _create_chirp(260.0, 42.0, 0.5, 0.32)
+	return _death_cache
 
 
 static func create_enemy_attack() -> AudioStreamWAV:
-	return _create_chirp(110.0, 420.0, 0.16, 0.25)
+	if _enemy_attack_cache == null:
+		_enemy_attack_cache = _create_chirp(110.0, 420.0, 0.16, 0.25)
+	return _enemy_attack_cache
 
 
 static func create_dash() -> AudioStreamWAV:
-	return _create_chirp(260.0, 1180.0, 0.18, 0.22)
+	if _dash_cache == null:
+		_dash_cache = _create_chirp(260.0, 1180.0, 0.18, 0.22)
+	return _dash_cache
 
 
 static func create_ambience() -> AudioStreamWAV:
+	if _ambience_cache != null:
+		return _ambience_cache
 	var duration: float = 6.0
 	var sample_count: int = ceili(duration * float(MIX_RATE))
 	var samples: PackedFloat32Array = PackedFloat32Array()
@@ -72,10 +95,13 @@ static func create_ambience() -> AudioStreamWAV:
 		drone += sin(TAU * 64.5 * time + 0.7) * 0.06
 		var shimmer: float = sin(TAU * 0.17 * time) * sin(TAU * 172.0 * time) * 0.018
 		samples[sample_index] = (drone + shimmer) * _edge_fade(time, duration, 0.08)
-	return _create_wav(samples, true)
+	_ambience_cache = _create_wav(samples, true)
+	return _ambience_cache
 
 
 static func create_music_loop() -> AudioStreamWAV:
+	if _music_cache != null:
+		return _music_cache
 	var duration: float = 8.0
 	var sample_count: int = ceili(duration * float(MIX_RATE))
 	var samples: PackedFloat32Array = PackedFloat32Array()
@@ -90,7 +116,8 @@ static func create_music_loop() -> AudioStreamWAV:
 		sample += sin(TAU * root * 1.5 * time) * 0.035
 		sample += sin(TAU * root * 2.0 * time) * 0.018
 		samples[sample_index] = sample * pulse * _edge_fade(time, duration, 0.08)
-	return _create_wav(samples, true)
+	_music_cache = _create_wav(samples, true)
+	return _music_cache
 
 
 static func _create_chirp(

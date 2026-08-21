@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/characters/player/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/cameras/top_down_camera.tscn" id="2_camera"]
@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" path="res://scenes/waves/wave_director.tscn" id="5_waves"]
 [ext_resource type="Script" path="res://scripts/navigation/arena_navigation.gd" id="6_navigation"]
 [ext_resource type="PackedScene" path="res://scenes/audio/arena_audio_director.tscn" id="7_audio"]
+[ext_resource type="PackedScene" path="res://scenes/run/run_director.tscn" id="8_run"]
+[ext_resource type="PackedScene" path="res://scenes/ui/session_ui.tscn" id="9_session_ui"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_main"]
 sky_top_color = Color(0.055, 0.075, 0.14, 1)
@@ -100,6 +102,10 @@ script = ExtResource("6_navigation")
 [node name="Player" parent="." instance=ExtResource("1_player")]
 
 [node name="WaveDirector" parent="." instance=ExtResource("5_waves")]
+auto_start = false
+auto_advance = false
+
+[node name="RunDirector" parent="." instance=ExtResource("8_run")]
 
 [node name="TopDownCamera" parent="." instance=ExtResource("2_camera")]
 
@@ -115,3 +121,5 @@ position = Vector3(-6, 0, -2)
 rotation_speed_degrees = 40.0
 
 [node name="MageHud" parent="." instance=ExtResource("4_hud")]
+
+[node name="SessionUi" parent="." instance=ExtResource("9_session_ui")]

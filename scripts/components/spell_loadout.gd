@@ -54,6 +54,21 @@ func get_spell(slot_index: int) -> SpellData:
 			return null
 
 
+func set_spell(slot_index: int, spell: SpellData) -> bool:
+	if spell == null or not spell.is_valid_definition():
+		return false
+	match slot_index:
+		0:
+			primary_spell = spell
+		1:
+			secondary_spell = spell
+		_:
+			return false
+	if active_slot_index == slot_index:
+		select_slot(slot_index)
+	return true
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not _enabled:
 		return

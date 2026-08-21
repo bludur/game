@@ -36,6 +36,12 @@ if ($LASTEXITCODE -ne 0) {
     throw "Enemy chase test failed with exit code $LASTEXITCODE."
 }
 
+Write-Host 'Running performance smoke test...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_performance.log') --script 'res://tests/qa/performance_smoke_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Performance smoke test failed with exit code $LASTEXITCODE."
+}
+
 Write-Host 'Running GUT unit tests...'
 & $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_gut.log') -s 'addons/gut/gut_cmdln.gd' -gexit
 if ($LASTEXITCODE -ne 0) {

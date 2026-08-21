@@ -27,4 +27,6 @@ jobs:
         run: |
           Godot_v4.7.2-stable_win64.exe --headless --editor --path . --log-file .godot/ci_import.log --quit-after 180
           Godot_v4.7.2-stable_win64.exe --headless --path . --log-file .godot/ci_smoke.log --script res://tests/qa/project_smoke_test.gd
+          Godot_v4.7.2-stable_win64.exe --headless --path . --log-file .godot/ci_enemy_chase.log --script res://tests/qa/enemy_chase_test.gd
+          Godot_v4.7.2-stable_win64.exe --headless --path . --log-file .godot/ci_performance.log --script res://tests/qa/performance_smoke_test.gd
           Godot_v4.7.2-stable_win64.exe --headless --path . --log-file .godot/ci_gut.log -s addons/gut/gut_cmdln.gd -gexit

@@ -29,6 +29,11 @@ func _run_checks() -> void:
 		var main_instance: Node = main_scene.instantiate()
 		root.add_child(main_instance)
 		await process_frame
+		var run_director: RunDirector = main_instance.get_node_or_null("RunDirector") as RunDirector
+		if run_director == null:
+			failures.append("Run director is missing.")
+		else:
+			run_director.start_new_run(true)
 		await physics_frame
 
 		var player: Node = get_first_node_in_group(&"player")
@@ -58,6 +63,8 @@ func _run_checks() -> void:
 		var wave_director: WaveDirector = main_instance.get_node_or_null("WaveDirector") as WaveDirector
 		if wave_director == null or wave_director.get_wave_count() != 3:
 			failures.append("Wave director with three waves is missing.")
+		if main_instance.get_node_or_null("SessionUi") == null:
+			failures.append("Session UI is missing.")
 		if get_nodes_in_group(&"training_target").size() != 3:
 			failures.append("Expected three training targets in the main scene.")
 		var enemies: Array[Node] = get_nodes_in_group(&"enemy")

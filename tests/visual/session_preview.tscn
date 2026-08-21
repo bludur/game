@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://tests/visual/session_preview_driver.gd" id="1_driver"]
+[ext_resource type="PackedScene" path="res://scenes/main/main.tscn" id="2_main"]
+
+[node name="SessionPreview" type="Node"]
+script = ExtResource("1_driver")
+
+[node name="Main" parent="." instance=ExtResource("2_main")]

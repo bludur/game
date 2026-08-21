@@ -5,6 +5,7 @@ signal defeated()
 signal respawned()
 
 @export_range(0.5, 10.0, 0.1) var respawn_delay: float = 2.0
+@export var auto_respawn: bool = true
 
 var _spawn_transform: Transform3D
 var _original_collision_layer: int
@@ -78,6 +79,24 @@ func request_dash(direction: Vector3 = Vector3.ZERO) -> bool:
 	return _controller.request_dash(direction)
 
 
+func set_controls_enabled(enabled: bool) -> void:
+	_controller.set_enabled(enabled)
+	_spell_caster.set_enabled(enabled)
+	_spell_loadout.set_enabled(enabled)
+	_dash.set_enabled(enabled)
+
+
+func set_auto_respawn(enabled: bool) -> void:
+	auto_respawn = enabled
+	if not enabled:
+		_respawn_timer.stop()
+
+
+func reset_for_new_run() -> void:
+	_respawn_timer.stop()
+	_restore_player()
+
+
 func _on_spell_cast(_spell: SpellData) -> void:
 	_sfx_pool.play_sfx(_cast_sound, -2.0)
 
@@ -106,31 +125,31 @@ func _on_dash_finished() -> void:
 
 func _on_died() -> void:
 	_sfx_pool.play_sfx(_death_sound, -1.0)
-	_controller.set_enabled(false)
-	_spell_caster.set_enabled(false)
-	_spell_loadout.set_enabled(false)
-	_dash.set_enabled(false)
+	set_controls_enabled(false)
 	velocity = Vector3.ZERO
 	_visuals.visible = false
 	collision_layer = 0
 	_hurtbox.set_deferred("monitoring", false)
 	_hurtbox.set_deferred("monitorable", false)
-	_respawn_timer.start(respawn_delay)
+	if auto_respawn:
+		_respawn_timer.start(respawn_delay)
 	defeated.emit()
 
 
 func _on_respawn_timeout() -> void:
+	_restore_player()
+	respawned.emit()
+
+
+func _restore_player() -> void:
 	global_transform = _spawn_transform
 	reset_physics_interpolation()
 	_health.reset()
 	_mana.reset()
+	_hurtbox.clear_invulnerability()
 	_visuals.scale = Vector3.ONE
 	_visuals.visible = true
 	collision_layer = _original_collision_layer
 	_hurtbox.set_deferred("monitoring", true)
 	_hurtbox.set_deferred("monitorable", true)
-	_controller.set_enabled(true)
-	_spell_caster.set_enabled(true)
-	_spell_loadout.set_enabled(true)
-	_dash.set_enabled(true)
-	respawned.emit()
+	set_controls_enabled(true)

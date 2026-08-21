@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/upgrade_data.gd" id="1_upgrade"]
+
+[resource]
+script = ExtResource("1_upgrade")
+upgrade_id = &"maximum_health"
+display_name = "Runic Vessel"
+description = "Maximum health increases by 30 and is fully restored."
+accent_color = Color(0.95, 0.28, 0.38, 1)
+effect_type = 2
+amount = 30.0

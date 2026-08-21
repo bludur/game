@@ -11,6 +11,9 @@ func _run_checks() -> void:
 	var main_instance: Node = MAIN_SCENE.instantiate()
 	root.add_child(main_instance)
 	await process_frame
+	var run_director: RunDirector = main_instance.get_node_or_null("RunDirector") as RunDirector
+	if run_director != null:
+		run_director.start_new_run(true)
 	await physics_frame
 
 	var player: MagePlayer = get_first_node_in_group(&"player") as MagePlayer
