@@ -1,6 +1,7 @@
 extends GutTest
 
 const ARCANE_BOLT: SpellData = preload("res://resources/spells/arcane_bolt.tres")
+const CHAIN_LIGHTNING: SpellData = preload("res://resources/spells/chain_lightning.tres")
 
 var _spell: SpellData
 
@@ -30,3 +31,10 @@ func test_arcane_bolt_combat_values_are_positive() -> void:
 
 func test_arcane_bolt_has_a_projectile_scene() -> void:
 	assert_not_null(_spell.projectile_scene)
+
+
+func test_chain_lightning_has_valid_chain_limits() -> void:
+	assert_true(CHAIN_LIGHTNING.is_valid_definition())
+	assert_eq(CHAIN_LIGHTNING.targeting_type, SpellData.TargetingType.CHAIN)
+	assert_eq(CHAIN_LIGHTNING.max_chain_targets, 3)
+	assert_gt(CHAIN_LIGHTNING.chain_jump_range, 0.0)

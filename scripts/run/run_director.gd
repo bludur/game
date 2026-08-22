@@ -21,9 +21,8 @@ enum State {
 @export var wave_director_path: NodePath = ^"../WaveDirector"
 
 @export_group("Upgrade Definitions")
-@export var arcane_damage_upgrade: UpgradeData
-@export var mana_regeneration_upgrade: UpgradeData
-@export var maximum_health_upgrade: UpgradeData
+@export var upgrade_pool: Array[UpgradeData] = []
+@export_range(1, 6, 1) var upgrade_offer_count: int = 3
 
 @export_group("Flow")
 @export var auto_begin: bool = true
@@ -41,6 +40,9 @@ var _base_max_mana: float
 var _base_mana_regeneration: float
 var _base_primary_spell: SpellData
 var _base_secondary_spell: SpellData
+var _base_tertiary_spell: SpellData
+var _base_dash_cooldown: float
+var _run_serial: int = -1
 
 @onready var _intro_timer: Timer = get_node("IntroTimer") as Timer
 @onready var _intermission_timer: Timer = get_node("IntermissionTimer") as Timer
@@ -59,7 +61,7 @@ func _ready() -> void:
 	_intro_timer.timeout.connect(_on_intro_timeout)
 	_intermission_timer.timeout.connect(_on_intermission_timeout)
 	_capture_base_stats()
-	_build_upgrade_options()
+	_validate_upgrade_pool()
 	if auto_begin:
 		call_deferred("start_new_run")
 
@@ -76,6 +78,8 @@ func start_new_run(skip_intro: bool = false) -> bool:
 	_player.reset_for_new_run()
 	_player.set_controls_enabled(false)
 	_applied_upgrade_ids.clear()
+	_run_serial += 1
+	_roll_upgrade_options()
 	_next_wave_index = 0
 	_set_state(State.INTRO)
 	run_restarted.emit()
@@ -105,6 +109,10 @@ func get_upgrade_options() -> Array[UpgradeData]:
 	return _upgrade_options.duplicate()
 
 
+func get_upgrade_pool() -> Array[UpgradeData]:
+	return upgrade_pool.duplicate()
+
+
 func get_applied_upgrade_ids() -> Array[StringName]:
 	return _applied_upgrade_ids.duplicate()
 
@@ -122,15 +130,33 @@ func _capture_base_stats() -> void:
 	_base_mana_regeneration = mana.regeneration_per_second
 	_base_primary_spell = loadout.get_spell(0)
 	_base_secondary_spell = loadout.get_spell(1)
+	_base_tertiary_spell = loadout.get_spell(2)
+	_base_dash_cooldown = _player.get_dash_component().cooldown_duration
 
 
-func _build_upgrade_options() -> void:
+func _validate_upgrade_pool() -> void:
+	var unique_ids: Array[StringName] = []
+	for upgrade: UpgradeData in upgrade_pool:
+		if upgrade == null or not upgrade.is_valid_definition():
+			push_error("RunDirector contains an invalid upgrade definition.")
+			continue
+		if unique_ids.has(upgrade.upgrade_id):
+			push_error("RunDirector contains duplicate upgrade id: %s." % upgrade.upgrade_id)
+		unique_ids.append(upgrade.upgrade_id)
+	if unique_ids.size() < upgrade_offer_count:
+		push_error("RunDirector requires enough unique upgrades for every offer.")
+
+
+func _roll_upgrade_options() -> void:
 	_upgrade_options.clear()
-	for upgrade: UpgradeData in [arcane_damage_upgrade, mana_regeneration_upgrade, maximum_health_upgrade]:
-		if upgrade != null and upgrade.is_valid_definition():
+	if upgrade_pool.is_empty():
+		return
+	var start_index: int = posmod(_run_serial, upgrade_pool.size())
+	for offset: int in mini(upgrade_offer_count, upgrade_pool.size()):
+		var upgrade: UpgradeData = upgrade_pool[(start_index + offset) % upgrade_pool.size()]
+		if upgrade != null and upgrade.is_valid_definition() \
+			and not _upgrade_options.has(upgrade):
 			_upgrade_options.append(upgrade)
-	if _upgrade_options.size() != 3:
-		push_error("RunDirector requires exactly three valid upgrade definitions.")
 
 
 func _restore_base_stats() -> void:
@@ -142,6 +168,8 @@ func _restore_base_stats() -> void:
 	mana.regeneration_per_second = _base_mana_regeneration
 	loadout.set_spell(0, _base_primary_spell)
 	loadout.set_spell(1, _base_secondary_spell)
+	loadout.set_spell(2, _base_tertiary_spell)
+	_player.get_dash_component().cooldown_duration = _base_dash_cooldown
 	loadout.select_slot(0)
 
 
@@ -157,6 +185,17 @@ func _apply_upgrade(upgrade: UpgradeData) -> void:
 			var health: HealthComponent = _player.get_health_component()
 			health.max_health += upgrade.amount
 			health.reset()
+		UpgradeData.EffectType.CHAIN_DAMAGE:
+			var upgraded_chain: SpellData = _base_tertiary_spell.duplicate(true) as SpellData
+			upgraded_chain.damage += upgrade.amount
+			_player.get_spell_loadout().set_spell(2, upgraded_chain)
+		UpgradeData.EffectType.MAX_MANA:
+			var mana: ManaComponent = _player.get_mana_component()
+			mana.max_mana += upgrade.amount
+			mana.reset()
+		UpgradeData.EffectType.DASH_COOLDOWN:
+			var dash: DashComponent = _player.get_dash_component()
+			dash.cooldown_duration = maxf(0.2, dash.cooldown_duration - upgrade.amount)
 
 
 func _set_state(next_state: State) -> void:

@@ -45,8 +45,9 @@ func _run_checks() -> void:
 			var caster: SpellCaster = mage.get_spell_caster()
 			var loadout: SpellLoadout = mage.get_spell_loadout()
 			var dash: DashComponent = mage.get_dash_component()
-			if loadout.get_spell(0) == null or loadout.get_spell(1) == null:
-				failures.append("Player spell loadout does not contain two spells.")
+			if loadout.get_spell(0) == null or loadout.get_spell(1) == null \
+				or loadout.get_spell(2) == null:
+				failures.append("Player spell loadout does not contain three spells.")
 			if dash == null:
 				failures.append("Player dash component is missing.")
 			var mana_before: float = mana.current_mana

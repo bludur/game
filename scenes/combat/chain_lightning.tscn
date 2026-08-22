@@ -1,0 +1,70 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/chain_lightning.gd" id="1_chain"]
+[ext_resource type="Script" path="res://scripts/components/chain_target_resolver.gd" id="2_resolver"]
+[ext_resource type="PackedScene" path="res://scenes/components/sfx_pool_3d.tscn" id="3_sfx"]
+
+[sub_resource type="Gradient" id="Gradient_sparks"]
+offsets = PackedFloat32Array(0, 0.55, 1)
+colors = PackedColorArray(0.9, 0.95, 1, 1, 0.48, 0.28, 1, 0.9, 0.14, 0.05, 0.4, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture_sparks"]
+gradient = SubResource("Gradient_sparks")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_sparks"]
+emission_shape = 1
+emission_sphere_radius = 0.8
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, -0.5, 0)
+initial_velocity_min = 2.0
+initial_velocity_max = 5.0
+scale_min = 0.45
+scale_max = 1.1
+color_ramp = SubResource("GradientTexture_sparks")
+
+[sub_resource type="StandardMaterial3D" id="Material_spark"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+emission_enabled = true
+emission = Color(0.54, 0.32, 1, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_spark"]
+material = SubResource("Material_spark")
+radius = 0.055
+height = 0.11
+radial_segments = 6
+rings = 3
+
+[node name="ChainLightning" type="Node3D" groups=["spell_effect"]]
+script = ExtResource("1_chain")
+
+[node name="TargetResolver" type="Node" parent="."]
+script = ExtResource("2_resolver")
+
+[node name="ArcVisuals" type="MeshInstance3D" parent="."]
+
+[node name="Sparks" type="GPUParticles3D" parent="."]
+emitting = false
+amount = 42
+lifetime = 0.38
+one_shot = true
+explosiveness = 0.92
+fixed_fps = 30
+process_material = SubResource("ParticleProcessMaterial_sparks")
+draw_pass_1 = SubResource("SphereMesh_spark")
+
+[node name="Glow" type="OmniLight3D" parent="."]
+position = Vector3(0, 0.7, 0)
+light_color = Color(0.48, 0.28, 1, 1)
+light_energy = 2.2
+omni_range = 5.0
+shadow_enabled = false
+
+[node name="SfxPool3D" parent="." instance=ExtResource("3_sfx")]
+
+[node name="LifetimeTimer" type="Timer" parent="."]
+wait_time = 0.42
+one_shot = true

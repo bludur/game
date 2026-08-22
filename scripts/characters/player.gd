@@ -28,6 +28,7 @@ var _dash_sound: AudioStreamWAV
 @onready var _sfx_pool: SfxPool3D = get_node("SfxPool3D") as SfxPool3D
 @onready var _dash_trail: GPUParticles3D = get_node("DashTrail") as GPUParticles3D
 @onready var _animator: CharacterAnimator = get_node("CharacterAnimator") as CharacterAnimator
+@onready var _chain_range_preview: MeshInstance3D = get_node("ChainRangePreview") as MeshInstance3D
 
 
 func _ready() -> void:
@@ -40,6 +41,8 @@ func _ready() -> void:
 		spawn_parent = get_parent()
 	_spell_caster.bind(self, _cast_origin, _mana, spawn_parent, &"player")
 	_spell_loadout.bind(_spell_caster)
+	_spell_loadout.active_spell_changed.connect(_on_active_spell_changed)
+	_on_active_spell_changed(_spell_loadout.get_active_spell(), _spell_loadout.active_slot_index)
 	_cast_sound = SyntheticAudio.create_spell_cast()
 	_hurt_sound = SyntheticAudio.create_hurt()
 	_death_sound = SyntheticAudio.create_death()
@@ -86,6 +89,7 @@ func set_controls_enabled(enabled: bool) -> void:
 	_spell_caster.set_enabled(enabled)
 	_spell_loadout.set_enabled(enabled)
 	_dash.set_enabled(enabled)
+	_update_range_preview(enabled)
 
 
 func set_auto_respawn(enabled: bool) -> void:
@@ -102,6 +106,19 @@ func reset_for_new_run() -> void:
 func _on_spell_cast(_spell: SpellData) -> void:
 	_sfx_pool.play_sfx(_cast_sound, -2.0)
 	_animator.play_cast()
+
+
+func _on_active_spell_changed(_spell: SpellData, _slot_index: int) -> void:
+	_update_range_preview(true)
+
+
+func _update_range_preview(controls_enabled: bool) -> void:
+	var active_spell: SpellData = _spell_loadout.get_active_spell()
+	var is_chain: bool = active_spell != null \
+		and active_spell.targeting_type == SpellData.TargetingType.CHAIN
+	_chain_range_preview.visible = controls_enabled and is_chain
+	if is_chain:
+		_chain_range_preview.scale = Vector3.ONE * active_spell.range_meters
 
 
 func _on_damaged(_amount: float) -> void:

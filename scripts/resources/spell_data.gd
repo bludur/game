@@ -5,6 +5,7 @@ enum TargetingType {
 	PROJECTILE,
 	AREA,
 	SELF,
+	CHAIN,
 }
 
 @export_group("Identity")
@@ -27,6 +28,10 @@ enum TargetingType {
 @export_range(0.1, 30.0, 0.1) var effect_duration: float = 3.0
 @export_range(0.1, 1.0, 0.05) var movement_speed_multiplier: float = 0.5
 
+@export_group("Chain Effect")
+@export_range(1, 12, 1) var max_chain_targets: int = 3
+@export_range(0.5, 20.0, 0.25) var chain_jump_range: float = 4.5
+
 @export_group("Presentation")
 @export var cast_color: Color = Color(0.55, 0.3, 1.0, 1.0)
 @export var projectile_scene: PackedScene
@@ -39,5 +44,7 @@ func is_valid_definition() -> bool:
 		and cooldown_seconds >= 0.0 \
 		and damage >= 0.0 \
 		and (targeting_type != TargetingType.PROJECTILE or projectile_speed > 0.0) \
+		and (targeting_type != TargetingType.CHAIN or max_chain_targets > 0) \
+		and (targeting_type != TargetingType.CHAIN or chain_jump_range > 0.0) \
 		and range_meters > 0.0 \
 		and projectile_scene != null

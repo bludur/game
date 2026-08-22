@@ -5,6 +5,9 @@ enum EffectType {
 	ARCANE_DAMAGE,
 	MANA_REGENERATION,
 	MAX_HEALTH,
+	CHAIN_DAMAGE,
+	MAX_MANA,
+	DASH_COOLDOWN,
 }
 
 @export_group("Identity")

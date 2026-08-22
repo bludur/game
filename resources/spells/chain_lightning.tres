@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SpellData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/spell_data.gd" id="1_spell"]
+[ext_resource type="PackedScene" path="res://scenes/combat/chain_lightning.tscn" id="2_chain"]
+
+[resource]
+script = ExtResource("1_spell")
+spell_id = &"chain_lightning"
+display_name = "Chain Lightning"
+description = "Strike the aimed foe and arc to two nearby enemies."
+targeting_type = 3
+mana_cost = 28.0
+cooldown_seconds = 2.2
+damage = 18.0
+projectile_speed = 0.0
+range_meters = 10.0
+max_chain_targets = 3
+chain_jump_range = 4.5
+cast_color = Color(0.52, 0.34, 1, 1)
+projectile_scene = ExtResource("2_chain")

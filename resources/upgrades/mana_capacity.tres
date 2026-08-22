@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="UpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/upgrade_data.gd" id="1_upgrade"]
+
+[resource]
+script = ExtResource("1_upgrade")
+upgrade_id = &"mana_capacity"
+display_name = "Deep Reservoir"
+description = "+25 maximum mana and refill it."
+accent_color = Color(0.3, 0.52, 1, 1)
+effect_type = 4
+amount = 25.0

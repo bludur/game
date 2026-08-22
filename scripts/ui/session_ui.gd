@@ -10,9 +10,9 @@ var _upgrade_options: Array[UpgradeData] = []
 @onready var _choice_overlay: Control = get_node("Root/ChoiceOverlay") as Control
 @onready var _upgrade_title: Label = get_node("Root/ChoiceOverlay/Center/Card/Content/Title") as Label
 @onready var _upgrade_buttons: Array[Button] = [
-	get_node("Root/ChoiceOverlay/Center/Card/Content/Choices/Damage") as Button,
-	get_node("Root/ChoiceOverlay/Center/Card/Content/Choices/Mana") as Button,
-	get_node("Root/ChoiceOverlay/Center/Card/Content/Choices/Health") as Button,
+	get_node("Root/ChoiceOverlay/Center/Card/Content/Choices/Option1") as Button,
+	get_node("Root/ChoiceOverlay/Center/Card/Content/Choices/Option2") as Button,
+	get_node("Root/ChoiceOverlay/Center/Card/Content/Choices/Option3") as Button,
 ]
 @onready var _result_overlay: Control = get_node("Root/ResultOverlay") as Control
 @onready var _result_title: Label = get_node("Root/ResultOverlay/Center/Card/Content/Title") as Label

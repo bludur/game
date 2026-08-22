@@ -14,6 +14,7 @@ static var _hurt_cache: AudioStreamWAV
 static var _death_cache: AudioStreamWAV
 static var _enemy_attack_cache: AudioStreamWAV
 static var _dash_cache: AudioStreamWAV
+static var _chain_lightning_cache: AudioStreamWAV
 static var _ambience_cache: AudioStreamWAV
 static var _music_cache: AudioStreamWAV
 
@@ -80,6 +81,12 @@ static func create_dash() -> AudioStreamWAV:
 	if _dash_cache == null:
 		_dash_cache = _create_chirp(260.0, 1180.0, 0.18, 0.22)
 	return _dash_cache
+
+
+static func create_chain_lightning() -> AudioStreamWAV:
+	if _chain_lightning_cache == null:
+		_chain_lightning_cache = _create_chirp(1280.0, 180.0, 0.32, 0.3)
+	return _chain_lightning_cache
 
 
 static func create_ambience() -> AudioStreamWAV:

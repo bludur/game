@@ -1,15 +1,16 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/run/run_director.gd" id="1_director"]
 [ext_resource type="Resource" path="res://resources/upgrades/arcane_damage.tres" id="2_damage"]
 [ext_resource type="Resource" path="res://resources/upgrades/mana_regeneration.tres" id="3_mana"]
 [ext_resource type="Resource" path="res://resources/upgrades/maximum_health.tres" id="4_health"]
+[ext_resource type="Resource" path="res://resources/upgrades/chain_damage.tres" id="5_chain"]
+[ext_resource type="Resource" path="res://resources/upgrades/mana_capacity.tres" id="6_capacity"]
+[ext_resource type="Resource" path="res://resources/upgrades/rapid_dash.tres" id="7_dash"]
 
 [node name="RunDirector" type="Node" groups=["run_director"]]
 script = ExtResource("1_director")
-arcane_damage_upgrade = ExtResource("2_damage")
-mana_regeneration_upgrade = ExtResource("3_mana")
-maximum_health_upgrade = ExtResource("4_health")
+upgrade_pool = Array[ExtResource("2_damage")]([ExtResource("2_damage"), ExtResource("3_mana"), ExtResource("4_health"), ExtResource("5_chain"), ExtResource("6_capacity"), ExtResource("7_dash")])
 
 [node name="IntroTimer" type="Timer" parent="."]
 one_shot = true

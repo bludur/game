@@ -5,9 +5,11 @@ signal active_spell_changed(spell: SpellData, slot_index: int)
 
 const SLOT_ONE_ACTION: StringName = &"spell_slot_1"
 const SLOT_TWO_ACTION: StringName = &"spell_slot_2"
+const SLOT_THREE_ACTION: StringName = &"spell_slot_3"
 
 @export var primary_spell: SpellData
 @export var secondary_spell: SpellData
+@export var tertiary_spell: SpellData
 
 var active_slot_index: int = 0
 var _caster: SpellCaster
@@ -17,6 +19,7 @@ var _enabled: bool = true
 func _ready() -> void:
 	_ensure_input_action(SLOT_ONE_ACTION, KEY_1, JOY_BUTTON_DPAD_LEFT)
 	_ensure_input_action(SLOT_TWO_ACTION, KEY_2, JOY_BUTTON_DPAD_RIGHT)
+	_ensure_input_action(SLOT_THREE_ACTION, KEY_3, JOY_BUTTON_DPAD_UP)
 
 
 func bind(caster: SpellCaster) -> void:
@@ -50,6 +53,8 @@ func get_spell(slot_index: int) -> SpellData:
 			return primary_spell
 		1:
 			return secondary_spell
+		2:
+			return tertiary_spell
 		_:
 			return null
 
@@ -62,6 +67,8 @@ func set_spell(slot_index: int, spell: SpellData) -> bool:
 			primary_spell = spell
 		1:
 			secondary_spell = spell
+		2:
+			tertiary_spell = spell
 		_:
 			return false
 	if active_slot_index == slot_index:
@@ -77,6 +84,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(SLOT_TWO_ACTION):
 		select_slot(1)
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(SLOT_THREE_ACTION):
+		select_slot(2)
 		get_viewport().set_input_as_handled()
 
 

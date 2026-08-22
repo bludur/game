@@ -88,7 +88,7 @@ func _on_cooldown_changed(remaining: float, total: float) -> void:
 
 func _on_active_spell_changed(spell: SpellData, slot_index: int) -> void:
 	_active_spell = spell
-	_slot_label.text = "[1] ARCANE BOLT    [2] FROST CIRCLE    ACTIVE: %d" % (slot_index + 1)
+	_slot_label.text = "[1] BOLT   [2] FROST   [3] LIGHTNING   ACTIVE: %d" % (slot_index + 1)
 	_on_cooldown_changed(_spell_caster.get_cooldown_remaining(), spell.cooldown_seconds)
 
 

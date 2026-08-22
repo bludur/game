@@ -127,6 +127,17 @@ func cast_at(target_position: Vector3) -> bool:
 			var area_effect: FrostCircle = effect_node as FrostCircle
 			area_effect.global_position = resolved_target
 			area_effect.configure(spell_data, caster_faction)
+		SpellData.TargetingType.CHAIN:
+			if effect_node is not ChainLightning:
+				_refund_invalid_effect(effect_node)
+				return false
+			var chain_effect: ChainLightning = effect_node as ChainLightning
+			chain_effect.global_position = cast_origin.global_position
+			if not chain_effect.configure(spell_data, caster_faction, caster_body, resolved_target):
+				mana_component.restore(spell_data.mana_cost)
+				chain_effect.queue_free()
+				cast_failed.emit(FAILURE_INVALID_TARGET)
+				return false
 		_:
 			_refund_invalid_effect(effect_node)
 			return false
