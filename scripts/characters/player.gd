@@ -27,6 +27,7 @@ var _dash_sound: AudioStreamWAV
 @onready var _respawn_timer: Timer = get_node("RespawnTimer") as Timer
 @onready var _sfx_pool: SfxPool3D = get_node("SfxPool3D") as SfxPool3D
 @onready var _dash_trail: GPUParticles3D = get_node("DashTrail") as GPUParticles3D
+@onready var _animator: CharacterAnimator = get_node("CharacterAnimator") as CharacterAnimator
 
 
 func _ready() -> void:
@@ -48,6 +49,7 @@ func _ready() -> void:
 	_spell_caster.spell_cast.connect(_on_spell_cast)
 	_dash.dash_started.connect(_on_dash_started)
 	_dash.dash_finished.connect(_on_dash_finished)
+	_controller.movement_activity_changed.connect(_animator.set_moving)
 	_respawn_timer.timeout.connect(_on_respawn_timeout)
 
 
@@ -99,10 +101,12 @@ func reset_for_new_run() -> void:
 
 func _on_spell_cast(_spell: SpellData) -> void:
 	_sfx_pool.play_sfx(_cast_sound, -2.0)
+	_animator.play_cast()
 
 
 func _on_damaged(_amount: float) -> void:
 	_sfx_pool.play_sfx(_hurt_sound)
+	_animator.play_hit()
 	if _hit_tween != null:
 		_hit_tween.kill()
 	_visuals.scale = Vector3(1.12, 0.88, 1.12)
@@ -117,6 +121,7 @@ func _on_dash_started(_direction: Vector3) -> void:
 	_dash_trail.restart()
 	_dash_trail.emitting = true
 	_sfx_pool.play_sfx(_dash_sound, -2.0)
+	_animator.play_dash()
 
 
 func _on_dash_finished() -> void:
@@ -127,7 +132,7 @@ func _on_died() -> void:
 	_sfx_pool.play_sfx(_death_sound, -1.0)
 	set_controls_enabled(false)
 	velocity = Vector3.ZERO
-	_visuals.visible = false
+	_animator.play_death()
 	collision_layer = 0
 	_hurtbox.set_deferred("monitoring", false)
 	_hurtbox.set_deferred("monitorable", false)
@@ -149,6 +154,7 @@ func _restore_player() -> void:
 	_hurtbox.clear_invulnerability()
 	_visuals.scale = Vector3.ONE
 	_visuals.visible = true
+	_animator.reset_visual()
 	collision_layer = _original_collision_layer
 	_hurtbox.set_deferred("monitoring", true)
 	_hurtbox.set_deferred("monitorable", true)

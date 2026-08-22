@@ -36,7 +36,7 @@
 Подробная архитектура, критерии готовности и границы следующего цикла находятся в
 [`docs/godot-prompter/plans/next_five_stages_0_2.md`](../godot-prompter/plans/next_five_stages_0_2.md).
 
-- [ ] Визуальная основа и анимационный контракт.
+- [x] Визуальная основа и анимационный контракт.
   Skills: `assets-pipeline`, `animation-system`, `3d-essentials`, `scene-organization`, `godot-optimization`, `godot-testing`
 - [ ] Третье заклинание и содержательный выбор улучшений.
   Skills: `resource-pattern`, `component-system`, `physics-system`, `math-essentials`, `particles-vfx`, `input-handling`, `godot-ui`, `godot-testing`

@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scripts/characters/player.gd" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/components/player_controller.tscn" id="2_controller"]
@@ -9,44 +9,12 @@
 [ext_resource type="PackedScene" path="res://scenes/components/sfx_pool_3d.tscn" id="7_sfx"]
 [ext_resource type="PackedScene" path="res://scenes/components/spell_loadout.tscn" id="8_loadout"]
 [ext_resource type="PackedScene" path="res://scenes/components/dash_component.tscn" id="9_dash"]
+[ext_resource type="PackedScene" path="res://assets/models/mage_player.glb" id="10_model"]
+[ext_resource type="PackedScene" path="res://scenes/components/character_animator.tscn" id="11_animator"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
 radius = 0.42
 height = 1.8
-
-[sub_resource type="StandardMaterial3D" id="Material_robes"]
-albedo_color = Color(0.16, 0.08, 0.34, 1)
-roughness = 0.82
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
-material = SubResource("Material_robes")
-radius = 0.38
-height = 1.25
-
-[sub_resource type="StandardMaterial3D" id="Material_skin"]
-albedo_color = Color(0.8, 0.58, 0.43, 1)
-roughness = 0.9
-
-[sub_resource type="SphereMesh" id="SphereMesh_head"]
-material = SubResource("Material_skin")
-radius = 0.31
-height = 0.62
-
-[sub_resource type="StandardMaterial3D" id="Material_hat"]
-albedo_color = Color(0.3, 0.11, 0.55, 1)
-roughness = 0.72
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_brim"]
-material = SubResource("Material_hat")
-top_radius = 0.55
-bottom_radius = 0.55
-height = 0.08
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_crown"]
-material = SubResource("Material_hat")
-top_radius = 0.04
-bottom_radius = 0.43
-height = 0.78
 
 [sub_resource type="Gradient" id="Gradient_dash"]
 offsets = PackedFloat32Array(0, 1)
@@ -119,21 +87,11 @@ shape = SubResource("CapsuleShape_player")
 
 [node name="Visuals" type="Node3D" parent="."]
 
-[node name="Body" type="MeshInstance3D" parent="Visuals"]
-position = Vector3(0, 0.75, 0)
-mesh = SubResource("CapsuleMesh_body")
+[node name="ModelRoot" type="Node3D" parent="Visuals"]
 
-[node name="Head" type="MeshInstance3D" parent="Visuals"]
-position = Vector3(0, 1.52, 0)
-mesh = SubResource("SphereMesh_head")
+[node name="MageModel" parent="Visuals/ModelRoot" instance=ExtResource("10_model")]
 
-[node name="HatBrim" type="MeshInstance3D" parent="Visuals"]
-position = Vector3(0, 1.83, 0)
-mesh = SubResource("CylinderMesh_brim")
-
-[node name="HatCrown" type="MeshInstance3D" parent="Visuals"]
-position = Vector3(0, 2.22, 0)
-mesh = SubResource("CylinderMesh_crown")
+[node name="CharacterAnimator" parent="." instance=ExtResource("11_animator")]
 
 [node name="DashTrail" type="GPUParticles3D" parent="."]
 position = Vector3(0, 0.85, 0)

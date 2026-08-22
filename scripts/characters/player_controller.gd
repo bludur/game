@@ -2,6 +2,7 @@ class_name PlayerController
 extends Node
 
 signal movement_state_changed(state_name: StringName)
+signal movement_activity_changed(is_moving: bool)
 
 enum State {
 	MOVE,
@@ -22,6 +23,7 @@ var _dash: DashComponent
 var _enabled: bool = true
 var _state: State = State.MOVE
 var _last_move_direction: Vector3 = Vector3.FORWARD
+var _was_moving: bool = false
 
 
 func _ready() -> void:
@@ -45,6 +47,9 @@ func set_enabled(enabled: bool) -> void:
 	set_physics_process(enabled and is_instance_valid(_body))
 	if not enabled and is_instance_valid(_body):
 		_body.velocity = Vector3.ZERO
+	if not enabled and _was_moving:
+		_was_moving = false
+		movement_activity_changed.emit(false)
 	_transition_to(State.MOVE if enabled else State.DISABLED)
 
 
@@ -67,6 +72,10 @@ func _physics_process(delta: float) -> void:
 		&"move_backward"
 	)
 	var move_direction: Vector3 = _camera_relative_direction(input_vector)
+	var is_moving: bool = move_direction.length_squared() > 0.001
+	if is_moving != _was_moving:
+		_was_moving = is_moving
+		movement_activity_changed.emit(_was_moving)
 	if move_direction != Vector3.ZERO:
 		_last_move_direction = move_direction
 	var horizontal_velocity: Vector3 = Vector3(_body.velocity.x, 0.0, _body.velocity.z)

@@ -43,7 +43,7 @@ var _glow_tween: Tween
 @onready var _visuals: Node3D = get_node("Visuals") as Node3D
 @onready var _glow: OmniLight3D = get_node("Visuals/Glow") as OmniLight3D
 @onready var _cast_origin: Marker3D = get_node("CastOrigin") as Marker3D
-@onready var _animation_player: AnimationPlayer = get_node("AnimationPlayer") as AnimationPlayer
+@onready var _animator: CharacterAnimator = get_node("CharacterAnimator") as CharacterAnimator
 @onready var _attack_timer: Timer = get_node("AttackTimer") as Timer
 @onready var _target_refresh_timer: Timer = get_node("TargetRefreshTimer") as Timer
 @onready var _sfx_pool: SfxPool3D = get_node("SfxPool3D") as SfxPool3D
@@ -57,8 +57,7 @@ func _ready() -> void:
 	_health.damaged.connect(_on_damaged)
 	_health.died.connect(_on_died)
 	_target_refresh_timer.timeout.connect(_refresh_navigation_target)
-	_animation_player.animation_finished.connect(_on_animation_finished)
-	_build_placeholder_animations()
+	_animator.animation_finished.connect(_on_animation_finished)
 	_enter_state(State.IDLE)
 	call_deferred("_refresh_navigation_target")
 
@@ -138,8 +137,7 @@ func try_attack() -> bool:
 		self,
 		&"enemy"
 	)
-	_animation_player.stop()
-	_animation_player.play(&"attack", 0.05)
+	_animator.play_cast()
 	_sfx_pool.play_sfx(_attack_sound, -3.0)
 	_attack_timer.start(attack_cooldown)
 	attacked.emit(attack_damage)
@@ -227,19 +225,19 @@ func _transition_to(next_state: State) -> void:
 func _enter_state(state: State) -> void:
 	match state:
 		State.IDLE, State.KEEP_DISTANCE:
-			_animation_player.play(&"idle", 0.12)
+			_animator.set_moving(false)
 		State.APPROACH, State.RETREAT:
-			_animation_player.play(&"move", 0.12)
+			_animator.set_moving(true)
 		State.DEAD:
 			velocity = Vector3.ZERO
-			_animation_player.stop()
-			_animation_player.play(&"death", 0.06)
+			_animator.play_death()
 		_:
 			pass
 
 
 func _on_damaged(_amount: float) -> void:
 	_sfx_pool.play_sfx(_hurt_sound, -4.0)
+	_animator.play_hit()
 	if _glow_tween != null:
 		_glow_tween.kill()
 	_glow.light_energy = 5.0
@@ -259,40 +257,5 @@ func _on_died() -> void:
 
 
 func _on_animation_finished(animation_name: StringName) -> void:
-	if animation_name == &"attack" and current_state != State.DEAD:
-		_animation_player.play(&"idle", 0.08)
-	elif animation_name == &"death" and current_state == State.DEAD:
+	if animation_name == &"death" and current_state == State.DEAD:
 		queue_free()
-
-
-func _build_placeholder_animations() -> void:
-	if _animation_player.has_animation(&"idle"):
-		return
-	var library: AnimationLibrary = AnimationLibrary.new()
-	var idle: Animation = Animation.new()
-	idle.length = 1.0
-	idle.loop_mode = Animation.LOOP_LINEAR
-	_add_scale_track(idle, PackedFloat32Array([0.0, 0.5, 1.0]), [Vector3.ONE, Vector3(1.04, 0.96, 1.04), Vector3.ONE])
-	var move: Animation = Animation.new()
-	move.length = 0.45
-	move.loop_mode = Animation.LOOP_LINEAR
-	_add_scale_track(move, PackedFloat32Array([0.0, 0.225, 0.45]), [Vector3.ONE, Vector3(0.94, 1.06, 0.94), Vector3.ONE])
-	var attack: Animation = Animation.new()
-	attack.length = 0.32
-	_add_scale_track(attack, PackedFloat32Array([0.0, 0.12, 0.32]), [Vector3.ONE, Vector3(1.25, 0.9, 1.25), Vector3.ONE])
-	var death: Animation = Animation.new()
-	death.length = 0.45
-	_add_scale_track(death, PackedFloat32Array([0.0, 0.45]), [Vector3.ONE, Vector3.ONE * 0.05])
-	library.add_animation(&"idle", idle)
-	library.add_animation(&"move", move)
-	library.add_animation(&"attack", attack)
-	library.add_animation(&"death", death)
-	_animation_player.add_animation_library(&"", library)
-
-
-func _add_scale_track(animation: Animation, times: PackedFloat32Array, values: Array[Variant]) -> void:
-	var track_index: int = animation.add_track(Animation.TYPE_VALUE)
-	animation.track_set_path(track_index, NodePath("Visuals:scale"))
-	animation.track_set_interpolation_type(track_index, Animation.INTERPOLATION_CUBIC)
-	for key_index: int in range(times.size()):
-		animation.track_insert_key(track_index, times[key_index], values[key_index])

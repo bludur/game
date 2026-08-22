@@ -1,70 +1,16 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/chaser_enemy.gd" id="1_enemy"]
 [ext_resource type="PackedScene" path="res://scenes/components/health_component.tscn" id="2_health"]
 [ext_resource type="PackedScene" path="res://scenes/components/hurtbox_component.tscn" id="3_hurtbox"]
 [ext_resource type="PackedScene" path="res://scenes/components/sfx_pool_3d.tscn" id="4_sfx"]
 [ext_resource type="PackedScene" path="res://scenes/components/movement_modifier_component.tscn" id="5_modifier"]
+[ext_resource type="PackedScene" path="res://assets/models/shadow_chaser.glb" id="6_model"]
+[ext_resource type="PackedScene" path="res://scenes/components/character_animator.tscn" id="7_animator"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_enemy"]
 radius = 0.46
 height = 1.5
-
-[sub_resource type="StandardMaterial3D" id="Material_enemy_body"]
-albedo_color = Color(0.18, 0.025, 0.14, 1)
-metallic = 0.2
-roughness = 0.42
-emission_enabled = true
-emission = Color(0.24, 0.015, 0.2, 1)
-emission_energy_multiplier = 1.7
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_enemy_body"]
-material = SubResource("Material_enemy_body")
-radius = 0.43
-height = 1.35
-radial_segments = 12
-rings = 6
-
-[sub_resource type="StandardMaterial3D" id="Material_enemy_core"]
-shading_mode = 0
-albedo_color = Color(1, 0.16, 0.46, 1)
-emission_enabled = true
-emission = Color(1, 0.015, 0.28, 1)
-emission_energy_multiplier = 4.2
-
-[sub_resource type="SphereMesh" id="SphereMesh_enemy_core"]
-material = SubResource("Material_enemy_core")
-radius = 0.18
-height = 0.36
-radial_segments = 12
-rings = 6
-
-[sub_resource type="StandardMaterial3D" id="Material_enemy_horn"]
-albedo_color = Color(0.055, 0.02, 0.08, 1)
-metallic = 0.45
-roughness = 0.28
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_enemy_horn"]
-material = SubResource("Material_enemy_horn")
-top_radius = 0.015
-bottom_radius = 0.13
-height = 0.58
-radial_segments = 7
-rings = 1
-
-[sub_resource type="StandardMaterial3D" id="Material_enemy_ring"]
-transparency = 1
-albedo_color = Color(0.75, 0.08, 0.46, 0.78)
-emission_enabled = true
-emission = Color(0.82, 0.02, 0.38, 1)
-emission_energy_multiplier = 2.8
-
-[sub_resource type="TorusMesh" id="TorusMesh_enemy_ring"]
-material = SubResource("Material_enemy_ring")
-inner_radius = 0.5
-outer_radius = 0.56
-rings = 18
-ring_segments = 8
 
 [node name="ChaserEnemy" type="CharacterBody3D" groups=["enemy"]]
 collision_layer = 4
@@ -97,28 +43,9 @@ position = Vector3(0, 0.9, 0)
 
 [node name="Visuals" type="Node3D" parent="."]
 
-[node name="Body" type="MeshInstance3D" parent="Visuals"]
-position = Vector3(0, 0.78, 0)
-mesh = SubResource("CapsuleMesh_enemy_body")
+[node name="ModelRoot" type="Node3D" parent="Visuals"]
 
-[node name="Core" type="MeshInstance3D" parent="Visuals"]
-position = Vector3(0, 0.95, -0.4)
-mesh = SubResource("SphereMesh_enemy_core")
-
-[node name="HornLeft" type="MeshInstance3D" parent="Visuals"]
-position = Vector3(-0.24, 1.53, 0)
-rotation_degrees = Vector3(0, 0, -20)
-mesh = SubResource("CylinderMesh_enemy_horn")
-
-[node name="HornRight" type="MeshInstance3D" parent="Visuals"]
-position = Vector3(0.24, 1.53, 0)
-rotation_degrees = Vector3(0, 0, 20)
-mesh = SubResource("CylinderMesh_enemy_horn")
-
-[node name="ArcaneRing" type="MeshInstance3D" parent="Visuals"]
-position = Vector3(0, 0.72, 0)
-rotation_degrees = Vector3(90, 0, 0)
-mesh = SubResource("TorusMesh_enemy_ring")
+[node name="ShadowChaserModel" parent="Visuals/ModelRoot" instance=ExtResource("6_model")]
 
 [node name="Glow" type="OmniLight3D" parent="Visuals"]
 position = Vector3(0, 0.95, -0.35)
@@ -127,7 +54,7 @@ light_energy = 1.8
 omni_range = 3.2
 shadow_enabled = false
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="CharacterAnimator" parent="." instance=ExtResource("7_animator")]
 
 [node name="AttackTimer" type="Timer" parent="."]
 one_shot = true

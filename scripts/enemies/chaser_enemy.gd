@@ -41,7 +41,7 @@ var _glow_tween: Tween
 @onready var _hurtbox: HurtboxComponent = get_node("HurtboxComponent") as HurtboxComponent
 @onready var _movement_modifier: MovementModifierComponent = get_node("MovementModifierComponent") as MovementModifierComponent
 @onready var _visuals: Node3D = get_node("Visuals") as Node3D
-@onready var _animation_player: AnimationPlayer = get_node("AnimationPlayer") as AnimationPlayer
+@onready var _animator: CharacterAnimator = get_node("CharacterAnimator") as CharacterAnimator
 @onready var _glow: OmniLight3D = get_node("Visuals/Glow") as OmniLight3D
 @onready var _sfx_pool: SfxPool3D = get_node("SfxPool3D") as SfxPool3D
 @onready var _attack_timer: Timer = get_node("AttackTimer") as Timer
@@ -60,8 +60,7 @@ func _ready() -> void:
 	_health.died.connect(_on_died)
 	_target_refresh_timer.timeout.connect(_refresh_navigation_target)
 	_respawn_timer.timeout.connect(_on_respawn_timeout)
-	_animation_player.animation_finished.connect(_on_animation_finished)
-	_build_placeholder_animations()
+	_animator.animation_finished.connect(_on_animation_finished)
 	_enter_state(State.IDLE)
 	call_deferred("_refresh_navigation_target")
 
@@ -132,8 +131,7 @@ func try_attack() -> bool:
 	if not is_instance_valid(target_hurtbox) or not target_hurtbox.receive_hit(attack_damage):
 		return false
 
-	_animation_player.stop()
-	_animation_player.play(&"attack", 0.08)
+	_animator.play_cast()
 	_sfx_pool.play_sfx(_attack_sound, -2.0)
 	_attack_timer.start(attack_cooldown)
 	attacked.emit(attack_damage)
@@ -234,16 +232,15 @@ func _transition_to(next_state: State) -> void:
 func _enter_state(state: State) -> void:
 	match state:
 		State.IDLE:
-			_animation_player.play(&"idle", 0.15)
+			_animator.set_moving(false)
 		State.CHASE:
-			_animation_player.play(&"chase", 0.12)
+			_animator.set_moving(true)
 		State.ATTACK:
 			if _attack_timer.is_stopped():
 				try_attack()
 		State.DEAD:
 			velocity = Vector3.ZERO
-			_animation_player.stop()
-			_animation_player.play(&"death", 0.08)
+			_animator.play_death()
 		_:
 			pass
 
@@ -254,6 +251,7 @@ func _exit_state(_state: State) -> void:
 
 func _on_damaged(_amount: float) -> void:
 	_sfx_pool.play_sfx(_hurt_sound, -3.0)
+	_animator.play_hit()
 	if _glow_tween != null:
 		_glow_tween.kill()
 	_glow.light_energy = 4.5
@@ -279,9 +277,7 @@ func _on_respawn_timeout() -> void:
 	reset_physics_interpolation()
 	_health.reset()
 	_movement_modifier.clear()
-	_visuals.position = Vector3.ZERO
-	_visuals.rotation = Vector3.ZERO
-	_visuals.scale = Vector3.ONE
+	_animator.reset_visual()
 	_visuals.visible = true
 	collision_layer = _original_collision_layer
 	_hurtbox.set_deferred("monitoring", true)
@@ -292,116 +288,8 @@ func _on_respawn_timeout() -> void:
 
 
 func _on_animation_finished(animation_name: StringName) -> void:
-	if animation_name == &"attack" and current_state == State.ATTACK:
-		_animation_player.play(&"idle", 0.08)
-	elif animation_name == &"death" and current_state == State.DEAD:
+	if animation_name == &"death" and current_state == State.DEAD:
 		if respawns:
 			_visuals.visible = false
 		else:
 			queue_free()
-
-
-func _build_placeholder_animations() -> void:
-	if _animation_player.has_animation(&"idle"):
-		return
-
-	var library: AnimationLibrary = AnimationLibrary.new()
-	library.add_animation(&"RESET", _create_reset_animation())
-	library.add_animation(&"idle", _create_idle_animation())
-	library.add_animation(&"chase", _create_chase_animation())
-	library.add_animation(&"attack", _create_attack_animation())
-	library.add_animation(&"death", _create_death_animation())
-	_animation_player.add_animation_library(&"", library)
-
-
-func _create_reset_animation() -> Animation:
-	var animation: Animation = Animation.new()
-	animation.length = 0.0
-	_add_value_track(
-		animation,
-		NodePath("Visuals:position"),
-		PackedFloat32Array([0.0]),
-		[Vector3.ZERO]
-	)
-	_add_value_track(
-		animation,
-		NodePath("Visuals:rotation"),
-		PackedFloat32Array([0.0]),
-		[Vector3.ZERO]
-	)
-	_add_value_track(
-		animation,
-		NodePath("Visuals:scale"),
-		PackedFloat32Array([0.0]),
-		[Vector3.ONE]
-	)
-	return animation
-
-
-func _create_idle_animation() -> Animation:
-	var animation: Animation = Animation.new()
-	animation.length = 1.2
-	animation.loop_mode = Animation.LOOP_LINEAR
-	_add_value_track(
-		animation,
-		NodePath("Visuals:position"),
-		PackedFloat32Array([0.0, 0.6, 1.2]),
-		[Vector3.ZERO, Vector3(0.0, 0.1, 0.0), Vector3.ZERO]
-	)
-	return animation
-
-
-func _create_chase_animation() -> Animation:
-	var animation: Animation = Animation.new()
-	animation.length = 0.42
-	animation.loop_mode = Animation.LOOP_LINEAR
-	_add_value_track(
-		animation,
-		NodePath("Visuals:scale"),
-		PackedFloat32Array([0.0, 0.21, 0.42]),
-		[Vector3.ONE, Vector3(1.08, 0.92, 1.08), Vector3.ONE]
-	)
-	return animation
-
-
-func _create_attack_animation() -> Animation:
-	var animation: Animation = Animation.new()
-	animation.length = 0.34
-	_add_value_track(
-		animation,
-		NodePath("Visuals:scale"),
-		PackedFloat32Array([0.0, 0.12, 0.34]),
-		[Vector3.ONE, Vector3(1.35, 0.82, 1.35), Vector3.ONE]
-	)
-	return animation
-
-
-func _create_death_animation() -> Animation:
-	var animation: Animation = Animation.new()
-	animation.length = 0.45
-	_add_value_track(
-		animation,
-		NodePath("Visuals:rotation"),
-		PackedFloat32Array([0.0, 0.45]),
-		[Vector3.ZERO, Vector3(0.0, 0.0, 1.35)]
-	)
-	_add_value_track(
-		animation,
-		NodePath("Visuals:scale"),
-		PackedFloat32Array([0.0, 0.45]),
-		[Vector3.ONE, Vector3.ONE * 0.05]
-	)
-	return animation
-
-
-func _add_value_track(
-	animation: Animation,
-	property_path: NodePath,
-	times: PackedFloat32Array,
-	values: Array[Variant]
-) -> void:
-	var track_index: int = animation.add_track(Animation.TYPE_VALUE)
-	animation.track_set_path(track_index, property_path)
-	animation.track_set_interpolation_type(track_index, Animation.INTERPOLATION_CUBIC)
-	for key_index: int in range(times.size()):
-		animation.track_insert_key(track_index, times[key_index], values[key_index])

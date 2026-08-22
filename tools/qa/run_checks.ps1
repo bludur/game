@@ -36,6 +36,12 @@ if ($LASTEXITCODE -ne 0) {
     throw "Enemy chase test failed with exit code $LASTEXITCODE."
 }
 
+Write-Host 'Running stylized asset integration test...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_stylized_assets.log') --script 'res://tests/qa/stylized_assets_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Stylized asset test failed with exit code $LASTEXITCODE."
+}
+
 Write-Host 'Running performance smoke test...'
 & $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_performance.log') --script 'res://tests/qa/performance_smoke_test.gd'
 if ($LASTEXITCODE -ne 0) {
