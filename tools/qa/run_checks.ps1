@@ -108,10 +108,22 @@ if ($LASTEXITCODE -ne 0) {
     throw "Survival soak test failed with exit code $LASTEXITCODE."
 }
 
+Write-Host 'Running alpha two-region transition, construction, save/load, and death soak test...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_alpha_two_region_soak.log') --script 'res://tests/qa/alpha_two_region_soak_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Alpha two-region soak test failed with exit code $LASTEXITCODE."
+}
+
 Write-Host 'Running Ashen Grove Compatibility renderer smoke test...'
 & $godotRunner -Console --headless --rendering-method gl_compatibility --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_survival_compatibility.log') --script 'res://tests/qa/survival_smoke_test.gd'
 if ($LASTEXITCODE -ne 0) {
     throw "Survival Compatibility smoke test failed with exit code $LASTEXITCODE."
+}
+
+Write-Host 'Running Moonbound Compatibility renderer transition test...'
+& $godotRunner -Console --headless --rendering-method gl_compatibility --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_moonbound_compatibility.log') --script 'res://tests/qa/moonbound_region_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Moonbound Compatibility transition test failed with exit code $LASTEXITCODE."
 }
 
 Write-Host 'Running full release flow with five sessions...'

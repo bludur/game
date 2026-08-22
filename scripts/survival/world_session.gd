@@ -3,6 +3,7 @@ extends Node3D
 
 signal main_menu_requested()
 signal notification_requested(message: String)
+signal audio_caption_requested(message: String)
 
 const PICKUP_SCENE: PackedScene = preload("res://scenes/interaction/world_pickup.tscn")
 const WITCH_ECHO_SCENE: PackedScene = preload("res://scenes/survival/witch_echo.tscn")
@@ -556,6 +557,7 @@ func _on_weather_changed(weather: WeatherDirector.Weather) -> void:
 
 func _on_hunt_started() -> void:
 	notification_requested.emit(tr("NOTICE_HUNT_STARTED"))
+	audio_caption_requested.emit(tr("CAPTION_HUNT_HOWL"))
 
 
 func _on_hunt_ended() -> void:
@@ -565,6 +567,7 @@ func _on_hunt_ended() -> void:
 func _on_raid_warning(raid_type: ThreatDirector.RaidType, seconds: float) -> void:
 	var raid_key: String = "NOTICE_RAID_%s" % ThreatDirector.RaidType.keys()[raid_type]
 	notification_requested.emit(tr("NOTICE_RAID_WARNING") % [tr(raid_key), ceili(seconds)])
+	audio_caption_requested.emit(tr("CAPTION_RAID_BELLS"))
 
 
 func _on_player_spell_cast(spell: SpellData) -> void:
@@ -673,6 +676,7 @@ func _rest_player_at(
 
 
 func _on_player_defeated() -> void:
+	audio_caption_requested.emit(tr("CAPTION_WITCH_DEFEATED"))
 	var echo_entries: Array[Dictionary] = player.get_inventory_component().extract_death_echo()
 	if not echo_entries.is_empty():
 		_spawn_echo(player.global_position, echo_entries)

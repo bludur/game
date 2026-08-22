@@ -5,6 +5,11 @@ const ENCOUNTERS: EncounterTableData = preload("res://resources/survival/encount
 const ITEM_CATALOG: ItemCatalog = preload("res://resources/survival/item_catalog.tres")
 const RECIPE_CATALOG: RecipeCatalog = preload("res://resources/survival/recipe_catalog.tres")
 const MOON_EATER_SCENE: PackedScene = preload("res://scenes/boss/moon_eater.tscn")
+const WORLD_SCENE: PackedScene = preload("res://scenes/survival/world_session.tscn")
+
+
+func after_each() -> void:
+	ProjectSettings.set_setting("witchroot/accessibility/subtitles_enabled", true)
 
 
 func test_authored_region_has_five_pois_twelve_nodes_and_four_resource_types() -> void:
@@ -61,3 +66,18 @@ func test_cold_is_reduced_by_frost_preparation_and_cleared_by_shelter() -> void:
 	assert_lt(cold.current_exposure, unprotected_gain)
 	cold.advance(5.0, true, true)
 	assert_eq(cold.current_exposure, 0.0)
+
+
+func test_important_sound_captions_respect_accessibility_setting() -> void:
+	var session: WorldSession = WORLD_SCENE.instantiate() as WorldSession
+	add_child_autofree(session)
+	await get_tree().process_frame
+	var caption: Label = session.survival_hud.get_node("Root/AudioCaption") as Label
+	ProjectSettings.set_setting("witchroot/accessibility/subtitles_enabled", false)
+	session.survival_hud.show_audio_caption("hidden cue")
+	assert_eq(caption.modulate.a, 0.0)
+	ProjectSettings.set_setting("witchroot/accessibility/subtitles_enabled", true)
+	session.survival_hud.show_audio_caption("audible cue")
+	await get_tree().process_frame
+	assert_eq(caption.text, "[audible cue]")
+	assert_gt(caption.modulate.a, 0.0)

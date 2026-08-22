@@ -16,6 +16,7 @@ var _capture_action: StringName
 @onready var _flash_intensity: HSlider = get_node("Center/Card/Scroll/Content/FlashRow/FlashIntensity") as HSlider
 @onready var _screen_shake: CheckButton = get_node("Center/Card/Scroll/Content/ScreenShake") as CheckButton
 @onready var _hold_interact: CheckButton = get_node("Center/Card/Scroll/Content/HoldInteract") as CheckButton
+@onready var _subtitles: CheckButton = get_node("Center/Card/Scroll/Content/Subtitles") as CheckButton
 @onready var _camera_sensitivity: HSlider = get_node("Center/Card/Scroll/Content/CameraLookRow/Sensitivity") as HSlider
 @onready var _camera_fov: HSlider = get_node("Center/Card/Scroll/Content/CameraLookRow/Fov") as HSlider
 @onready var _invert_camera_y: CheckButton = get_node("Center/Card/Scroll/Content/CameraToggleRow/InvertY") as CheckButton
@@ -78,6 +79,7 @@ func _sync_from_store() -> void:
 	_flash_intensity.value = _store.flash_intensity
 	_screen_shake.button_pressed = _store.screen_shake_enabled
 	_hold_interact.button_pressed = _store.hold_to_interact
+	_subtitles.button_pressed = _store.subtitles_enabled
 	_camera_sensitivity.value = _store.mouse_sensitivity
 	_camera_fov.value = _store.camera_fov
 	_invert_camera_y.button_pressed = _store.invert_camera_y
@@ -104,7 +106,8 @@ func _save_and_close() -> void:
 		_ui_scale.value,
 		_flash_intensity.value,
 		_screen_shake.button_pressed,
-		_hold_interact.button_pressed
+		_hold_interact.button_pressed,
+		_subtitles.button_pressed
 	)
 	_store.set_camera_preferences(
 		_camera_sensitivity.value,
@@ -135,6 +138,7 @@ func refresh_text() -> void:
 	(get_node("Center/Card/Scroll/Content/FlashRow/Label") as Label).text = tr("SETTINGS_FLASH")
 	_screen_shake.text = tr("SETTINGS_SHAKE")
 	_hold_interact.text = tr("SETTINGS_HOLD_INTERACT")
+	_subtitles.text = tr("SETTINGS_SUBTITLES")
 	(get_node("Center/Card/Scroll/Content/CameraLookRow/SensitivityLabel") as Label).text = tr("SETTINGS_CAMERA_SENSITIVITY")
 	(get_node("Center/Card/Scroll/Content/CameraLookRow/FovLabel") as Label).text = tr("SETTINGS_CAMERA_FOV")
 	_invert_camera_y.text = tr("SETTINGS_INVERT_Y")

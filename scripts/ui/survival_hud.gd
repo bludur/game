@@ -1,6 +1,8 @@
 class_name SurvivalHud
 extends CanvasLayer
 
+const INPUT_GLYPHS: Script = preload("res://scripts/app/input_glyphs.gd")
+
 signal craft_requested(recipe_id: StringName)
 signal ritual_requested(ritual_id: StringName)
 signal interface_open_changed(open: bool)
@@ -11,10 +13,13 @@ var _equipment: EquipmentComponent
 var _selected_slot: int = -1
 var _slot_buttons: Array[Button] = []
 var _notification_tween: Tween
+var _caption_tween: Tween
 var _build_category_buttons: Array[Button] = []
 var _storage_piece: BuildingPiece
 var _grimoire_buttons: Array[Button] = []
 var _selected_grimoire_node_id: StringName = &""
+var _using_gamepad: bool = false
+var _focused_interactable: InteractableComponent
 
 @onready var _health_bar: ProgressBar = get_node("Root/Status/Content/HealthBar") as ProgressBar
 @onready var _health_label: Label = get_node("Root/Status/Content/HealthLabel") as Label
@@ -33,6 +38,7 @@ var _selected_grimoire_node_id: StringName = &""
 @onready var _objective_label: Label = get_node("Root/Objective") as Label
 @onready var _prompt: Label = get_node("Root/InteractionPrompt") as Label
 @onready var _notification: Label = get_node("Root/Notification") as Label
+@onready var _audio_caption: Label = get_node("Root/AudioCaption") as Label
 @onready var _survival_window: PanelContainer = get_node("Root/SurvivalWindow") as PanelContainer
 @onready var _tabs: TabContainer = get_node("Root/SurvivalWindow/Layout/Tabs") as TabContainer
 @onready var _inventory_grid: GridContainer = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Grid") as GridContainer
@@ -64,7 +70,9 @@ var _selected_grimoire_node_id: StringName = &""
 @onready var _crosshair: Label = get_node("Root/Crosshair") as Label
 @onready var _active_effects_panel: PanelContainer = get_node("Root/ActiveEffects") as PanelContainer
 @onready var _active_effects_label: Label = get_node("Root/ActiveEffects/Content") as Label
+@onready var _hotkeys: Label = get_node("Root/Hotkeys") as Label
 @onready var _notification_timer: Timer = get_node("NotificationTimer") as Timer
+@onready var _caption_timer: Timer = get_node("CaptionTimer") as Timer
 
 
 func _ready() -> void:
@@ -80,6 +88,7 @@ func _ready() -> void:
 	_build_panel.visible = false
 	_storage_window.visible = false
 	_notification.modulate.a = 0.0
+	_audio_caption.modulate.a = 0.0
 	_build_category_buttons = [
 		get_node("Root/BuildPanel/Categories/Foundations") as Button,
 		get_node("Root/BuildPanel/Categories/Walls") as Button,
@@ -103,6 +112,7 @@ func _ready() -> void:
 	(get_node("Root/SurvivalWindow/Layout/Header/Close") as Button).pressed.connect(_close_interfaces)
 	(get_node("Root/StorageWindow/Layout/Header/Close") as Button).pressed.connect(_close_storage)
 	_notification_timer.timeout.connect(_hide_notification)
+	_caption_timer.timeout.connect(_hide_audio_caption)
 
 
 func bind(session: WorldSession) -> void:
@@ -135,6 +145,7 @@ func bind(session: WorldSession) -> void:
 	session.construction_system.selection_changed.connect(_on_build_selection_changed)
 	session.construction_system.category_changed.connect(_on_build_category_changed)
 	session.notification_requested.connect(show_notification)
+	session.audio_caption_requested.connect(show_audio_caption)
 	var health: HealthComponent = session.player.get_health_component()
 	var mana: ManaComponent = session.player.get_mana_component()
 	var stamina: StaminaComponent = session.player.get_stamina_component()
@@ -156,11 +167,22 @@ func bind(session: WorldSession) -> void:
 	_refresh_objective()
 	_refresh_grimoire()
 	_on_build_category_changed(session.construction_system.active_category)
+	_refresh_input_glyphs()
 
 
 func _process(_delta: float) -> void:
 	if _session != null and _session.construction_system.build_mode:
 		_refresh_build_label()
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventJoypadButton and event.is_pressed():
+		_set_input_device(true)
+	elif event is InputEventJoypadMotion \
+			and absf((event as InputEventJoypadMotion).axis_value) >= 0.35:
+		_set_input_device(true)
+	elif (event is InputEventKey or event is InputEventMouseButton) and event.is_pressed():
+		_set_input_device(false)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -194,6 +216,20 @@ func show_notification(message: String) -> void:
 	_refresh_objective()
 
 
+func show_audio_caption(message: String) -> void:
+	if not bool(ProjectSettings.get_setting(
+		"witchroot/accessibility/subtitles_enabled", true
+	)):
+		return
+	_audio_caption.text = "[%s]" % message
+	if _caption_tween != null:
+		_caption_tween.kill()
+	_audio_caption.modulate.a = 0.0
+	_caption_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_caption_tween.tween_property(_audio_caption, "modulate:a", 1.0, 0.14)
+	_caption_timer.start(2.8)
+
+
 func rebind_region() -> void:
 	if _session == null:
 		return
@@ -201,6 +237,10 @@ func rebind_region() -> void:
 	_session.cold_exposure.refresh()
 	_refresh_objective()
 	_refresh_grimoire()
+
+
+func refresh_input_glyphs() -> void:
+	_refresh_input_glyphs()
 
 
 func _build_inventory_grid() -> void:
@@ -597,9 +637,42 @@ func _on_threat_changed(score: float) -> void:
 
 
 func _on_interaction_focus_changed(interactable: InteractableComponent) -> void:
+	_focused_interactable = interactable
 	_prompt.visible = is_instance_valid(interactable) and not _survival_window.visible and not _map_panel.visible
 	if is_instance_valid(interactable):
-		_prompt.text = tr("SURVIVAL_INTERACT") % tr(interactable.prompt_text)
+		_refresh_interaction_prompt()
+
+
+func _set_input_device(gamepad: bool) -> void:
+	if _using_gamepad == gamepad:
+		return
+	_using_gamepad = gamepad
+	_refresh_input_glyphs()
+
+
+func _refresh_input_glyphs() -> void:
+	if not is_instance_valid(_hotkeys):
+		return
+	_hotkeys.text = tr("SURVIVAL_HOTKEYS_DYNAMIC") % [
+		INPUT_GLYPHS.camera_label(_using_gamepad),
+		INPUT_GLYPHS.action_label(&"primary_spell", _using_gamepad),
+		INPUT_GLYPHS.action_label(&"ward", _using_gamepad),
+		INPUT_GLYPHS.action_label(&"jump", _using_gamepad),
+		INPUT_GLYPHS.action_label(&"sprint", _using_gamepad),
+		INPUT_GLYPHS.action_label(&"dash", _using_gamepad),
+		INPUT_GLYPHS.action_label(&"inventory", _using_gamepad),
+		INPUT_GLYPHS.action_label(&"build_mode", _using_gamepad),
+	]
+	_refresh_interaction_prompt()
+
+
+func _refresh_interaction_prompt() -> void:
+	if not is_instance_valid(_focused_interactable):
+		return
+	_prompt.text = tr("SURVIVAL_INTERACT_DYNAMIC") % [
+		INPUT_GLYPHS.action_label(&"interact", _using_gamepad),
+		tr(_focused_interactable.prompt_text),
+	]
 
 
 func close_interfaces() -> void:
@@ -777,6 +850,13 @@ func _hide_notification() -> void:
 		_notification_tween.kill()
 	_notification_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_notification_tween.tween_property(_notification, "modulate:a", 0.0, 0.3)
+
+
+func _hide_audio_caption() -> void:
+	if _caption_tween != null:
+		_caption_tween.kill()
+	_caption_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_caption_tween.tween_property(_audio_caption, "modulate:a", 0.0, 0.25)
 
 
 func _ingredient_text(ingredients: Array[ItemAmountData]) -> String:

@@ -147,7 +147,9 @@ func _refresh_ui_text() -> void:
 func _on_settings_changed() -> void:
 	_refresh_ui_text()
 	if _current_run is WorldSession:
-		(_current_run as WorldSession).apply_camera_settings(settings_store)
+		var session: WorldSession = _current_run as WorldSession
+		session.apply_camera_settings(settings_store)
+		session.survival_hud.refresh_input_glyphs()
 
 
 func _clear_run() -> void:

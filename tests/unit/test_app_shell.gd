@@ -63,5 +63,22 @@ func test_settings_remain_scrollable_at_reference_resolution() -> void:
 	settings.visible = true
 	await get_tree().process_frame
 	var scroll: ScrollContainer = settings.get_node("Center/Card/Scroll") as ScrollContainer
+	var subtitles: CheckButton = settings.get_node("Center/Card/Scroll/Content/Subtitles") as CheckButton
 	assert_lte(scroll.size.y, 640.0)
 	assert_gt(scroll.get_v_scroll_bar().max_value, scroll.size.y)
+	assert_gte(subtitles.custom_minimum_size.y, 42.0)
+
+
+func test_survival_hud_refreshes_glyph_after_runtime_remapping() -> void:
+	var app: AppRoot = APP_SCENE.instantiate() as AppRoot
+	add_child_autofree(app)
+	await get_tree().process_frame
+	assert_true(app.start_survival())
+	await get_tree().process_frame
+	var session: WorldSession = app.get_current_run() as WorldSession
+	var hotkeys: Label = session.survival_hud.get_node("Root/Hotkeys") as Label
+	var key: InputEventKey = InputEventKey.new()
+	key.physical_keycode = KEY_K
+	assert_true(app.settings_store.rebind_action(&"primary_spell", key))
+	assert_true(hotkeys.text.contains("K"))
+	app.settings_store.reset_input_bindings()
