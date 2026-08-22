@@ -11,6 +11,7 @@ var _upgrade_options: Array[UpgradeData] = []
 @onready var _announcement_subtitle: Label = get_node("Root/Announcement/Content/Subtitle") as Label
 @onready var _choice_overlay: Control = get_node("Root/ChoiceOverlay") as Control
 @onready var _upgrade_title: Label = get_node("Root/ChoiceOverlay/Center/Card/Content/Title") as Label
+@onready var _upgrade_hint: Label = get_node("Root/ChoiceOverlay/Center/Card/Content/Hint") as Label
 @onready var _upgrade_buttons: Array[Button] = [
 	get_node("Root/ChoiceOverlay/Center/Card/Content/Choices/Option1") as Button,
 	get_node("Root/ChoiceOverlay/Center/Card/Content/Choices/Option2") as Button,
@@ -21,11 +22,16 @@ var _upgrade_options: Array[UpgradeData] = []
 @onready var _result_subtitle: Label = get_node("Root/ResultOverlay/Center/Card/Content/Subtitle") as Label
 @onready var _restart_button: Button = get_node("Root/ResultOverlay/Center/Card/Content/Restart") as Button
 @onready var _main_menu_button: Button = get_node("Root/ResultOverlay/Center/Card/Content/MainMenu") as Button
+@onready var _version_label: Label = get_node("Root/Version") as Label
 @onready var _announcement_timer: Timer = get_node("AnnouncementTimer") as Timer
 
 
 func _ready() -> void:
 	UiTranslations.ensure_registered()
+	_version_label.text = "v%s" % BuildInfo.VERSION
+	_upgrade_hint.text = tr("RUN_UPGRADE_HINT")
+	_restart_button.text = tr("RUN_RESTART")
+	_main_menu_button.text = tr("RESULT_MENU")
 	for index: int in _upgrade_buttons.size():
 		_upgrade_buttons[index].pressed.connect(_on_upgrade_pressed.bind(index))
 	_restart_button.pressed.connect(_on_restart_pressed)
@@ -83,11 +89,12 @@ func _on_upgrade_requested(options: Array[UpgradeData]) -> void:
 		var button: Button = _upgrade_buttons[index]
 		if index >= _upgrade_options.size():
 			button.disabled = true
-			button.text = "UNAVAILABLE"
+			button.text = tr("RUN_UNAVAILABLE")
 			continue
 		var upgrade: UpgradeData = _upgrade_options[index]
 		button.disabled = false
-		button.text = "%s\n%s" % [upgrade.display_name.to_upper(), upgrade.description]
+		var key_stem: String = "UPGRADE_%s" % String(upgrade.upgrade_id).to_upper()
+		button.text = "%s\n%s" % [tr(key_stem + "_NAME"), tr(key_stem + "_DESC")]
 		button.add_theme_color_override("font_color", upgrade.accent_color)
 	_upgrade_buttons[0].grab_focus()
 

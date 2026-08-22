@@ -20,6 +20,7 @@ func _run_checks() -> void:
 	var enemy: ChaserEnemy = get_first_node_in_group(&"enemy") as ChaserEnemy
 	if player == null or enemy == null:
 		push_error("Enemy chase test requires one MagePlayer and one ChaserEnemy.")
+		await _cleanup(main_instance)
 		quit(1)
 		return
 
@@ -43,6 +44,8 @@ func _run_checks() -> void:
 	if player.get_health_component().current_health >= starting_health:
 		failures.append("ChaserEnemy reached no successful melee attack within four seconds.")
 
+	await _cleanup(main_instance)
+
 	if failures.is_empty():
 		print("ENEMY CHASE TEST PASSED")
 		quit(0)
@@ -50,3 +53,11 @@ func _run_checks() -> void:
 	for failure: String in failures:
 		push_error(failure)
 	quit(1)
+
+
+func _cleanup(main_instance: Node) -> void:
+	main_instance.queue_free()
+	await process_frame
+	await process_frame
+	await create_timer(0.2).timeout
+	SyntheticAudio.release_cached_streams()

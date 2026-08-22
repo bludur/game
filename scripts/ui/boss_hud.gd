@@ -10,6 +10,7 @@ var _boss: ArenaWarden
 
 
 func _ready() -> void:
+	UiTranslations.ensure_registered()
 	_panel.visible = false
 	call_deferred("_bind_encounter")
 
@@ -25,7 +26,7 @@ func _bind_encounter() -> void:
 
 func _on_boss_spawned(boss: ArenaWarden) -> void:
 	_boss = boss
-	_name_label.text = "ARENA WARDEN"
+	_name_label.text = tr("BOSS_ARENA_WARDEN")
 	_panel.visible = true
 	_boss.get_health_component().health_changed.connect(_on_health_changed)
 	_boss.phase_changed.connect(_on_phase_changed)
@@ -42,7 +43,7 @@ func _on_health_changed(current: float, maximum: float) -> void:
 
 
 func _on_phase_changed(phase: int) -> void:
-	_phase_label.text = "PHASE %d / 2" % phase
+	_phase_label.text = tr("BOSS_PHASE") % phase
 
 
 func _on_boss_defeated() -> void:

@@ -64,7 +64,7 @@ height = 2.8
 navigation_layers = 1
 
 [node name="HealthComponent" parent="." instance=ExtResource("2_health")]
-max_health = 360.0
+max_health = 320.0
 
 [node name="HurtboxComponent" parent="." instance=ExtResource("3_hurtbox")]
 position = Vector3(0, 1.45, 0)

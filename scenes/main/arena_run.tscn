@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/characters/player/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/cameras/top_down_camera.tscn" id="2_camera"]
@@ -14,6 +14,9 @@
 [ext_resource type="PackedScene" path="res://assets/models/arena_altar.glb" id="12_altar"]
 [ext_resource type="PackedScene" path="res://scenes/boss/boss_encounter.tscn" id="13_boss"]
 [ext_resource type="PackedScene" path="res://scenes/ui/boss_hud.tscn" id="14_boss_hud"]
+[ext_resource type="PackedScene" path="res://scenes/tutorial/tutorial_director.tscn" id="15_tutorial"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/combat_feedback.tscn" id="16_feedback"]
+[ext_resource type="Script" path="res://scripts/run/run_metrics_recorder.gd" id="17_metrics"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_main"]
 sky_top_color = Color(0.025, 0.035, 0.085, 1)
@@ -120,6 +123,9 @@ auto_advance = false
 
 [node name="RunDirector" parent="." instance=ExtResource("8_run")]
 
+[node name="RunMetricsRecorder" type="Node" parent="."]
+script = ExtResource("17_metrics")
+
 [node name="TopDownCamera" parent="." instance=ExtResource("2_camera")]
 
 [node name="TrainingTargetA" parent="." instance=ExtResource("3_target")]
@@ -138,3 +144,7 @@ rotation_speed_degrees = 40.0
 [node name="BossHud" parent="." instance=ExtResource("14_boss_hud")]
 
 [node name="SessionUi" parent="." instance=ExtResource("9_session_ui")]
+
+[node name="CombatFeedback" parent="." instance=ExtResource("16_feedback")]
+
+[node name="TutorialDirector" parent="." instance=ExtResource("15_tutorial")]

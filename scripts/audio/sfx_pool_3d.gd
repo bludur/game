@@ -37,3 +37,11 @@ func play_sfx(stream: AudioStream, volume_db: float = 0.0) -> bool:
 	selected_player.volume_db = volume_db
 	selected_player.play()
 	return true
+
+
+func _exit_tree() -> void:
+	for player: AudioStreamPlayer3D in _players:
+		if is_instance_valid(player):
+			player.stop()
+			player.stream = null
+	_players.clear()

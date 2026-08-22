@@ -299,6 +299,7 @@ func _install_translations() -> void:
 	UiTranslations.ensure_registered()
 	_register_translation("en", {
 		"GAME_TITLE": "Witchroot: Arena of Omens",
+		"GAME_SUBTITLE": "TOP-DOWN SPELLCRAFT DEMO",
 		"MENU_START": "Begin Run", "MENU_SETTINGS": "Settings", "MENU_QUIT": "Quit",
 		"MENU_RESUME": "Resume", "MENU_MAIN": "Main Menu", "MENU_BACK": "Back",
 		"SETTINGS_TITLE": "Settings", "SETTINGS_MASTER": "Master Volume",
@@ -312,6 +313,7 @@ func _install_translations() -> void:
 	})
 	_register_translation("ru", {
 		"GAME_TITLE": "Witchroot: Арена знамений",
+		"GAME_SUBTITLE": "ДЕМО МАГИЧЕСКОЙ АРЕНЫ",
 		"MENU_START": "Начать забег", "MENU_SETTINGS": "Настройки", "MENU_QUIT": "Выход",
 		"MENU_RESUME": "Продолжить", "MENU_MAIN": "Главное меню", "MENU_BACK": "Назад",
 		"SETTINGS_TITLE": "Настройки", "SETTINGS_MASTER": "Общая громкость",

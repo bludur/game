@@ -85,6 +85,9 @@ func _run_checks() -> void:
 
 		main_instance.queue_free()
 		await process_frame
+		await process_frame
+		await create_timer(0.2).timeout
+		SyntheticAudio.release_cached_streams()
 
 	var spell: Resource = ARCANE_BOLT
 	if spell == null:

@@ -10,3 +10,6 @@ bus = &"Music"
 
 [node name="AmbiencePlayer" type="AudioStreamPlayer" parent="."]
 bus = &"Ambience"
+
+[node name="ResultPlayer" type="AudioStreamPlayer" parent="."]
+bus = &"SFX"

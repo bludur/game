@@ -21,10 +21,14 @@ var _wave_director: WaveDirector
 @onready var _dash_label: Label = get_node("%DashLabel") as Label
 @onready var _dash_bar: ProgressBar = get_node("%DashBar") as ProgressBar
 @onready var _wave_label: Label = get_node("%WaveLabel") as Label
+@onready var _title_label: Label = get_node("Root/StatusPanel/Content/Title") as Label
+@onready var _instructions_label: Label = get_node("Root/Instructions") as Label
 
 
 func _ready() -> void:
 	UiTranslations.ensure_registered()
+	_title_label.text = tr("HUD_TITLE")
+	_instructions_label.text = tr("HUD_INSTRUCTIONS")
 	_bind_player()
 	_bind_wave_director()
 
@@ -80,7 +84,7 @@ func _on_mana_changed(current: float, maximum: float) -> void:
 func _on_cooldown_changed(remaining: float, total: float) -> void:
 	_cooldown_bar.max_value = total
 	_cooldown_bar.value = total - remaining
-	var spell_name: String = _active_spell.display_name.to_upper() if _active_spell != null else "SPELL"
+	var spell_name: String = _localized_spell_name(_active_spell)
 	if remaining <= 0.0:
 		_spell_label.text = tr("HUD_READY") % spell_name
 	else:
@@ -106,3 +110,11 @@ func _on_wave_started(wave_number: int, wave_name: String, total_enemies: int) -
 func _on_enemy_count_changed(remaining: int) -> void:
 	var wave_number: int = _wave_director.get_current_wave_number() if is_instance_valid(_wave_director) else 0
 	_wave_label.text = tr("HUD_WAVE") % [wave_number, remaining]
+
+
+func _localized_spell_name(spell: SpellData) -> String:
+	if spell == null:
+		return "SPELL"
+	var key: StringName = StringName("SPELL_%s" % String(spell.spell_id).to_upper())
+	var translated: String = tr(key)
+	return translated if translated != String(key) else spell.display_name.to_upper()

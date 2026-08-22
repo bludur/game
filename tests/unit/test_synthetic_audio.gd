@@ -13,3 +13,13 @@ func test_ambience_is_configured_as_loop() -> void:
 	assert_eq(stream.loop_mode, AudioStreamWAV.LOOP_FORWARD)
 	assert_eq(stream.loop_begin, 0)
 	assert_gt(stream.loop_end, 0)
+
+
+func test_result_stingers_are_distinct_non_looping_streams() -> void:
+	var victory: AudioStreamWAV = SyntheticAudio.create_victory()
+	var defeat: AudioStreamWAV = SyntheticAudio.create_defeat_result()
+	assert_ne(victory, defeat)
+	assert_eq(victory.loop_mode, AudioStreamWAV.LOOP_DISABLED)
+	assert_eq(defeat.loop_mode, AudioStreamWAV.LOOP_DISABLED)
+	assert_gt(victory.data.size(), 100)
+	assert_gt(defeat.data.size(), 100)

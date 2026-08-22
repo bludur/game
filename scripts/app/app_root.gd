@@ -35,6 +35,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+func _exit_tree() -> void:
+	SyntheticAudio.release_cached_streams()
+
+
 func start_run() -> bool:
 	if arena_run_scene == null:
 		return false

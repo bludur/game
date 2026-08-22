@@ -21,6 +21,9 @@ func _ready() -> void:
 
 func refresh_text() -> void:
 	(get_node("Center/Card/Content/Title") as Label).text = tr("GAME_TITLE")
+	(get_node("Center/Card/Content/Subtitle") as Label).text = "%s  •  v%s" % [
+		tr("GAME_SUBTITLE"), BuildInfo.VERSION
+	]
 	_start_button.text = tr("MENU_START")
 	_settings_button.text = tr("MENU_SETTINGS")
 	_quit_button.text = tr("MENU_QUIT")

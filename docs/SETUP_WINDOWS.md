@@ -56,5 +56,6 @@ gh auth login
 ```
 
 Скрипт использует зафиксированный preset `Windows Desktop`, создаёт
-`build/windows/MagePrototype.exe` со встроенным `.pck` и упаковывает его в
-`build/MagePrototype-Windows-x86_64.zip`. Каталог `build/` намеренно исключён из Git.
+`build/windows/Witchroot.exe` со встроенным `.pck` и упаковывает его вместе с
+release notes в `build/Witchroot-0.2.0-Windows-x86_64.zip`. Каталог `build/`
+намеренно исключён из Git.

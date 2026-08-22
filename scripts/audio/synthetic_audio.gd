@@ -15,8 +15,24 @@ static var _death_cache: AudioStreamWAV
 static var _enemy_attack_cache: AudioStreamWAV
 static var _dash_cache: AudioStreamWAV
 static var _chain_lightning_cache: AudioStreamWAV
+static var _victory_cache: AudioStreamWAV
+static var _defeat_result_cache: AudioStreamWAV
 static var _ambience_cache: AudioStreamWAV
 static var _music_cache: AudioStreamWAV
+
+
+static func release_cached_streams() -> void:
+	_spell_cast_cache = null
+	_arcane_impact_cache = null
+	_hurt_cache = null
+	_death_cache = null
+	_enemy_attack_cache = null
+	_dash_cache = null
+	_chain_lightning_cache = null
+	_victory_cache = null
+	_defeat_result_cache = null
+	_ambience_cache = null
+	_music_cache = null
 
 
 static func create_tone(
@@ -89,6 +105,18 @@ static func create_chain_lightning() -> AudioStreamWAV:
 	return _chain_lightning_cache
 
 
+static func create_victory() -> AudioStreamWAV:
+	if _victory_cache == null:
+		_victory_cache = _create_sequence(PackedFloat32Array([392.0, 523.25, 659.25, 783.99]), 0.16, 0.24)
+	return _victory_cache
+
+
+static func create_defeat_result() -> AudioStreamWAV:
+	if _defeat_result_cache == null:
+		_defeat_result_cache = _create_sequence(PackedFloat32Array([220.0, 164.81, 110.0]), 0.22, 0.25)
+	return _defeat_result_cache
+
+
 static func create_ambience() -> AudioStreamWAV:
 	if _ambience_cache != null:
 		return _ambience_cache
@@ -144,6 +172,24 @@ static func _create_chirp(
 		phase += TAU * frequency / float(MIX_RATE)
 		var envelope: float = pow(1.0 - progress, 1.35) * _edge_fade(time, duration)
 		samples[sample_index] = sin(phase) * volume * envelope
+	return _create_wav(samples, false)
+
+
+static func _create_sequence(
+	frequencies: PackedFloat32Array,
+	note_duration: float,
+	volume: float
+) -> AudioStreamWAV:
+	var total_duration: float = note_duration * float(frequencies.size())
+	var sample_count: int = ceili(total_duration * float(MIX_RATE))
+	var samples: PackedFloat32Array = PackedFloat32Array()
+	samples.resize(sample_count)
+	for sample_index: int in range(sample_count):
+		var time: float = float(sample_index) / float(MIX_RATE)
+		var note_index: int = mini(frequencies.size() - 1, floori(time / note_duration))
+		var note_time: float = fmod(time, note_duration)
+		var envelope: float = pow(maxf(0.0, 1.0 - note_time / note_duration), 1.2)
+		samples[sample_index] = sin(TAU * frequencies[note_index] * time) * volume * envelope
 	return _create_wav(samples, false)
 
 

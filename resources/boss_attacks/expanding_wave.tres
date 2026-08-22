@@ -8,5 +8,5 @@ attack_id = &"expanding_wave"
 display_name = "Warden's Pulse"
 attack_type = 1
 telegraph_duration = 1.15
-damage = 20.0
+damage = 18.0
 radius = 4.75

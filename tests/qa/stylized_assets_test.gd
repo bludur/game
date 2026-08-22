@@ -46,6 +46,9 @@ func _run_checks() -> void:
 			failures.append("Main scene is missing stylized node: %s" % character_path)
 	main.queue_free()
 	await process_frame
+	await process_frame
+	await create_timer(0.2).timeout
+	SyntheticAudio.release_cached_streams()
 
 	if failures.is_empty():
 		print("STYLIZED ASSETS TEST PASSED")

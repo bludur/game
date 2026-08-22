@@ -8,6 +8,6 @@ attack_id = &"directed_strike"
 display_name = "Runic Cleave"
 attack_type = 0
 telegraph_duration = 0.9
-damage = 24.0
+damage = 22.0
 length = 11.0
 width = 2.25

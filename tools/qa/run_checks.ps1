@@ -48,6 +48,18 @@ if ($LASTEXITCODE -ne 0) {
     throw "Performance smoke test failed with exit code $LASTEXITCODE."
 }
 
+Write-Host 'Running full release flow with five sessions...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_release_flow.log') --script 'res://tests/qa/release_flow_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Release flow test failed with exit code $LASTEXITCODE."
+}
+
+Write-Host 'Running Compatibility renderer smoke test...'
+& $godotRunner -Console --headless --rendering-method gl_compatibility --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_compatibility.log') --quit-after 2
+if ($LASTEXITCODE -ne 0) {
+    throw "Compatibility renderer smoke test failed with exit code $LASTEXITCODE."
+}
+
 Write-Host 'Running GUT unit tests...'
 & $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_gut.log') -s 'addons/gut/gut_cmdln.gd' -gexit
 if ($LASTEXITCODE -ne 0) {
