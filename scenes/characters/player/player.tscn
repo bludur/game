@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://scripts/characters/player.gd" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/components/player_controller.tscn" id="2_controller"]
@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" path="res://scenes/components/character_animator.tscn" id="11_animator"]
 [ext_resource type="PackedScene" path="res://scenes/components/inventory_component.tscn" id="12_inventory"]
 [ext_resource type="PackedScene" path="res://scenes/components/corruption_component.tscn" id="13_corruption"]
+[ext_resource type="PackedScene" path="res://scenes/components/stamina_component.tscn" id="14_stamina"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
 radius = 0.42
@@ -71,6 +72,8 @@ ring_segments = 5
 collision_layer = 2
 collision_mask = 1
 floor_snap_length = 0.25
+floor_stop_on_slope = true
+floor_max_angle = 0.872665
 script = ExtResource("1_player")
 
 [node name="PlayerController" parent="." instance=ExtResource("2_controller")]
@@ -80,6 +83,8 @@ script = ExtResource("1_player")
 [node name="ManaComponent" parent="." instance=ExtResource("4_mana")]
 max_mana = 100.0
 regeneration_per_second = 14.0
+
+[node name="StaminaComponent" parent="." instance=ExtResource("14_stamina")]
 
 [node name="HurtboxComponent" parent="." instance=ExtResource("6_hurtbox")]
 position = Vector3(0, 0.9, 0)

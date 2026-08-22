@@ -53,3 +53,15 @@ func test_shell_controls_use_full_rect_anchors_and_large_targets() -> void:
 	assert_eq(screen_host.anchor_bottom, 1.0)
 	assert_eq(menu.anchor_right, 1.0)
 	assert_gte(start_button.custom_minimum_size.y, 44.0)
+
+
+func test_settings_remain_scrollable_at_reference_resolution() -> void:
+	var app: AppRoot = APP_SCENE.instantiate() as AppRoot
+	add_child_autofree(app)
+	await get_tree().process_frame
+	var settings: SettingsMenu = app.get_node("ScreenHost/SettingsMenu") as SettingsMenu
+	settings.visible = true
+	await get_tree().process_frame
+	var scroll: ScrollContainer = settings.get_node("Center/Card/Scroll") as ScrollContainer
+	assert_lte(scroll.size.y, 640.0)
+	assert_gt(scroll.get_v_scroll_bar().max_value, scroll.size.y)

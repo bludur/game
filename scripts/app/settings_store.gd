@@ -4,7 +4,7 @@ extends Node
 signal settings_changed()
 signal binding_conflict_resolved(action: StringName)
 
-const SCHEMA_VERSION: int = 2
+const SCHEMA_VERSION: int = 3
 const MIN_SUPPORTED_SCHEMA_VERSION: int = 1
 const DEFAULT_PATH: String = "user://settings.cfg"
 const SUPPORTED_LOCALES: PackedStringArray = ["ru", "en"]
@@ -21,6 +21,10 @@ var ui_scale: float = 1.0
 var flash_intensity: float = 0.7
 var screen_shake_enabled: bool = true
 var hold_to_interact: bool = false
+var mouse_sensitivity: float = 0.003
+var invert_camera_y: bool = false
+var camera_fov: float = 70.0
+var left_shoulder_camera: bool = false
 var _default_bindings: Dictionary[StringName, Array] = {}
 
 
@@ -62,6 +66,10 @@ func load_settings() -> bool:
 	flash_intensity = clampf(float(config.get_value("accessibility", "flash_intensity", 0.7)), 0.0, 1.0)
 	screen_shake_enabled = bool(config.get_value("accessibility", "screen_shake_enabled", true))
 	hold_to_interact = bool(config.get_value("accessibility", "hold_to_interact", false))
+	mouse_sensitivity = clampf(float(config.get_value("camera", "mouse_sensitivity", 0.003)), 0.0005, 0.02)
+	invert_camera_y = bool(config.get_value("camera", "invert_y", false))
+	camera_fov = clampf(float(config.get_value("camera", "field_of_view", 70.0)), 50.0, 100.0)
+	left_shoulder_camera = bool(config.get_value("camera", "left_shoulder", false))
 	_load_bindings(config)
 	return true
 
@@ -85,6 +93,10 @@ func save_settings() -> bool:
 	config.set_value("accessibility", "flash_intensity", flash_intensity)
 	config.set_value("accessibility", "screen_shake_enabled", screen_shake_enabled)
 	config.set_value("accessibility", "hold_to_interact", hold_to_interact)
+	config.set_value("camera", "mouse_sensitivity", mouse_sensitivity)
+	config.set_value("camera", "invert_y", invert_camera_y)
+	config.set_value("camera", "field_of_view", camera_fov)
+	config.set_value("camera", "left_shoulder", left_shoulder_camera)
 	for action: StringName in _default_bindings:
 		var serialized: Array[Dictionary] = []
 		for event: InputEvent in InputMap.action_get_events(action):
@@ -138,6 +150,20 @@ func set_accessibility(
 	settings_changed.emit()
 
 
+func set_camera_preferences(
+	next_mouse_sensitivity: float,
+	next_invert_y: bool,
+	next_fov: float,
+	next_left_shoulder: bool
+) -> void:
+	mouse_sensitivity = clampf(next_mouse_sensitivity, 0.0005, 0.02)
+	invert_camera_y = next_invert_y
+	camera_fov = clampf(next_fov, 50.0, 100.0)
+	left_shoulder_camera = next_left_shoulder
+	_apply_camera_preferences()
+	settings_changed.emit()
+
+
 func rebind_action(action: StringName, event: InputEvent) -> bool:
 	if not _default_bindings.has(action) or event == null:
 		return false
@@ -173,6 +199,7 @@ func apply_all() -> void:
 	_apply_window_mode()
 	_apply_graphics()
 	_apply_accessibility()
+	_apply_camera_preferences()
 	TranslationServer.set_locale(locale)
 
 
@@ -187,6 +214,10 @@ func _reset_values() -> void:
 	flash_intensity = 0.7
 	screen_shake_enabled = true
 	hold_to_interact = false
+	mouse_sensitivity = 0.003
+	invert_camera_y = false
+	camera_fov = 70.0
+	left_shoulder_camera = false
 
 
 func _apply_audio() -> void:
@@ -219,6 +250,13 @@ func _apply_accessibility() -> void:
 	ProjectSettings.set_setting("witchroot/accessibility/hold_to_interact", hold_to_interact)
 
 
+func _apply_camera_preferences() -> void:
+	ProjectSettings.set_setting("witchroot/camera/mouse_sensitivity", mouse_sensitivity)
+	ProjectSettings.set_setting("witchroot/camera/invert_y", invert_camera_y)
+	ProjectSettings.set_setting("witchroot/camera/field_of_view", camera_fov)
+	ProjectSettings.set_setting("witchroot/camera/left_shoulder", left_shoulder_camera)
+
+
 func _sanitize_choice(value: StringName, allowed: Array[StringName], fallback: StringName) -> StringName:
 	return value if allowed.has(value) else fallback
 
@@ -226,8 +264,9 @@ func _sanitize_choice(value: StringName, allowed: Array[StringName], fallback: S
 func _capture_default_bindings() -> void:
 	for action: StringName in [
 		&"move_forward", &"move_backward", &"move_left", &"move_right",
-		&"primary_spell", &"dash", &"sprint", &"spell_slot_1", &"spell_slot_2",
+		&"primary_spell", &"dash", &"jump", &"sprint", &"spell_slot_1", &"spell_slot_2",
 		&"spell_slot_3", &"pause", &"aim_left", &"aim_right", &"aim_up", &"aim_down",
+		&"camera_swap_shoulder",
 	]:
 		if not InputMap.has_action(action):
 			continue
@@ -247,7 +286,8 @@ func _ensure_gamepad_actions() -> void:
 	_add_joy_axis(&"aim_up", JOY_AXIS_RIGHT_Y, -1.0)
 	_add_joy_axis(&"aim_down", JOY_AXIS_RIGHT_Y, 1.0)
 	_add_joy_button(&"primary_spell", JOY_BUTTON_RIGHT_SHOULDER)
-	_add_joy_button(&"dash", JOY_BUTTON_A)
+	_add_joy_button(&"dash", JOY_BUTTON_B)
+	_add_joy_button(&"jump", JOY_BUTTON_A)
 	_add_joy_button(&"sprint", JOY_BUTTON_LEFT_STICK)
 	_add_joy_button(&"pause", JOY_BUTTON_START)
 
@@ -349,6 +389,8 @@ func _install_translations() -> void:
 		"SETTINGS_REBIND_DASH": "Rebind Dash", "SETTINGS_RESET": "Reset Controls",
 		"SETTINGS_UI_SCALE": "Interface Scale", "SETTINGS_FLASH": "Flash Intensity",
 		"SETTINGS_SHAKE": "Screen Shake", "SETTINGS_HOLD_INTERACT": "Hold to Interact",
+		"SETTINGS_CAMERA_SENSITIVITY": "Camera Sensitivity", "SETTINGS_CAMERA_FOV": "Field of View",
+		"SETTINGS_INVERT_Y": "Invert Camera Y", "SETTINGS_LEFT_SHOULDER": "Default to Left Shoulder",
 		"SETTINGS_SAVE": "Save and Back", "SETTINGS_PRESS_INPUT": "Press a key or gamepad button…",
 		"WINDOWED": "Windowed", "FULLSCREEN": "Fullscreen", "QUALITY_LOW": "Low", "QUALITY_HIGH": "High",
 		"PAUSED": "Paused", "RESULT_MENU": "Return to Main Menu",
@@ -365,6 +407,8 @@ func _install_translations() -> void:
 		"SETTINGS_REBIND_DASH": "Назначить рывок", "SETTINGS_RESET": "Сбросить управление",
 		"SETTINGS_UI_SCALE": "Масштаб интерфейса", "SETTINGS_FLASH": "Интенсивность вспышек",
 		"SETTINGS_SHAKE": "Тряска экрана", "SETTINGS_HOLD_INTERACT": "Удерживать для взаимодействия",
+		"SETTINGS_CAMERA_SENSITIVITY": "Чувствительность камеры", "SETTINGS_CAMERA_FOV": "Угол обзора",
+		"SETTINGS_INVERT_Y": "Инверсия камеры по Y", "SETTINGS_LEFT_SHOULDER": "Камера у левого плеча",
 		"SETTINGS_SAVE": "Сохранить и назад", "SETTINGS_PRESS_INPUT": "Нажмите клавишу или кнопку геймпада…",
 		"WINDOWED": "В окне", "FULLSCREEN": "Полный экран", "QUALITY_LOW": "Низко", "QUALITY_HIGH": "Высоко",
 		"PAUSED": "Пауза", "RESULT_MENU": "Вернуться в главное меню",

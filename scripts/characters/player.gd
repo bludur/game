@@ -18,6 +18,7 @@ var _dash_sound: AudioStreamWAV
 @onready var _controller: PlayerController = get_node("PlayerController") as PlayerController
 @onready var _health: HealthComponent = get_node("HealthComponent") as HealthComponent
 @onready var _mana: ManaComponent = get_node("ManaComponent") as ManaComponent
+@onready var _stamina: StaminaComponent = get_node("StaminaComponent") as StaminaComponent
 @onready var _hurtbox: HurtboxComponent = get_node("HurtboxComponent") as HurtboxComponent
 @onready var _spell_caster: SpellCaster = get_node("SpellCaster") as SpellCaster
 @onready var _spell_loadout: SpellLoadout = get_node("SpellLoadout") as SpellLoadout
@@ -36,7 +37,7 @@ var _dash_sound: AudioStreamWAV
 func _ready() -> void:
 	_spawn_transform = global_transform
 	_original_collision_layer = collision_layer
-	_controller.bind(self, _visuals, _dash)
+	_controller.bind(self, _visuals, _dash, _stamina)
 	_hurtbox.bind_health(_health)
 	var spawn_parent: Node = get_tree().current_scene
 	if not is_instance_valid(spawn_parent):
@@ -55,7 +56,7 @@ func _ready() -> void:
 	_spell_caster.cast_direction_resolved.connect(_on_cast_direction_resolved)
 	_dash.dash_started.connect(_on_dash_started)
 	_dash.dash_finished.connect(_on_dash_finished)
-	_controller.movement_activity_changed.connect(_animator.set_moving)
+	_controller.locomotion_changed.connect(_animator.set_locomotion)
 	_respawn_timer.timeout.connect(_on_respawn_timeout)
 
 
@@ -65,6 +66,10 @@ func get_health_component() -> HealthComponent:
 
 func get_mana_component() -> ManaComponent:
 	return _mana
+
+
+func get_stamina_component() -> StaminaComponent:
+	return _stamina
 
 
 func get_hurtbox_component() -> HurtboxComponent:
@@ -193,6 +198,7 @@ func _restore_player() -> void:
 	reset_physics_interpolation()
 	_health.reset()
 	_mana.reset()
+	_stamina.reset()
 	_hurtbox.clear_invulnerability()
 	_visuals.scale = Vector3.ONE
 	_visuals.visible = true

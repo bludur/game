@@ -6,20 +6,24 @@ signal close_requested()
 var _store: SettingsStore
 var _capture_action: StringName
 
-@onready var _master: HSlider = get_node("Center/Card/Content/Master") as HSlider
-@onready var _music: HSlider = get_node("Center/Card/Content/Music") as HSlider
-@onready var _sfx: HSlider = get_node("Center/Card/Content/Sfx") as HSlider
-@onready var _language: OptionButton = get_node("Center/Card/Content/Language") as OptionButton
-@onready var _window_mode: OptionButton = get_node("Center/Card/Content/WindowMode") as OptionButton
-@onready var _graphics: OptionButton = get_node("Center/Card/Content/Graphics") as OptionButton
-@onready var _ui_scale: HSlider = get_node("Center/Card/Content/UiScaleRow/UiScale") as HSlider
-@onready var _flash_intensity: HSlider = get_node("Center/Card/Content/FlashRow/FlashIntensity") as HSlider
-@onready var _screen_shake: CheckButton = get_node("Center/Card/Content/ScreenShake") as CheckButton
-@onready var _hold_interact: CheckButton = get_node("Center/Card/Content/HoldInteract") as CheckButton
-@onready var _cast_button: Button = get_node("Center/Card/Content/RebindCast") as Button
-@onready var _dash_button: Button = get_node("Center/Card/Content/RebindDash") as Button
-@onready var _status: Label = get_node("Center/Card/Content/Status") as Label
-@onready var _save_button: Button = get_node("Center/Card/Content/Save") as Button
+@onready var _master: HSlider = get_node("Center/Card/Scroll/Content/Master") as HSlider
+@onready var _music: HSlider = get_node("Center/Card/Scroll/Content/Music") as HSlider
+@onready var _sfx: HSlider = get_node("Center/Card/Scroll/Content/Sfx") as HSlider
+@onready var _language: OptionButton = get_node("Center/Card/Scroll/Content/Language") as OptionButton
+@onready var _window_mode: OptionButton = get_node("Center/Card/Scroll/Content/WindowMode") as OptionButton
+@onready var _graphics: OptionButton = get_node("Center/Card/Scroll/Content/Graphics") as OptionButton
+@onready var _ui_scale: HSlider = get_node("Center/Card/Scroll/Content/UiScaleRow/UiScale") as HSlider
+@onready var _flash_intensity: HSlider = get_node("Center/Card/Scroll/Content/FlashRow/FlashIntensity") as HSlider
+@onready var _screen_shake: CheckButton = get_node("Center/Card/Scroll/Content/ScreenShake") as CheckButton
+@onready var _hold_interact: CheckButton = get_node("Center/Card/Scroll/Content/HoldInteract") as CheckButton
+@onready var _camera_sensitivity: HSlider = get_node("Center/Card/Scroll/Content/CameraLookRow/Sensitivity") as HSlider
+@onready var _camera_fov: HSlider = get_node("Center/Card/Scroll/Content/CameraLookRow/Fov") as HSlider
+@onready var _invert_camera_y: CheckButton = get_node("Center/Card/Scroll/Content/CameraToggleRow/InvertY") as CheckButton
+@onready var _left_shoulder: CheckButton = get_node("Center/Card/Scroll/Content/CameraToggleRow/LeftShoulder") as CheckButton
+@onready var _cast_button: Button = get_node("Center/Card/Scroll/Content/RebindCast") as Button
+@onready var _dash_button: Button = get_node("Center/Card/Scroll/Content/RebindDash") as Button
+@onready var _status: Label = get_node("Center/Card/Scroll/Content/Status") as Label
+@onready var _save_button: Button = get_node("Center/Card/Scroll/Content/Save") as Button
 
 
 func _ready() -> void:
@@ -32,7 +36,7 @@ func _ready() -> void:
 	_graphics.add_item(tr("QUALITY_HIGH"), 1)
 	_cast_button.pressed.connect(_begin_capture.bind(&"primary_spell"))
 	_dash_button.pressed.connect(_begin_capture.bind(&"dash"))
-	(get_node("Center/Card/Content/Reset") as Button).pressed.connect(_reset_bindings)
+	(get_node("Center/Card/Scroll/Content/Reset") as Button).pressed.connect(_reset_bindings)
 	_save_button.pressed.connect(_save_and_close)
 	refresh_text()
 	visibility_changed.connect(_on_visibility_changed)
@@ -70,6 +74,10 @@ func _sync_from_store() -> void:
 	_flash_intensity.value = _store.flash_intensity
 	_screen_shake.button_pressed = _store.screen_shake_enabled
 	_hold_interact.button_pressed = _store.hold_to_interact
+	_camera_sensitivity.value = _store.mouse_sensitivity
+	_camera_fov.value = _store.camera_fov
+	_invert_camera_y.button_pressed = _store.invert_camera_y
+	_left_shoulder.button_pressed = _store.left_shoulder_camera
 	_status.text = ""
 
 
@@ -94,6 +102,12 @@ func _save_and_close() -> void:
 		_screen_shake.button_pressed,
 		_hold_interact.button_pressed
 	)
+	_store.set_camera_preferences(
+		_camera_sensitivity.value,
+		_invert_camera_y.button_pressed,
+		_camera_fov.value,
+		_left_shoulder.button_pressed
+	)
 	_store.save_settings()
 	_capture_action = &""
 	close_requested.emit()
@@ -102,24 +116,28 @@ func _save_and_close() -> void:
 func _on_visibility_changed() -> void:
 	if visible and is_node_ready():
 		_sync_from_store()
-		_save_button.grab_focus()
+		_master.grab_focus()
 
 
 func refresh_text() -> void:
-	(get_node("Center/Card/Content/Title") as Label).text = tr("SETTINGS_TITLE")
-	(get_node("Center/Card/Content/MasterLabel") as Label).text = tr("SETTINGS_MASTER")
-	(get_node("Center/Card/Content/MusicLabel") as Label).text = tr("SETTINGS_MUSIC")
-	(get_node("Center/Card/Content/SfxLabel") as Label).text = tr("SETTINGS_SFX")
-	(get_node("Center/Card/Content/LanguageLabel") as Label).text = tr("SETTINGS_LANGUAGE")
-	(get_node("Center/Card/Content/WindowLabel") as Label).text = tr("SETTINGS_WINDOW")
-	(get_node("Center/Card/Content/GraphicsLabel") as Label).text = tr("SETTINGS_GRAPHICS")
-	(get_node("Center/Card/Content/UiScaleRow/Label") as Label).text = tr("SETTINGS_UI_SCALE")
-	(get_node("Center/Card/Content/FlashRow/Label") as Label).text = tr("SETTINGS_FLASH")
+	(get_node("Center/Card/Scroll/Content/Title") as Label).text = tr("SETTINGS_TITLE")
+	(get_node("Center/Card/Scroll/Content/MasterLabel") as Label).text = tr("SETTINGS_MASTER")
+	(get_node("Center/Card/Scroll/Content/MusicLabel") as Label).text = tr("SETTINGS_MUSIC")
+	(get_node("Center/Card/Scroll/Content/SfxLabel") as Label).text = tr("SETTINGS_SFX")
+	(get_node("Center/Card/Scroll/Content/LanguageLabel") as Label).text = tr("SETTINGS_LANGUAGE")
+	(get_node("Center/Card/Scroll/Content/WindowLabel") as Label).text = tr("SETTINGS_WINDOW")
+	(get_node("Center/Card/Scroll/Content/GraphicsLabel") as Label).text = tr("SETTINGS_GRAPHICS")
+	(get_node("Center/Card/Scroll/Content/UiScaleRow/Label") as Label).text = tr("SETTINGS_UI_SCALE")
+	(get_node("Center/Card/Scroll/Content/FlashRow/Label") as Label).text = tr("SETTINGS_FLASH")
 	_screen_shake.text = tr("SETTINGS_SHAKE")
 	_hold_interact.text = tr("SETTINGS_HOLD_INTERACT")
+	(get_node("Center/Card/Scroll/Content/CameraLookRow/SensitivityLabel") as Label).text = tr("SETTINGS_CAMERA_SENSITIVITY")
+	(get_node("Center/Card/Scroll/Content/CameraLookRow/FovLabel") as Label).text = tr("SETTINGS_CAMERA_FOV")
+	_invert_camera_y.text = tr("SETTINGS_INVERT_Y")
+	_left_shoulder.text = tr("SETTINGS_LEFT_SHOULDER")
 	_cast_button.text = tr("SETTINGS_REBIND_CAST")
 	_dash_button.text = tr("SETTINGS_REBIND_DASH")
-	(get_node("Center/Card/Content/Reset") as Button).text = tr("SETTINGS_RESET")
+	(get_node("Center/Card/Scroll/Content/Reset") as Button).text = tr("SETTINGS_RESET")
 	_save_button.text = tr("SETTINGS_SAVE")
 	if _window_mode.item_count == 2:
 		_window_mode.set_item_text(0, tr("WINDOWED"))

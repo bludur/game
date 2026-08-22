@@ -27,7 +27,7 @@ func _ready() -> void:
 	_main_menu.settings_requested.connect(_open_settings_from_menu)
 	_main_menu.quit_requested.connect(get_tree().quit)
 	_settings_menu.bind(settings_store)
-	settings_store.settings_changed.connect(_refresh_ui_text)
+	settings_store.settings_changed.connect(_on_settings_changed)
 	_settings_menu.close_requested.connect(_close_settings)
 	_pause_menu.resume_requested.connect(_resume_run)
 	_pause_menu.settings_requested.connect(_open_settings_from_pause)
@@ -77,6 +77,7 @@ func _start_session(session_scene: PackedScene) -> bool:
 		_current_run.connect(&"main_menu_requested", return_to_menu)
 	if _current_run is WorldSession:
 		(_current_run as WorldSession).bind_save_service(save_game_service)
+		(_current_run as WorldSession).apply_camera_settings(settings_store)
 		(_current_run as WorldSession).set_session_paused(false)
 	return true
 
@@ -141,6 +142,12 @@ func _refresh_ui_text() -> void:
 	_main_menu.refresh_text()
 	_settings_menu.refresh_text()
 	_pause_menu.refresh_text()
+
+
+func _on_settings_changed() -> void:
+	_refresh_ui_text()
+	if _current_run is WorldSession:
+		(_current_run as WorldSession).apply_camera_settings(settings_store)
 
 
 func _clear_run() -> void:

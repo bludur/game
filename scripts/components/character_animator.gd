@@ -6,12 +6,16 @@ signal animation_finished(animation_name: StringName)
 
 const IDLE: StringName = &"idle"
 const MOVE: StringName = &"move"
+const RUN: StringName = &"run"
+const JUMP: StringName = &"jump"
 const CAST: StringName = &"cast"
 const HIT: StringName = &"hit"
 const DASH: StringName = &"dash"
 const DEATH: StringName = &"death"
 
 var _moving: bool = false
+var _sprinting: bool = false
+var _airborne: bool = false
 var _locked: bool = false
 var _dead: bool = false
 
@@ -26,17 +30,22 @@ func _ready() -> void:
 
 
 func set_moving(is_moving: bool) -> void:
+	set_locomotion(is_moving, false, false)
+
+
+func set_locomotion(is_moving: bool, is_sprinting: bool, is_airborne: bool) -> void:
 	_moving = is_moving
+	_sprinting = is_sprinting
+	_airborne = is_airborne
 	if _locked or _dead:
 		return
-	if _moving:
-		_play_loop(MOVE, 0.12)
-	else:
-		_play_loop(IDLE, 0.15)
+	_play_locomotion(0.12)
 
 
 func play_idle() -> void:
 	_moving = false
+	_sprinting = false
+	_airborne = false
 	if not _locked and not _dead:
 		_play_loop(IDLE, 0.12)
 
@@ -66,6 +75,8 @@ func reset_visual() -> void:
 	_dead = false
 	_locked = false
 	_moving = false
+	_sprinting = false
+	_airborne = false
 	_model_root.position = Vector3.ZERO
 	_model_root.rotation = Vector3.ZERO
 	_model_root.scale = Vector3.ONE
@@ -101,10 +112,7 @@ func _on_animation_player_finished(animation_name: StringName) -> void:
 	if animation_name == DEATH:
 		return
 	_locked = false
-	if _moving:
-		_play_loop(MOVE, 0.08)
-	else:
-		_play_loop(IDLE, 0.08)
+	_play_locomotion(0.08)
 
 
 func _build_animation_library() -> void:
@@ -114,6 +122,8 @@ func _build_animation_library() -> void:
 	library.add_animation(&"RESET", _create_reset_animation())
 	library.add_animation(IDLE, _create_idle_animation())
 	library.add_animation(MOVE, _create_move_animation())
+	library.add_animation(RUN, _create_run_animation())
+	library.add_animation(JUMP, _create_jump_animation())
 	library.add_animation(CAST, _create_cast_animation())
 	library.add_animation(HIT, _create_hit_animation())
 	library.add_animation(DASH, _create_dash_animation())
@@ -166,6 +176,55 @@ func _create_move_animation() -> Animation:
 		[Vector3.ONE, Vector3(1.035, 0.965, 1.035), Vector3.ONE]
 	)
 	return animation
+
+
+func _create_run_animation() -> Animation:
+	var animation := Animation.new()
+	animation.length = 0.32
+	animation.loop_mode = Animation.LOOP_LINEAR
+	_add_track(
+		animation,
+		NodePath("Visuals/ModelRoot:position"),
+		PackedFloat32Array([0.0, 0.08, 0.16, 0.24, 0.32]),
+		[Vector3.ZERO, Vector3(0.0, 0.11, 0.0), Vector3.ZERO, Vector3(0.0, 0.08, 0.0), Vector3.ZERO]
+	)
+	_add_track(
+		animation,
+		NodePath("Visuals/ModelRoot:rotation"),
+		PackedFloat32Array([0.0, 0.16, 0.32]),
+		[Vector3(-0.08, 0.0, -0.035), Vector3(-0.13, 0.0, 0.035), Vector3(-0.08, 0.0, -0.035)]
+	)
+	return animation
+
+
+func _create_jump_animation() -> Animation:
+	var animation := Animation.new()
+	animation.length = 0.5
+	animation.loop_mode = Animation.LOOP_LINEAR
+	_add_track(
+		animation,
+		NodePath("Visuals/ModelRoot:position"),
+		PackedFloat32Array([0.0, 0.25, 0.5]),
+		[Vector3(0.0, -0.04, 0.0), Vector3(0.0, 0.04, 0.0), Vector3(0.0, -0.04, 0.0)]
+	)
+	_add_track(
+		animation,
+		NodePath("Visuals/ModelRoot:scale"),
+		PackedFloat32Array([0.0, 0.5]),
+		[Vector3(0.96, 1.06, 0.96), Vector3(0.96, 1.06, 0.96)]
+	)
+	return animation
+
+
+func _play_locomotion(blend_seconds: float) -> void:
+	if _airborne:
+		_play_loop(JUMP, blend_seconds)
+	elif _moving and _sprinting:
+		_play_loop(RUN, blend_seconds)
+	elif _moving:
+		_play_loop(MOVE, blend_seconds)
+	else:
+		_play_loop(IDLE, blend_seconds)
 
 
 func _create_cast_animation() -> Animation:

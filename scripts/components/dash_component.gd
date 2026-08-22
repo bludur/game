@@ -35,11 +35,9 @@ func _process(_delta: float) -> void:
 
 
 func try_begin(direction: Vector3) -> bool:
-	if not _enabled or is_dashing or not _cooldown_timer.is_stopped():
+	if not can_begin(direction):
 		return false
 	direction.y = 0.0
-	if direction.length_squared() <= 0.001:
-		return false
 	dash_direction = direction.normalized()
 	is_dashing = true
 	_duration_timer.start(dash_duration)
@@ -48,6 +46,13 @@ func try_begin(direction: Vector3) -> bool:
 	dash_started.emit(dash_direction)
 	cooldown_changed.emit(cooldown_duration, cooldown_duration)
 	return true
+
+
+func can_begin(direction: Vector3) -> bool:
+	if not _enabled or is_dashing or not _cooldown_timer.is_stopped():
+		return false
+	direction.y = 0.0
+	return direction.length_squared() > 0.001
 
 
 func set_enabled(enabled: bool) -> void:

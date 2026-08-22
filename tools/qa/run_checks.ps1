@@ -36,6 +36,12 @@ if ($LASTEXITCODE -ne 0) {
     throw "Survival smoke test failed with exit code $LASTEXITCODE."
 }
 
+Write-Host 'Running third-person locomotion course regression...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_locomotion_course.log') --script 'res://tests/qa/third_person_locomotion_course_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Third-person locomotion course failed with exit code $LASTEXITCODE."
+}
+
 Write-Host 'Running enemy chase integration test...'
 & $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_enemy_chase.log') --script 'res://tests/qa/enemy_chase_test.gd'
 if ($LASTEXITCODE -ne 0) {

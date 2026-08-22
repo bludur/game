@@ -15,6 +15,8 @@ var _notification_tween: Tween
 @onready var _health_label: Label = get_node("Root/Status/Content/HealthLabel") as Label
 @onready var _mana_bar: ProgressBar = get_node("Root/Status/Content/ManaBar") as ProgressBar
 @onready var _mana_label: Label = get_node("Root/Status/Content/ManaLabel") as Label
+@onready var _stamina_bar: ProgressBar = get_node("Root/Status/Content/StaminaBar") as ProgressBar
+@onready var _stamina_label: Label = get_node("Root/Status/Content/StaminaLabel") as Label
 @onready var _corruption_bar: ProgressBar = get_node("Root/Status/Content/CorruptionBar") as ProgressBar
 @onready var _corruption_label: Label = get_node("Root/Status/Content/CorruptionLabel") as Label
 @onready var _corruption_reason: Label = get_node("Root/Status/Content/CorruptionReason") as Label
@@ -63,6 +65,7 @@ func bind(session: WorldSession) -> void:
 	_inventory.inventory_changed.connect(_refresh_inventory)
 	session.player.get_health_component().health_changed.connect(_on_health_changed)
 	session.player.get_mana_component().mana_changed.connect(_on_mana_changed)
+	session.player.get_stamina_component().stamina_changed.connect(_on_stamina_changed)
 	session.player.get_corruption_component().corruption_changed.connect(_on_corruption_changed)
 	session.world_clock.time_changed.connect(_on_time_changed)
 	session.threat_director.threat_changed.connect(_on_threat_changed)
@@ -72,9 +75,11 @@ func bind(session: WorldSession) -> void:
 	session.notification_requested.connect(show_notification)
 	var health: HealthComponent = session.player.get_health_component()
 	var mana: ManaComponent = session.player.get_mana_component()
+	var stamina: StaminaComponent = session.player.get_stamina_component()
 	var corruption: CorruptionComponent = session.player.get_corruption_component()
 	_on_health_changed(health.current_health, health.max_health)
 	_on_mana_changed(mana.current_mana, mana.max_mana)
+	_on_stamina_changed(stamina.current_stamina, stamina.max_stamina)
 	_on_corruption_changed(corruption.current_corruption, corruption.maximum_corruption, &"safe")
 	_on_time_changed(session.world_clock.normalized_time, session.world_clock.day_number)
 	_refresh_inventory()
@@ -238,6 +243,12 @@ func _on_mana_changed(current: float, maximum: float) -> void:
 	_mana_bar.max_value = maximum
 	_mana_bar.value = current
 	_mana_label.text = tr("SURVIVAL_MANA") % [floori(current), floori(maximum)]
+
+
+func _on_stamina_changed(current: float, maximum: float) -> void:
+	_stamina_bar.max_value = maximum
+	_stamina_bar.value = current
+	_stamina_label.text = tr("SURVIVAL_STAMINA") % [floori(current), floori(maximum)]
 
 
 func _on_corruption_changed(current: float, maximum: float, reason: StringName) -> void:

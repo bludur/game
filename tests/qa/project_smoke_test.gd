@@ -45,11 +45,14 @@ func _run_checks() -> void:
 			var caster: SpellCaster = mage.get_spell_caster()
 			var loadout: SpellLoadout = mage.get_spell_loadout()
 			var dash: DashComponent = mage.get_dash_component()
+			var stamina: StaminaComponent = mage.get_stamina_component()
 			if loadout.get_spell(0) == null or loadout.get_spell(1) == null \
 				or loadout.get_spell(2) == null:
 				failures.append("Player spell loadout does not contain three spells.")
 			if dash == null:
 				failures.append("Player dash component is missing.")
+			if stamina == null or stamina.max_stamina <= 0.0:
+				failures.append("Player stamina component is missing or invalid.")
 			var mana_before: float = mana.current_mana
 			if not caster.cast_at(mage.global_position + Vector3(0.0, 0.0, -4.0)):
 				failures.append("Arcane Bolt could not be cast through the public API.")

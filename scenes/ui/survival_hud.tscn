@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/survival_hud.gd" id="1_hud"]
 [ext_resource type="Script" path="res://scripts/ui/survival_map.gd" id="2_map"]
@@ -35,6 +35,13 @@ corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="ManaFill"]
 bg_color = Color(0.23, 0.29, 0.86, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StaminaFill"]
+bg_color = Color(0.26, 0.72, 0.36, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -104,7 +111,7 @@ layout_mode = 0
 offset_left = 20.0
 offset_top = 20.0
 offset_right = 352.0
-offset_bottom = 252.0
+offset_bottom = 294.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("Panel")
 
@@ -136,6 +143,20 @@ mouse_filter = 2
 theme_override_styles/background = SubResource("BarBackground")
 theme_override_styles/fill = SubResource("ManaFill")
 show_percentage = false
+value = 100.0
+
+[node name="StaminaLabel" type="Label" parent="Root/Status/Content"]
+layout_mode = 2
+text = "SURVIVAL_STAMINA"
+
+[node name="StaminaBar" type="ProgressBar" parent="Root/Status/Content"]
+custom_minimum_size = Vector2(300, 14)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("BarBackground")
+theme_override_styles/fill = SubResource("StaminaFill")
+show_percentage = false
+step = 0.0
 value = 100.0
 
 [node name="CorruptionLabel" type="Label" parent="Root/Status/Content"]

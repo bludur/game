@@ -167,6 +167,17 @@ func bind_save_service(service: SaveGameService) -> void:
 		_save_game_service.load_game(self, 0)
 
 
+func apply_camera_settings(store: SettingsStore) -> void:
+	if store == null or not is_instance_valid(third_person_camera):
+		return
+	third_person_camera.apply_settings(
+		store.mouse_sensitivity,
+		store.invert_camera_y,
+		store.camera_fov,
+		store.left_shoulder_camera
+	)
+
+
 func serialize_game() -> Dictionary:
 	for resource_node: ResourceNode in region.get_persistent_resources():
 		world_state.set_resource_state(resource_node.persistent_id, resource_node.serialize_state())
@@ -320,6 +331,7 @@ func _on_rest_requested(hearth: WitchfireHearth, interactor: MagePlayer) -> void
 	interactor.set_respawn_transform(_respawn_transform)
 	interactor.get_health_component().heal(interactor.get_health_component().max_health)
 	interactor.get_mana_component().restore(interactor.get_mana_component().max_mana)
+	interactor.get_stamina_component().restore(interactor.get_stamina_component().max_stamina)
 	interactor.get_corruption_component().cleanse(100.0, &"rest")
 	notification_requested.emit(tr("NOTICE_HEARTH_BOUND"))
 	if is_instance_valid(_save_game_service):

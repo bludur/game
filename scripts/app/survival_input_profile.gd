@@ -1,9 +1,14 @@
 class_name SurvivalInputProfile
 extends RefCounted
 
+static var _legacy_dash_migrated: bool = false
+
 
 static func ensure_actions() -> void:
-	_migrate_dash_binding()
+	if not _legacy_dash_migrated:
+		_migrate_dash_binding()
+		_legacy_dash_migrated = true
+	_add_key_action(&"jump", KEY_SPACE, JOY_BUTTON_A)
 	_add_key_action(&"sprint", KEY_SHIFT, JOY_BUTTON_LEFT_STICK)
 	_add_key_action(&"interact", KEY_E, JOY_BUTTON_A)
 	_add_key_action(&"inventory", KEY_TAB, JOY_BUTTON_BACK)
@@ -15,6 +20,7 @@ static func ensure_actions() -> void:
 	_add_key_action(&"region_map", KEY_M, JOY_BUTTON_RIGHT_STICK)
 	_add_key_action(&"camera_rotate_left", KEY_Q, JOY_BUTTON_DPAD_LEFT)
 	_add_key_action(&"camera_rotate_right", KEY_T, JOY_BUTTON_DPAD_RIGHT)
+	_add_key_action(&"camera_swap_shoulder", KEY_V, JOY_BUTTON_DPAD_UP)
 	_add_mouse_action(&"camera_zoom_in", MOUSE_BUTTON_WHEEL_UP)
 	_add_mouse_action(&"camera_zoom_out", MOUSE_BUTTON_WHEEL_DOWN)
 	_add_joy_axis_action(&"aim_left", JOY_AXIS_RIGHT_X, -1.0)
@@ -25,16 +31,22 @@ static func ensure_actions() -> void:
 
 static func _migrate_dash_binding() -> void:
 	if not InputMap.has_action(&"dash"):
-		_add_key_action(&"dash", KEY_SPACE, JOY_BUTTON_A)
+		_add_key_action(&"dash", KEY_ALT, JOY_BUTTON_B)
 		return
 	var replaced_legacy_binding: bool = false
 	for input_event: InputEvent in InputMap.action_get_events(&"dash"):
 		if input_event is InputEventKey \
-				and (input_event as InputEventKey).physical_keycode == KEY_SHIFT:
+				and ((input_event as InputEventKey).physical_keycode == KEY_SHIFT \
+				or (input_event as InputEventKey).physical_keycode == KEY_SPACE):
+			InputMap.action_erase_event(&"dash", input_event)
+			replaced_legacy_binding = true
+		elif input_event is InputEventJoypadButton \
+				and (input_event as InputEventJoypadButton).button_index == JOY_BUTTON_A:
 			InputMap.action_erase_event(&"dash", input_event)
 			replaced_legacy_binding = true
 	if replaced_legacy_binding or not _has_keyboard_binding(&"dash"):
-		_add_key_event(&"dash", KEY_SPACE)
+		_add_key_event(&"dash", KEY_ALT)
+	_add_joy_button_event(&"dash", JOY_BUTTON_B)
 
 
 static func _has_keyboard_binding(action: StringName) -> bool:
@@ -49,6 +61,13 @@ static func _add_key_event(action: StringName, key: Key) -> void:
 	key_event.physical_keycode = key
 	if not _action_has_event(action, key_event):
 		InputMap.action_add_event(action, key_event)
+
+
+static func _add_joy_button_event(action: StringName, button: JoyButton) -> void:
+	var joy_event: InputEventJoypadButton = InputEventJoypadButton.new()
+	joy_event.button_index = button
+	if not _action_has_event(action, joy_event):
+		InputMap.action_add_event(action, joy_event)
 
 
 static func _add_key_action(action: StringName, key: Key, joy_button: JoyButton) -> void:

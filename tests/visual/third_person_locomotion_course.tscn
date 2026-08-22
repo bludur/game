@@ -1,0 +1,151 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/characters/player/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://scenes/cameras/third_person_camera_rig.tscn" id="2_camera"]
+[ext_resource type="Script" path="res://tests/visual/third_person_locomotion_course.gd" id="3_course"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMaterial"]
+sky_top_color = Color(0.018, 0.012, 0.04, 1)
+sky_horizon_color = Color(0.22, 0.08, 0.28, 1)
+ground_bottom_color = Color(0.008, 0.01, 0.018, 1)
+ground_horizon_color = Color(0.09, 0.04, 0.11, 1)
+
+[sub_resource type="Sky" id="Sky"]
+sky_material = SubResource("SkyMaterial")
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 2
+sky = SubResource("Sky")
+ambient_light_source = 3
+ambient_light_color = Color(0.48, 0.4, 0.62, 1)
+ambient_light_energy = 0.58
+tonemap_mode = 3
+
+[sub_resource type="StandardMaterial3D" id="CourseMaterial"]
+albedo_color = Color(0.13, 0.09, 0.18, 1)
+roughness = 0.86
+
+[sub_resource type="StandardMaterial3D" id="ObstacleMaterial"]
+albedo_color = Color(0.32, 0.13, 0.42, 1)
+roughness = 0.68
+emission_enabled = true
+emission = Color(0.14, 0.025, 0.22, 1)
+emission_energy_multiplier = 1.35
+
+[sub_resource type="StandardMaterial3D" id="MarkerMaterial"]
+albedo_color = Color(0.14, 0.5, 0.32, 1)
+emission_enabled = true
+emission = Color(0.08, 0.55, 0.28, 1)
+emission_energy_multiplier = 1.8
+
+[node name="ThirdPersonLocomotionCourse" type="Node3D"]
+script = ExtResource("3_course")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment")
+
+[node name="Moon" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-52, -28, 0)
+light_color = Color(0.72, 0.64, 0.94, 1)
+light_energy = 1.15
+shadow_enabled = true
+directional_shadow_max_distance = 45.0
+
+[node name="Floor" type="CSGBox3D" parent="."]
+position = Vector3(0, -0.2, -8)
+size = Vector3(28, 0.4, 36)
+use_collision = true
+collision_layer = 1
+collision_mask = 0
+material = SubResource("CourseMaterial")
+
+[node name="CameraBackWall" type="CSGBox3D" parent="."]
+position = Vector3(0, 1.5, 2.7)
+size = Vector3(5.5, 3, 0.35)
+use_collision = true
+collision_layer = 1
+collision_mask = 0
+material = SubResource("ObstacleMaterial")
+
+[node name="DodgeWall" type="CSGBox3D" parent="."]
+position = Vector3(2, 1.5, 0)
+size = Vector3(0.35, 3, 4)
+use_collision = true
+collision_layer = 1
+collision_mask = 0
+material = SubResource("ObstacleMaterial")
+
+[node name="ColumnLeft" type="CSGCylinder3D" parent="."]
+position = Vector3(-2.1, 1.5, -5)
+radius = 0.75
+height = 3.0
+sides = 12
+use_collision = true
+collision_layer = 1
+collision_mask = 0
+material = SubResource("ObstacleMaterial")
+
+[node name="ColumnRight" type="CSGCylinder3D" parent="."]
+position = Vector3(2.1, 1.5, -5)
+radius = 0.75
+height = 3.0
+sides = 12
+use_collision = true
+collision_layer = 1
+collision_mask = 0
+material = SubResource("ObstacleMaterial")
+
+[node name="LowCeiling" type="CSGBox3D" parent="."]
+position = Vector3(0, 2.65, -9)
+size = Vector3(5.5, 0.35, 5)
+use_collision = true
+collision_layer = 1
+collision_mask = 0
+material = SubResource("ObstacleMaterial")
+
+[node name="Slope" type="CSGBox3D" parent="."]
+position = Vector3(-6, 0.65, -10)
+rotation_degrees = Vector3(-12, 0, 0)
+size = Vector3(3.5, 0.4, 7)
+use_collision = true
+collision_layer = 1
+collision_mask = 0
+material = SubResource("CourseMaterial")
+
+[node name="Stairs" type="Node3D" parent="."]
+position = Vector3(6, 0, -8)
+
+[node name="Step1" type="CSGBox3D" parent="Stairs"]
+position = Vector3(0, 0.15, 0)
+size = Vector3(3, 0.3, 1)
+use_collision = true
+collision_layer = 1
+collision_mask = 0
+material = SubResource("CourseMaterial")
+
+[node name="Step2" type="CSGBox3D" parent="Stairs"]
+position = Vector3(0, 0.3, -0.85)
+size = Vector3(3, 0.6, 1)
+use_collision = true
+collision_layer = 1
+collision_mask = 0
+material = SubResource("CourseMaterial")
+
+[node name="Step3" type="CSGBox3D" parent="Stairs"]
+position = Vector3(0, 0.45, -1.7)
+size = Vector3(3, 0.9, 1)
+use_collision = true
+collision_layer = 1
+collision_mask = 0
+material = SubResource("CourseMaterial")
+
+[node name="FinishMarker" type="CSGCylinder3D" parent="."]
+position = Vector3(0, 0.04, -18)
+radius = 1.2
+height = 0.08
+sides = 24
+material = SubResource("MarkerMaterial")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+
+[node name="ThirdPersonCameraRig" parent="." instance=ExtResource("2_camera")]

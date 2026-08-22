@@ -17,6 +17,7 @@ func test_settings_round_trip_with_schema_version_and_safe_values() -> void:
 	store.set_locale("en")
 	store.set_graphics_quality(&"low")
 	store.set_accessibility(1.2, 0.3, false, true)
+	store.set_camera_preferences(0.006, true, 82.0, true)
 	assert_true(store.save_settings())
 	store.queue_free()
 	await get_tree().process_frame
@@ -31,6 +32,10 @@ func test_settings_round_trip_with_schema_version_and_safe_values() -> void:
 	assert_eq(loaded.flash_intensity, 0.3)
 	assert_false(loaded.screen_shake_enabled)
 	assert_true(loaded.hold_to_interact)
+	assert_almost_eq(loaded.mouse_sensitivity, 0.006, 0.0001)
+	assert_true(loaded.invert_camera_y)
+	assert_almost_eq(loaded.camera_fov, 82.0, 0.001)
+	assert_true(loaded.left_shoulder_camera)
 
 
 func test_unknown_schema_falls_back_to_defaults() -> void:

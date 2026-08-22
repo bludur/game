@@ -5,6 +5,7 @@ extends CanvasLayer
 
 var _health: HealthComponent
 var _mana: ManaComponent
+var _stamina: StaminaComponent
 var _spell_caster: SpellCaster
 var _spell_loadout: SpellLoadout
 var _active_spell: SpellData
@@ -15,6 +16,8 @@ var _wave_director: WaveDirector
 @onready var _health_label: Label = get_node("%HealthLabel") as Label
 @onready var _mana_bar: ProgressBar = get_node("%ManaBar") as ProgressBar
 @onready var _mana_label: Label = get_node("%ManaLabel") as Label
+@onready var _stamina_bar: ProgressBar = get_node("%StaminaBar") as ProgressBar
+@onready var _stamina_label: Label = get_node("%StaminaLabel") as Label
 @onready var _cooldown_bar: ProgressBar = get_node("%CooldownBar") as ProgressBar
 @onready var _spell_label: Label = get_node("%SpellLabel") as Label
 @onready var _slot_label: Label = get_node("%SlotLabel") as Label
@@ -52,6 +55,7 @@ func _bind_player() -> void:
 	var mage: MagePlayer = player as MagePlayer
 	_health = mage.get_health_component()
 	_mana = mage.get_mana_component()
+	_stamina = mage.get_stamina_component()
 	_spell_caster = mage.get_spell_caster()
 	_spell_loadout = mage.get_spell_loadout()
 	_active_spell = _spell_loadout.get_active_spell()
@@ -59,12 +63,14 @@ func _bind_player() -> void:
 
 	_health.health_changed.connect(_on_health_changed)
 	_mana.mana_changed.connect(_on_mana_changed)
+	_stamina.stamina_changed.connect(_on_stamina_changed)
 	_spell_caster.cooldown_changed.connect(_on_cooldown_changed)
 	_spell_loadout.active_spell_changed.connect(_on_active_spell_changed)
 	_dash.cooldown_changed.connect(_on_dash_cooldown_changed)
 
 	_on_health_changed(_health.current_health, _health.max_health)
 	_on_mana_changed(_mana.current_mana, _mana.max_mana)
+	_on_stamina_changed(_stamina.current_stamina, _stamina.max_stamina)
 	_on_active_spell_changed(_active_spell, _spell_loadout.active_slot_index)
 	_on_dash_cooldown_changed(0.0, _dash.cooldown_duration)
 
@@ -79,6 +85,12 @@ func _on_mana_changed(current: float, maximum: float) -> void:
 	_mana_bar.max_value = maximum
 	_mana_bar.value = current
 	_mana_label.text = tr("HUD_MANA") % [floori(current), floori(maximum)]
+
+
+func _on_stamina_changed(current: float, maximum: float) -> void:
+	_stamina_bar.max_value = maximum
+	_stamina_bar.value = current
+	_stamina_label.text = tr("HUD_STAMINA") % [floori(current), floori(maximum)]
 
 
 func _on_cooldown_changed(remaining: float, total: float) -> void:

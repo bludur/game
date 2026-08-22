@@ -54,72 +54,78 @@ custom_minimum_size = Vector2(620, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBox_card")
 
-[node name="Content" type="VBoxContainer" parent="Center/Card"]
+[node name="Scroll" type="ScrollContainer" parent="Center/Card"]
+custom_minimum_size = Vector2(620, 640)
 layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Content" type="VBoxContainer" parent="Center/Card/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 5
 
-[node name="Title" type="Label" parent="Center/Card/Content"]
+[node name="Title" type="Label" parent="Center/Card/Scroll/Content"]
 layout_mode = 2
 text = "SETTINGS_TITLE"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 26
 
-[node name="MasterLabel" type="Label" parent="Center/Card/Content"]
+[node name="MasterLabel" type="Label" parent="Center/Card/Scroll/Content"]
 layout_mode = 2
 text = "SETTINGS_MASTER"
-[node name="Master" type="HSlider" parent="Center/Card/Content"]
+[node name="Master" type="HSlider" parent="Center/Card/Scroll/Content"]
 layout_mode = 2
 max_value = 1.0
 step = 0.05
 
-[node name="MusicLabel" type="Label" parent="Center/Card/Content"]
+[node name="MusicLabel" type="Label" parent="Center/Card/Scroll/Content"]
 layout_mode = 2
 text = "SETTINGS_MUSIC"
-[node name="Music" type="HSlider" parent="Center/Card/Content"]
+[node name="Music" type="HSlider" parent="Center/Card/Scroll/Content"]
 layout_mode = 2
 max_value = 1.0
 step = 0.05
 
-[node name="SfxLabel" type="Label" parent="Center/Card/Content"]
+[node name="SfxLabel" type="Label" parent="Center/Card/Scroll/Content"]
 layout_mode = 2
 text = "SETTINGS_SFX"
-[node name="Sfx" type="HSlider" parent="Center/Card/Content"]
+[node name="Sfx" type="HSlider" parent="Center/Card/Scroll/Content"]
 layout_mode = 2
 max_value = 1.0
 step = 0.05
 
-[node name="LanguageLabel" type="Label" parent="Center/Card/Content"]
+[node name="LanguageLabel" type="Label" parent="Center/Card/Scroll/Content"]
 layout_mode = 2
 text = "SETTINGS_LANGUAGE"
-[node name="Language" type="OptionButton" parent="Center/Card/Content"]
+[node name="Language" type="OptionButton" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 
-[node name="WindowLabel" type="Label" parent="Center/Card/Content"]
+[node name="WindowLabel" type="Label" parent="Center/Card/Scroll/Content"]
 layout_mode = 2
 text = "SETTINGS_WINDOW"
-[node name="WindowMode" type="OptionButton" parent="Center/Card/Content"]
+[node name="WindowMode" type="OptionButton" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 
-[node name="GraphicsLabel" type="Label" parent="Center/Card/Content"]
+[node name="GraphicsLabel" type="Label" parent="Center/Card/Scroll/Content"]
 layout_mode = 2
 text = "SETTINGS_GRAPHICS"
-[node name="Graphics" type="OptionButton" parent="Center/Card/Content"]
+[node name="Graphics" type="OptionButton" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 
-[node name="UiScaleRow" type="HBoxContainer" parent="Center/Card/Content"]
+[node name="UiScaleRow" type="HBoxContainer" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Center/Card/Content/UiScaleRow"]
+[node name="Label" type="Label" parent="Center/Card/Scroll/Content/UiScaleRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SETTINGS_UI_SCALE"
 vertical_alignment = 1
 
-[node name="UiScale" type="HSlider" parent="Center/Card/Content/UiScaleRow"]
+[node name="UiScale" type="HSlider" parent="Center/Card/Scroll/Content/UiScaleRow"]
 custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 min_value = 0.8
@@ -127,51 +133,99 @@ max_value = 1.4
 step = 0.1
 value = 1.0
 
-[node name="FlashRow" type="HBoxContainer" parent="Center/Card/Content"]
+[node name="FlashRow" type="HBoxContainer" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Center/Card/Content/FlashRow"]
+[node name="Label" type="Label" parent="Center/Card/Scroll/Content/FlashRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SETTINGS_FLASH"
 vertical_alignment = 1
 
-[node name="FlashIntensity" type="HSlider" parent="Center/Card/Content/FlashRow"]
+[node name="FlashIntensity" type="HSlider" parent="Center/Card/Scroll/Content/FlashRow"]
 custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 max_value = 1.0
 step = 0.1
 value = 0.7
 
-[node name="ScreenShake" type="CheckButton" parent="Center/Card/Content"]
+[node name="ScreenShake" type="CheckButton" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "SETTINGS_SHAKE"
 
-[node name="HoldInteract" type="CheckButton" parent="Center/Card/Content"]
+[node name="HoldInteract" type="CheckButton" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "SETTINGS_HOLD_INTERACT"
 
-[node name="RebindCast" type="Button" parent="Center/Card/Content"]
+[node name="CameraLookRow" type="HBoxContainer" parent="Center/Card/Scroll/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SensitivityLabel" type="Label" parent="Center/Card/Scroll/Content/CameraLookRow"]
+layout_mode = 2
+text = "SETTINGS_CAMERA_SENSITIVITY"
+vertical_alignment = 1
+
+[node name="Sensitivity" type="HSlider" parent="Center/Card/Scroll/Content/CameraLookRow"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0005
+max_value = 0.008
+step = 0.0005
+value = 0.003
+
+[node name="FovLabel" type="Label" parent="Center/Card/Scroll/Content/CameraLookRow"]
+layout_mode = 2
+text = "SETTINGS_CAMERA_FOV"
+vertical_alignment = 1
+
+[node name="Fov" type="HSlider" parent="Center/Card/Scroll/Content/CameraLookRow"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 50.0
+max_value = 100.0
+step = 1.0
+value = 70.0
+
+[node name="CameraToggleRow" type="HBoxContainer" parent="Center/Card/Scroll/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="InvertY" type="CheckButton" parent="Center/Card/Scroll/Content/CameraToggleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SETTINGS_INVERT_Y"
+
+[node name="LeftShoulder" type="CheckButton" parent="Center/Card/Scroll/Content/CameraToggleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SETTINGS_LEFT_SHOULDER"
+
+[node name="RebindCast" type="Button" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "SETTINGS_REBIND_CAST"
-[node name="RebindDash" type="Button" parent="Center/Card/Content"]
+[node name="RebindDash" type="Button" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "SETTINGS_REBIND_DASH"
-[node name="Reset" type="Button" parent="Center/Card/Content"]
+[node name="Reset" type="Button" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "SETTINGS_RESET"
-[node name="Status" type="Label" parent="Center/Card/Content"]
+[node name="Status" type="Label" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 horizontal_alignment = 1
 theme_override_colors/font_color = Color(0.85, 0.68, 1, 1)
-[node name="Save" type="Button" parent="Center/Card/Content"]
+[node name="Save" type="Button" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 text = "SETTINGS_SAVE"
