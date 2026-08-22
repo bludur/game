@@ -26,6 +26,7 @@ static func ensure_actions() -> void:
 	_add_key_action(&"use_consumable", KEY_X, JOY_BUTTON_DPAD_DOWN)
 	_add_key_action(&"quick_save", KEY_F5, JOY_BUTTON_START)
 	_add_key_action(&"region_map", KEY_M, JOY_BUTTON_RIGHT_STICK)
+	_add_keyboard_action(&"grimoire", KEY_L)
 	_add_key_action(&"camera_rotate_left", KEY_Q, JOY_BUTTON_DPAD_LEFT)
 	_add_key_action(&"camera_rotate_right", KEY_T, JOY_BUTTON_DPAD_RIGHT)
 	_add_key_action(&"camera_swap_shoulder", KEY_V, JOY_BUTTON_DPAD_UP)

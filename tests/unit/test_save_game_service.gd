@@ -24,6 +24,9 @@ func test_three_save_cycles_and_backup_recovery_preserve_world_state() -> void:
 	var inventory: InventoryComponent = session.get_player_inventory()
 	var gravewood: ItemData = session.item_catalog.get_item(&"gravewood")
 	inventory.add_item(gravewood, 3)
+	session.grimoire.discover_fragment_from_source(&"broken_observatory")
+	assert_true(session.grimoire.unlock_node(&"arcane_star_sigil"))
+	assert_true(session.grimoire.select_node(&"arcane_star_sigil"))
 	session.player.global_position = Vector3(1, 0.1, 2)
 	assert_true(_service.save_game(session, 0))
 	session.player.global_position = Vector3(11, 0.1, 12)
@@ -65,6 +68,8 @@ func test_three_save_cycles_and_backup_recovery_preserve_world_state() -> void:
 		session.player.get_equipment_component().serialize_state(),
 		{"focus": "stormglass_rod", "robe": "wardkeeper_raiment", "talisman": "last_ember_charm"}
 	)
+	assert_eq(session.grimoire.active_node_ids, [&"arcane_star_sigil"])
+	assert_true(session.grimoire.discovered_fragments.has(&"fragment_star_map"))
 
 
 func test_version_two_migration_grants_one_safe_starter_loadout() -> void:
@@ -74,10 +79,11 @@ func test_version_two_migration_grants_one_safe_starter_loadout() -> void:
 		"world_state": {},
 	}
 	var migrated: Dictionary = _service.call("_migrate", legacy_snapshot) as Dictionary
-	assert_eq(migrated["version"], 3)
+	assert_eq(migrated["version"], 4)
 	assert_eq(
 		(migrated["player"] as Dictionary)["equipment"],
 		{"focus": "novice_wand", "robe": "ashweave_mantle", "talisman": "quicksilver_knot"}
 	)
+	assert_eq((migrated["grimoire"] as Dictionary)["active_nodes"], [])
 	var migrated_again: Dictionary = _service.call("_migrate", migrated) as Dictionary
 	assert_eq((migrated_again["player"] as Dictionary)["equipment"], (migrated["player"] as Dictionary)["equipment"])

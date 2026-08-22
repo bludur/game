@@ -17,6 +17,7 @@ var _dash_sound: AudioStreamWAV
 var _ward_sound: AudioStreamWAV
 var _controls_enabled: bool = true
 var _build_mode: bool = false
+var _grimoire_modifier_provider: Callable
 
 @onready var _controller: PlayerController = get_node("PlayerController") as PlayerController
 @onready var _health: HealthComponent = get_node("HealthComponent") as HealthComponent
@@ -70,7 +71,7 @@ func _ready() -> void:
 	if not is_instance_valid(spawn_parent):
 		spawn_parent = get_parent()
 	_spell_caster.bind(self, _cast_origin, _mana, spawn_parent, &"player", _combat_state)
-	_spell_caster.set_modifier_provider(_equipment.get_spell_profile)
+	_spell_caster.set_modifier_provider(_get_combined_spell_profile)
 	_spell_loadout.bind(_spell_caster)
 	_spell_loadout.active_spell_changed.connect(_on_active_spell_changed)
 	_on_active_spell_changed(_spell_loadout.get_active_spell(), _spell_loadout.active_slot_index)
@@ -140,6 +141,10 @@ func get_inventory_component() -> InventoryComponent:
 
 func get_corruption_component() -> CorruptionComponent:
 	return _corruption
+
+
+func set_grimoire_modifier_provider(provider: Callable) -> void:
+	_grimoire_modifier_provider = provider
 
 
 func set_respawn_transform(next_transform: Transform3D) -> void:
@@ -248,6 +253,16 @@ func _on_ward_active_changed(active: bool) -> void:
 
 func _get_status_corruption_resistance() -> float:
 	return _status_effects.get_resistance(StatusEffectData.ResistanceType.CORRUPTION)
+
+
+func _get_combined_spell_profile(spell: SpellData) -> Dictionary:
+	var profile: Dictionary = _equipment.get_spell_profile(spell)
+	if not _grimoire_modifier_provider.is_valid():
+		return profile
+	var grimoire_profile: Dictionary = _grimoire_modifier_provider.call(spell) as Dictionary
+	for key: String in profile:
+		profile[key] = float(profile[key]) * float(grimoire_profile.get(key, 1.0))
+	return profile
 
 
 func _filter_incoming_damage(damage: float) -> float:

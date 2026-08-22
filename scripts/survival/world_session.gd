@@ -21,6 +21,7 @@ const WITCH_ECHO_SCENE: PackedScene = preload("res://scenes/survival/witch_echo.
 @onready var _moon_fill: DirectionalLight3D = get_node("MoonFill") as DirectionalLight3D
 @onready var _respawn_timer: Timer = get_node("RespawnTimer") as Timer
 @onready var grimoire: GrimoireState = get_node("GrimoireState") as GrimoireState
+@onready var progress_journal: ProgressJournal = get_node("ProgressJournal") as ProgressJournal
 @onready var crafting_system: CraftingSystem = get_node("CraftingSystem") as CraftingSystem
 @onready var ritual_system: RitualSystem = get_node("RitualSystem") as RitualSystem
 @onready var construction_system: ConstructionSystem = get_node("ConstructionHost") as ConstructionSystem
@@ -60,6 +61,8 @@ func _ready() -> void:
 	_respawn_timer.timeout.connect(_on_respawn_timeout)
 	witchfire_hearth.rest_requested.connect(_on_rest_requested)
 	world_clock.time_changed.connect(_on_time_changed)
+	progress_journal.bind(world_state, grimoire)
+	player.set_grimoire_modifier_provider(grimoire.get_spell_profile)
 	crafting_system.bind(player.get_inventory_component(), grimoire)
 	ritual_system.bind(player, player.get_inventory_component(), world_state, _ritual_circle)
 	construction_system.bind(player, player.get_inventory_component(), world_state, item_catalog)
@@ -246,6 +249,7 @@ func apply_game(snapshot: Dictionary) -> bool:
 	world_clock.apply_state(snapshot.get("clock", {}) as Dictionary)
 	grimoire.apply_state(snapshot.get("grimoire", grimoire.serialize_state()) as Dictionary)
 	world_state.apply_state(snapshot.get("world_state", {}) as Dictionary)
+	_sync_grimoire_fragments_from_world()
 	for resource_node: ResourceNode in region.get_persistent_resources():
 		if world_state.resource_states.has(resource_node.persistent_id):
 			resource_node.apply_state(world_state.resource_states[resource_node.persistent_id])
@@ -361,11 +365,14 @@ func _on_functional_piece_used(piece: BuildingPiece, interactor: MagePlayer) -> 
 
 
 func _on_poi_discovered(poi: RegionPoiData) -> void:
+	var fragment: KnowledgeFragmentData = grimoire.discover_fragment_from_source(poi.poi_id)
 	var key: String = "MAP_POI_%s" % String(poi.poi_id).to_upper()
 	var poi_name: String = tr(key)
 	if poi_name == key:
 		poi_name = poi.display_name
 	notification_requested.emit(tr("NOTICE_POI_DISCOVERED") % poi_name)
+	if fragment != null:
+		notification_requested.emit(tr("NOTICE_GRIMOIRE_FRAGMENT") % fragment.display_name)
 
 
 func _on_weather_changed(weather: WeatherDirector.Weather) -> void:
@@ -411,8 +418,32 @@ func _on_threat_enemy_defeated(
 
 func _on_matriarch_defeated() -> void:
 	world_state.set_progression_flag(&"great_portal_unlocked")
+	grimoire.discover_fragment_from_source(&"rootbound_matriarch")
 	if is_instance_valid(_save_game_service):
 		_save_game_service.save_game(self, 0)
+
+
+func request_grimoire_respec() -> bool:
+	var flat_offset: Vector3 = player.global_position - witchfire_hearth.global_position
+	flat_offset.y = 0.0
+	if flat_offset.length() > 6.0:
+		notification_requested.emit(tr("NOTICE_GRIMOIRE_RESPEC_HEARTH"))
+		return false
+	if not grimoire.respec(player.get_inventory_component()):
+		notification_requested.emit(tr("NOTICE_GRIMOIRE_RESPEC_COST") % [
+			grimoire.definition.respec_item_quantity,
+		])
+		return false
+	notification_requested.emit(tr("NOTICE_GRIMOIRE_RESPEC_DONE"))
+	return true
+
+
+func _sync_grimoire_fragments_from_world() -> void:
+	for poi: RegionPoiData in region.poi_catalog.points:
+		if world_state.has_progression_flag(RegionDiscovery._flag_for(poi.poi_id)):
+			grimoire.discover_fragment_from_source(poi.poi_id)
+	if world_state.has_progression_flag(&"matriarch_defeated"):
+		grimoire.discover_fragment_from_source(&"rootbound_matriarch")
 
 
 func _apply_all_ritual_world_effects() -> void:

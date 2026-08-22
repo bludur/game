@@ -428,6 +428,82 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 7
 
+[node name="Grimoire" type="VBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs"]
+layout_mode = 2
+
+[node name="Columns" type="HBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="Tree" type="VBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Tree"]
+layout_mode = 2
+text = "ЧЕТЫРЕ ШКОЛЫ"
+theme_override_colors/font_color = Color(0.82, 0.66, 1, 1)
+theme_override_font_sizes/font_size = 16
+
+[node name="Scroll" type="ScrollContainer" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Tree"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Tree/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Details" type="VBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 9
+
+[node name="NodeTitle" type="Label" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+text = "ГРИМУАР"
+theme_override_colors/font_color = Color(0.94, 0.82, 0.38, 1)
+theme_override_font_sizes/font_size = 19
+
+[node name="NodeDetails" type="Label" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details"]
+custom_minimum_size = Vector2(0, 158)
+layout_mode = 2
+text = "Выберите запись."
+autowrap_mode = 2
+vertical_alignment = 1
+theme_override_colors/font_color = Color(0.84, 0.82, 0.9, 1)
+
+[node name="Actions" type="HBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="Unlock" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details/Actions"]
+custom_minimum_size = Vector2(170, 44)
+layout_mode = 2
+text = "Расшифровать"
+
+[node name="Activate" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details/Actions"]
+custom_minimum_size = Vector2(170, 44)
+layout_mode = 2
+text = "Выбрать"
+
+[node name="Journal" type="Label" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "ЖУРНАЛ ЦЕЛЕЙ"
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.78, 0.88, 1)
+
+[node name="Respec" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Перенастроить у Великого очага"
+
 [node name="MapPanel" type="PanelContainer" parent="Root"]
 layout_mode = 0
 anchors_preset = 8

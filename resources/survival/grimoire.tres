@@ -1,6 +1,242 @@
-[gd_resource type="Resource" script_class="GrimoireData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="GrimoireData" load_steps=25 format=3]
+
 [ext_resource type="Script" path="res://scripts/resources/grimoire_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/knowledge_fragment_data.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/resources/knowledge_node_data.gd" id="3"]
+
+[sub_resource type="Resource" id="F_observatory"]
+script = ExtResource("2")
+fragment_id = &"fragment_star_map"
+display_name = "Осколок звёздной карты"
+source_hint = "Исследуйте Разбитую обсерваторию."
+source_id = &"broken_observatory"
+school = 0
+
+[sub_resource type="Resource" id="F_moonwell"]
+script = ExtResource("2")
+fragment_id = &"fragment_dead_moon"
+display_name = "Отблеск мёртвой луны"
+source_hint = "Найдите Колодец мёртвой луны."
+source_id = &"dead_moonwell"
+school = 0
+
+[sub_resource type="Resource" id="F_root_cave"]
+script = ExtResource("2")
+fragment_id = &"fragment_rime_root"
+display_name = "Инеевый корень"
+source_hint = "Исследуйте Пещеру корней."
+source_id = &"root_cave"
+school = 1
+
+[sub_resource type="Resource" id="F_chapel"]
+script = ExtResource("2")
+fragment_id = &"fragment_drowned_bell"
+display_name = "Эхо утонувшего колокола"
+source_hint = "Отыщите Утонувшую часовню."
+source_id = &"drowned_chapel"
+school = 1
+
+[sub_resource type="Resource" id="F_watchtower"]
+script = ExtResource("2")
+fragment_id = &"fragment_storm_lens"
+display_name = "Грозовая линза"
+source_hint = "Поднимитесь к Полой дозорной башне."
+source_id = &"hollow_watchtower"
+school = 2
+
+[sub_resource type="Resource" id="F_stones"]
+script = ExtResource("2")
+fragment_id = &"fragment_pilgrim_thunder"
+display_name = "Клятва громового пилигрима"
+source_hint = "Прочтите Камни пилигримов."
+source_id = &"pilgrim_stones"
+school = 2
+
+[sub_resource type="Resource" id="F_gallows"]
+script = ExtResource("2")
+fragment_id = &"fragment_last_whisper"
+display_name = "Последний шёпот ведьмы"
+source_hint = "Отыщите Ведьмины виселицы."
+source_id = &"witch_gallows"
+school = 3
+
+[sub_resource type="Resource" id="F_bog"]
+script = ExtResource("2")
+fragment_id = &"fragment_bog_name"
+display_name = "Истинное имя трясины"
+source_hint = "Вслушайтесь в Шепчущее болото."
+source_id = &"whispering_bog"
+school = 3
+
+[sub_resource type="Resource" id="F_matriarch"]
+script = ExtResource("2")
+fragment_id = &"fragment_matriarch_rootheart"
+display_name = "Память корневого сердца"
+source_hint = "Очистите Укоренённую матриархиню в Беззвёздном склепе."
+source_kind = 1
+source_id = &"rootbound_matriarch"
+school = 3
+
+[sub_resource type="Resource" id="N_arcane_1"]
+script = ExtResource("3")
+node_id = &"arcane_star_sigil"
+display_name = "Звёздная печать"
+description = "Тайные снаряды удерживают более плотную форму."
+school = 0
+required_fragment_ids = Array[StringName]([&"fragment_star_map"])
+reward_kind = 0
+reward_id = &"spell_star_sigil"
+damage_multiplier = 1.12
+
+[sub_resource type="Resource" id="N_arcane_2"]
+script = ExtResource("3")
+node_id = &"arcane_moon_thread"
+display_name = "Лунная нить"
+description = "Экономит ману и ускоряет плетение тайных чар."
+school = 0
+knowledge_level = 2
+prerequisite_node_ids = Array[StringName]([&"arcane_star_sigil"])
+required_fragment_ids = Array[StringName]([&"fragment_dead_moon"])
+reward_kind = 2
+reward_id = &"ritual_moon_thread"
+cooldown_multiplier = 0.9
+mana_cost_multiplier = 0.9
+
+[sub_resource type="Resource" id="N_arcane_3"]
+script = ExtResource("3")
+node_id = &"arcane_great_portal"
+display_name = "Геометрия Великого портала"
+description = "Раскрывает рецепт фокуса для перехода в следующую область."
+school = 0
+knowledge_level = 3
+prerequisite_node_ids = Array[StringName]([&"arcane_moon_thread"])
+required_fragment_ids = Array[StringName]([&"fragment_matriarch_rootheart"])
+incompatible_node_ids = Array[StringName]([&"forbidden_voidthorn"])
+reward_kind = 3
+reward_id = &"great_portal_focus"
+area_radius_multiplier = 1.15
+
+[sub_resource type="Resource" id="N_frost_1"]
+script = ExtResource("3")
+node_id = &"frost_rime_veil"
+display_name = "Инеевый покров"
+description = "Холод дольше сковывает поражённые цели."
+school = 1
+required_fragment_ids = Array[StringName]([&"fragment_rime_root"])
+reward_kind = 1
+reward_id = &"modifier_rime_veil"
+effect_duration_multiplier = 1.2
+
+[sub_resource type="Resource" id="N_frost_2"]
+script = ExtResource("3")
+node_id = &"frost_drowned_domain"
+display_name = "Владения утонувшего звона"
+description = "Морозные области становятся шире и дешевле."
+school = 1
+knowledge_level = 2
+prerequisite_node_ids = Array[StringName]([&"frost_rime_veil"])
+required_fragment_ids = Array[StringName]([&"fragment_drowned_bell"])
+reward_kind = 2
+reward_id = &"ritual_drowned_domain"
+mana_cost_multiplier = 0.88
+area_radius_multiplier = 1.22
+
+[sub_resource type="Resource" id="N_frost_3"]
+script = ExtResource("3")
+node_id = &"frost_rimewood_mastery"
+display_name = "Память инеевого древа"
+description = "Раскрывает форму посоха, усиливающего морозную школу."
+school = 1
+knowledge_level = 3
+prerequisite_node_ids = Array[StringName]([&"frost_drowned_domain"])
+required_fragment_ids = Array[StringName]([&"fragment_matriarch_rootheart"])
+reward_kind = 3
+reward_id = &"shape_rimewood_crook"
+damage_multiplier = 1.15
+
+[sub_resource type="Resource" id="N_storm_1"]
+script = ExtResource("3")
+node_id = &"storm_lens"
+display_name = "Линза грозы"
+description = "Молния быстрее находит следующую цель."
+school = 2
+required_fragment_ids = Array[StringName]([&"fragment_storm_lens"])
+reward_kind = 1
+reward_id = &"modifier_storm_lens"
+chain_jump_multiplier = 1.2
+
+[sub_resource type="Resource" id="N_storm_2"]
+script = ExtResource("3")
+node_id = &"storm_pilgrim_oath"
+display_name = "Клятва громового пилигрима"
+description = "Ускоряет грозовые чары и уплотняет разряд."
+school = 2
+knowledge_level = 2
+prerequisite_node_ids = Array[StringName]([&"storm_lens"])
+required_fragment_ids = Array[StringName]([&"fragment_pilgrim_thunder"])
+reward_kind = 0
+reward_id = &"spell_pilgrim_thunder"
+cooldown_multiplier = 0.88
+damage_multiplier = 1.1
+
+[sub_resource type="Resource" id="N_storm_3"]
+script = ExtResource("3")
+node_id = &"stormglass_mastery"
+display_name = "Повелитель грозового стекла"
+description = "Раскрывает рецепт жезла из грозового стекла."
+school = 2
+knowledge_level = 3
+prerequisite_node_ids = Array[StringName]([&"storm_pilgrim_oath"])
+required_fragment_ids = Array[StringName]([&"fragment_matriarch_rootheart"])
+reward_kind = 3
+reward_id = &"shape_stormglass_rod"
+chain_jump_multiplier = 1.25
+
+[sub_resource type="Resource" id="N_forbidden_1"]
+script = ExtResource("3")
+node_id = &"forbidden_last_whisper"
+display_name = "Последний шёпот"
+description = "Запретные чары наносят больше урона ценой узкой специализации."
+school = 3
+required_fragment_ids = Array[StringName]([&"fragment_last_whisper"])
+reward_kind = 0
+reward_id = &"spell_last_whisper"
+damage_multiplier = 1.18
+
+[sub_resource type="Resource" id="N_forbidden_2"]
+script = ExtResource("3")
+node_id = &"forbidden_bog_name"
+display_name = "Истинное имя трясины"
+description = "Запретное воздействие длится дольше и охватывает большую область."
+school = 3
+knowledge_level = 2
+prerequisite_node_ids = Array[StringName]([&"forbidden_last_whisper"])
+required_fragment_ids = Array[StringName]([&"fragment_bog_name"])
+reward_kind = 2
+reward_id = &"ritual_true_bog_name"
+area_radius_multiplier = 1.18
+effect_duration_multiplier = 1.22
+
+[sub_resource type="Resource" id="N_forbidden_3"]
+script = ExtResource("3")
+node_id = &"forbidden_voidthorn"
+display_name = "Договор Пустошипа"
+description = "Раскрывает рецепт опасного фокуса Пустошипа."
+school = 3
+knowledge_level = 3
+prerequisite_node_ids = Array[StringName]([&"forbidden_bog_name"])
+required_fragment_ids = Array[StringName]([&"fragment_matriarch_rootheart"])
+incompatible_node_ids = Array[StringName]([&"arcane_great_portal"])
+reward_kind = 3
+reward_id = &"bind_voidthorn_focus"
+damage_multiplier = 1.25
+
 [resource]
 script = ExtResource("1")
 starting_knowledge = Array[StringName]([&"first_witchfire", &"ashen_botany"])
-starting_recipes = Array[StringName]([&"brew_clear_root", &"cook_ember_stew", &"bake_moonbread", &"simmer_gravecap_broth", &"brew_frostward_tonic", &"brew_antivenom", &"brew_courage_tonic", &"inscribe_storm_binding", &"weave_witchfire_charm", &"distill_ward_essence", &"grind_ritual_chalk", &"spin_arcane_thread", &"prepare_gravewood", &"etch_arcane_rune", &"etch_frost_rune", &"etch_storm_rune", &"weave_soul_lattice", &"bind_witchfire_core", &"temper_ward", &"great_portal_focus", &"shape_rimewood_crook", &"shape_stormglass_rod", &"bind_voidthorn_focus", &"weave_rimebound_robes", &"weave_wardkeeper_raiment", &"weave_bloodroot_shroud", &"set_moonwell_locket", &"bind_last_ember_charm", &"awaken_hollow_eye_relic"])
+starting_recipes = Array[StringName]([&"brew_clear_root", &"cook_ember_stew", &"bake_moonbread", &"simmer_gravecap_broth", &"brew_frostward_tonic", &"brew_antivenom", &"brew_courage_tonic", &"inscribe_storm_binding", &"weave_witchfire_charm", &"distill_ward_essence", &"grind_ritual_chalk", &"spin_arcane_thread", &"prepare_gravewood", &"etch_arcane_rune", &"etch_frost_rune", &"etch_storm_rune", &"weave_soul_lattice", &"bind_witchfire_core", &"temper_ward", &"weave_rimebound_robes", &"weave_wardkeeper_raiment", &"weave_bloodroot_shroud", &"set_moonwell_locket", &"bind_last_ember_charm", &"awaken_hollow_eye_relic"])
+maximum_active_nodes = 3
+respec_item_id = &"ritual_chalk"
+respec_item_quantity = 3
+fragments = Array[KnowledgeFragmentData]([SubResource("F_observatory"), SubResource("F_moonwell"), SubResource("F_root_cave"), SubResource("F_chapel"), SubResource("F_watchtower"), SubResource("F_stones"), SubResource("F_gallows"), SubResource("F_bog"), SubResource("F_matriarch")])
+nodes = Array[KnowledgeNodeData]([SubResource("N_arcane_1"), SubResource("N_arcane_2"), SubResource("N_arcane_3"), SubResource("N_frost_1"), SubResource("N_frost_2"), SubResource("N_frost_3"), SubResource("N_storm_1"), SubResource("N_storm_2"), SubResource("N_storm_3"), SubResource("N_forbidden_1"), SubResource("N_forbidden_2"), SubResource("N_forbidden_3")])

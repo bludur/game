@@ -13,6 +13,8 @@ var _slot_buttons: Array[Button] = []
 var _notification_tween: Tween
 var _build_category_buttons: Array[Button] = []
 var _storage_piece: BuildingPiece
+var _grimoire_buttons: Array[Button] = []
+var _selected_grimoire_node_id: StringName = &""
 
 @onready var _health_bar: ProgressBar = get_node("Root/Status/Content/HealthBar") as ProgressBar
 @onready var _health_label: Label = get_node("Root/Status/Content/HealthLabel") as Label
@@ -34,6 +36,13 @@ var _storage_piece: BuildingPiece
 @onready var _inventory_grid: GridContainer = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Grid") as GridContainer
 @onready var _crafting_list: VBoxContainer = get_node("Root/SurvivalWindow/Layout/Tabs/Crafting/Scroll/List") as VBoxContainer
 @onready var _ritual_list: VBoxContainer = get_node("Root/SurvivalWindow/Layout/Tabs/Rituals/Scroll/List") as VBoxContainer
+@onready var _grimoire_list: VBoxContainer = get_node("Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Tree/Scroll/List") as VBoxContainer
+@onready var _grimoire_title: Label = get_node("Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details/NodeTitle") as Label
+@onready var _grimoire_details: Label = get_node("Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details/NodeDetails") as Label
+@onready var _grimoire_unlock: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details/Actions/Unlock") as Button
+@onready var _grimoire_activate: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details/Actions/Activate") as Button
+@onready var _grimoire_journal: Label = get_node("Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details/Journal") as Label
+@onready var _grimoire_respec: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Grimoire/Columns/Details/Respec") as Button
 @onready var _split_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions/Split") as Button
 @onready var _drop_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions/Drop") as Button
 @onready var _use_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions/Use") as Button
@@ -61,6 +70,7 @@ func _ready() -> void:
 	_tabs.set_tab_title(0, tr("SURVIVAL_INVENTORY"))
 	_tabs.set_tab_title(1, tr("SURVIVAL_CRAFTING"))
 	_tabs.set_tab_title(2, tr("SURVIVAL_RITUALS"))
+	_tabs.set_tab_title(3, tr("SURVIVAL_GRIMOIRE"))
 	_survival_window.visible = false
 	_map_panel.visible = false
 	_prompt.visible = false
@@ -85,6 +95,9 @@ func _ready() -> void:
 	_focus_button.pressed.connect(_unequip_slot.bind(EquipmentData.Slot.FOCUS))
 	_robe_button.pressed.connect(_unequip_slot.bind(EquipmentData.Slot.ROBE))
 	_talisman_button.pressed.connect(_unequip_slot.bind(EquipmentData.Slot.TALISMAN))
+	_grimoire_unlock.pressed.connect(_unlock_selected_grimoire_node)
+	_grimoire_activate.pressed.connect(_toggle_selected_grimoire_node)
+	_grimoire_respec.pressed.connect(_request_grimoire_respec)
 	(get_node("Root/SurvivalWindow/Layout/Header/Close") as Button).pressed.connect(_close_interfaces)
 	(get_node("Root/StorageWindow/Layout/Header/Close") as Button).pressed.connect(_close_storage)
 	_notification_timer.timeout.connect(_hide_notification)
@@ -97,8 +110,14 @@ func bind(session: WorldSession) -> void:
 	_build_inventory_grid()
 	_build_recipe_list()
 	_build_ritual_list()
+	_build_grimoire_list()
 	_map.bind(session.player, session.world_state, session.region.poi_catalog)
 	_inventory.inventory_changed.connect(_refresh_inventory)
+	session.grimoire.fragment_discovered.connect(_on_grimoire_changed.unbind(1))
+	session.grimoire.node_unlocked.connect(_on_grimoire_changed.unbind(1))
+	session.grimoire.active_nodes_changed.connect(_on_grimoire_changed.unbind(1))
+	session.grimoire.recipe_unlocked.connect(_on_grimoire_changed.unbind(1))
+	session.world_state.state_changed.connect(_refresh_grimoire)
 	_equipment.equipment_changed.connect(_on_equipment_changed)
 	session.player.get_health_component().health_changed.connect(_on_health_changed)
 	session.player.get_mana_component().mana_changed.connect(_on_mana_changed)
@@ -127,6 +146,7 @@ func bind(session: WorldSession) -> void:
 	_refresh_inventory()
 	_refresh_equipment()
 	_refresh_objective()
+	_refresh_grimoire()
 	_on_build_category_changed(session.construction_system.active_category)
 
 
@@ -146,6 +166,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"ritual") and not _session.construction_system.build_mode:
 		_toggle_survival_window(2)
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(&"grimoire"):
+		_toggle_survival_window(3)
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"region_map"):
 		_toggle_map()
@@ -195,6 +218,22 @@ func _build_ritual_list() -> void:
 		button.tooltip_text = _ingredient_text(ritual.ingredients)
 		button.pressed.connect(ritual_requested.emit.bind(ritual.ritual_id))
 		_ritual_list.add_child(button)
+
+
+func _build_grimoire_list() -> void:
+	_grimoire_buttons.clear()
+	for child: Node in _grimoire_list.get_children():
+		child.queue_free()
+	if _session.grimoire.definition == null:
+		return
+	for node_data: KnowledgeNodeData in _session.grimoire.definition.nodes:
+		var button: Button = Button.new()
+		button.custom_minimum_size = Vector2(285, 54)
+		button.focus_mode = Control.FOCUS_ALL
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.pressed.connect(_select_grimoire_node.bind(node_data.node_id))
+		_grimoire_list.add_child(button)
+		_grimoire_buttons.append(button)
 
 
 func _refresh_inventory() -> void:
@@ -350,9 +389,102 @@ func _toggle_survival_window(tab_index: int) -> void:
 	if should_open:
 		_tabs.current_tab = tab_index
 		_refresh_inventory()
+		if tab_index == 3:
+			_refresh_grimoire()
 		if tab_index == 0 and not _slot_buttons.is_empty():
 			_slot_buttons[0].grab_focus()
+		elif tab_index == 3 and not _grimoire_buttons.is_empty():
+			_grimoire_buttons[0].grab_focus()
 	_emit_interface_state()
+
+
+func _select_grimoire_node(node_id: StringName) -> void:
+	_selected_grimoire_node_id = node_id
+	_refresh_grimoire()
+
+
+func _unlock_selected_grimoire_node() -> void:
+	if _session.grimoire.unlock_node(_selected_grimoire_node_id):
+		show_notification(tr("NOTICE_GRIMOIRE_NODE_UNLOCKED"))
+	else:
+		show_notification(_session.grimoire.get_unlock_hint(_selected_grimoire_node_id))
+	_refresh_grimoire()
+
+
+func _toggle_selected_grimoire_node() -> void:
+	if not _session.grimoire.toggle_node(_selected_grimoire_node_id):
+		show_notification(tr("NOTICE_GRIMOIRE_INVALID_LOADOUT"))
+	_refresh_grimoire()
+
+
+func _request_grimoire_respec() -> void:
+	_session.request_grimoire_respec()
+	_refresh_grimoire()
+
+
+func _on_grimoire_changed() -> void:
+	_refresh_grimoire()
+	_refresh_recipe_availability()
+
+
+func _refresh_grimoire() -> void:
+	if _session == null or _session.grimoire.definition == null:
+		return
+	var grimoire: GrimoireState = _session.grimoire
+	if _selected_grimoire_node_id.is_empty() and not grimoire.definition.nodes.is_empty():
+		var next_node: KnowledgeNodeData = grimoire.get_next_achievable_node()
+		_selected_grimoire_node_id = next_node.node_id \
+			if next_node != null else grimoire.definition.nodes[0].node_id
+	for index: int in mini(_grimoire_buttons.size(), grimoire.definition.nodes.size()):
+		var node_data: KnowledgeNodeData = grimoire.definition.nodes[index]
+		var button: Button = _grimoire_buttons[index]
+		var marker: String = "◆" if grimoire.active_node_ids.has(node_data.node_id) else (
+			"✓" if grimoire.unlocked_nodes.has(node_data.node_id) else "·"
+		)
+		button.text = "%s %s  ·  ступень %s" % [
+			marker, _school_name(node_data.school), "I".repeat(node_data.knowledge_level),
+		]
+		button.tooltip_text = node_data.display_name
+		button.modulate = Color(0.78, 0.66, 1.0, 1.0) \
+			if grimoire.get_unlock_status(node_data.node_id) == &"ready" else Color.WHITE
+	var selected: KnowledgeNodeData = grimoire.definition.get_node_data(_selected_grimoire_node_id)
+	if selected == null:
+		return
+	_grimoire_title.text = "%s · %s %d" % [
+		selected.display_name, _school_name(selected.school), selected.knowledge_level,
+	]
+	_grimoire_details.text = "%s\n\n%s\n\n%s" % [
+		selected.effect_summary(),
+		_reward_text(selected),
+		grimoire.get_unlock_hint(selected.node_id),
+	]
+	var unlocked: bool = grimoire.unlocked_nodes.has(selected.node_id)
+	var active: bool = grimoire.active_node_ids.has(selected.node_id)
+	_grimoire_unlock.visible = not unlocked
+	_grimoire_unlock.disabled = not grimoire.can_unlock_node(selected.node_id)
+	_grimoire_activate.visible = unlocked
+	_grimoire_activate.text = tr("GRIMOIRE_DEACTIVATE") if active else tr("GRIMOIRE_ACTIVATE")
+	_grimoire_journal.text = _journal_text()
+	_grimoire_respec.text = tr("GRIMOIRE_RESPEC") % [
+		grimoire.definition.respec_item_quantity,
+	]
+	_grimoire_respec.disabled = grimoire.active_node_ids.is_empty()
+
+
+func _journal_text() -> String:
+	var lines: PackedStringArray = PackedStringArray([tr("GRIMOIRE_JOURNAL")])
+	for entry: Dictionary in _session.progress_journal.get_entries():
+		lines.append("\n• %s\n  %s" % [String(entry.get("title", "")), String(entry.get("hint", ""))])
+	return "\n".join(lines)
+
+
+func _reward_text(node_data: KnowledgeNodeData) -> String:
+	var reward_kind: String = ["заклинание", "модификатор", "ритуал", "рецепт экипировки"][node_data.reward_kind]
+	return "Награда: %s · %s" % [reward_kind, String(node_data.reward_id)]
+
+
+func _school_name(school: SpellModifierData.School) -> String:
+	return ["Тайная", "Мороз", "Буря", "Запретная"][school]
 
 
 func _toggle_map() -> void:
