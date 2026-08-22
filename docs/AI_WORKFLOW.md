@@ -16,7 +16,7 @@ Codex работает непосредственно с репозиторие�
 ### Основа вертикального среза
 
 - `player-controller`, `input-handling`, `physics-system` — движение мага и коллизии.
-- `camera-system` — top-down камера, сглаживание и look-ahead.
+- `camera-system` — third-person orbit, SpringArm3D, zoom и плавное слежение.
 - `resource-pattern` — описания заклинаний, врагов и предметов в `.tres`.
 - `component-system` — здоровье, мана, получение урона и применение заклинаний.
 - `ai-navigation`, `state-machine` — первый преследующий противник.

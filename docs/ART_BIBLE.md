@@ -3,9 +3,9 @@
 ## Direction
 
 `Mage Prototype` uses a readable stylized low-poly look: large silhouettes,
-faceted surfaces, matte stone and concentrated emissive magic. The fixed camera
-must communicate faction and attack intent before small surface details become
-visible.
+faceted surfaces, matte stone and concentrated emissive magic. The third-person
+camera must keep silhouettes readable at exploration distance while supporting
+closer views of characters, structures and concentrated spell effects.
 
 ## Palette
 

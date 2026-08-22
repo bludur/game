@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/survival/world_session.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/regions/ashen_grove.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/characters/player/player.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/cameras/top_down_camera.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/cameras/third_person_camera_rig.tscn" id="4"]
 [ext_resource type="Script" path="res://scripts/interaction/interaction_controller.gd" id="5"]
 [ext_resource type="Resource" path="res://resources/survival/item_catalog.tres" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/ui/survival_hud.tscn" id="7"]
@@ -105,7 +105,7 @@ obstacle_clearance = 0.8
 position = Vector3(0, 0.1, 58)
 auto_respawn = false
 
-[node name="TopDownCamera" parent="." instance=ExtResource("4")]
+[node name="ThirdPersonCameraRig" parent="." instance=ExtResource("4")]
 
 [node name="InteractionController" type="Node" parent="."]
 script = ExtResource("5")

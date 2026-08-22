@@ -77,8 +77,7 @@ func _physics_process(_delta: float) -> void:
 	var definition: BuildingPieceData = get_selected_piece()
 	if definition == null:
 		return
-	var forward: Vector3 = -_player.global_basis.z
-	forward.y = 0.0
+	var forward: Vector3 = _get_placement_forward()
 	var target: Vector3 = _player.global_position + forward.normalized() * placement_distance
 	target.x = snappedf(target.x, grid_size)
 	target.z = snappedf(target.z, grid_size)
@@ -90,6 +89,16 @@ func _physics_process(_delta: float) -> void:
 		and not _intersects_world(definition, _placement_transform)
 	_preview_material.albedo_color = Color(0.18, 0.9, 0.55, 0.42) if _placement_valid \
 		else Color(0.95, 0.16, 0.28, 0.42)
+
+
+func _get_placement_forward() -> Vector3:
+	var camera: Camera3D = get_viewport().get_camera_3d()
+	if is_instance_valid(camera) and camera.projection == Camera3D.PROJECTION_PERSPECTIVE:
+		var camera_forward: Vector3 = -camera.global_basis.z
+		camera_forward.y = 0.0
+		if camera_forward.length_squared() > 0.001:
+			return camera_forward.normalized()
+	return -_player.global_basis.z
 
 
 func set_build_mode(active: bool) -> void:

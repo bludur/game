@@ -226,7 +226,7 @@ func _sanitize_choice(value: StringName, allowed: Array[StringName], fallback: S
 func _capture_default_bindings() -> void:
 	for action: StringName in [
 		&"move_forward", &"move_backward", &"move_left", &"move_right",
-		&"primary_spell", &"dash", &"spell_slot_1", &"spell_slot_2",
+		&"primary_spell", &"dash", &"sprint", &"spell_slot_1", &"spell_slot_2",
 		&"spell_slot_3", &"pause", &"aim_left", &"aim_right", &"aim_up", &"aim_down",
 	]:
 		if not InputMap.has_action(action):
@@ -248,6 +248,7 @@ func _ensure_gamepad_actions() -> void:
 	_add_joy_axis(&"aim_down", JOY_AXIS_RIGHT_Y, 1.0)
 	_add_joy_button(&"primary_spell", JOY_BUTTON_RIGHT_SHOULDER)
 	_add_joy_button(&"dash", JOY_BUTTON_A)
+	_add_joy_button(&"sprint", JOY_BUTTON_LEFT_STICK)
 	_add_joy_button(&"pause", JOY_BUTTON_START)
 
 

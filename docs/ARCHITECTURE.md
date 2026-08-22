@@ -3,23 +3,26 @@
 ## Scene composition
 
 ```text
-Main (Node3D)
+WorldSession (Node3D)
 ├── WorldEnvironment
 ├── Sun
-├── Arena (StaticBody3D)
+├── RegionHost
+│   ├── AshenGrove
+│   └── StarlessCrypt
 ├── Player (CharacterBody3D instance)
-├── WaveDirector
-│   ├── Enemies
-│   └── SpawnPoints × 4
-├── RunDirector
-├── TopDownCamera (Node3D instance)
-│   └── Camera3D
-├── TrainingTarget × 3
-├── MageHud (CanvasLayer)
-└── SessionUi (CanvasLayer)
+├── ThirdPersonCameraRig
+│   └── PitchPivot
+│       └── ShoulderOffset
+│           └── SpringArm3D
+│               └── Camera3D
+├── InteractionController
+├── ConstructionHost
+├── ThreatDirector
+└── SurvivalHud (CanvasLayer)
 ```
 
-`Main` — composition root. Он размещает мир и экземпляры, но не содержит игровой логики.
+`WorldSession` — composition root survival-среза. Старая `ArenaRun` с
+`TopDownCamera` сохранена как отдельная боевая и QA-сцена.
 
 ## Player
 
@@ -42,7 +45,8 @@ Player (CharacterBody3D)
 ```
 
 `MagePlayer` — композиционный корень, который связывает прямых детей.
-`PlayerController` владеет только перемещением и поворотом визуальной модели.
+`PlayerController` владеет перемещением относительно камеры, бегом и поворотом
+тела персонажа в направлении движения или заклинания.
 `HealthComponent`, `ManaComponent`, `SpellCaster`, `SpellLoadout` и
 `DashComponent` являются переиспользуемыми сценами.
 
@@ -65,8 +69,9 @@ RunDirector.INTRO
 
 ```text
 Input Map -> PlayerController -> CharacterBody3D.velocity -> move_and_slide()
-Player group -> TopDownCamera -> smoothed world position
-primary_spell -> SpellCaster -> ManaComponent.try_spend()
+Player group -> ThirdPersonCameraRig -> interpolated follow -> SpringArm3D collision
+mouse/right stick -> ThirdPersonCameraRig -> yaw/pitch -> camera-relative movement
+primary_spell -> screen-center aim -> SpellCaster -> ManaComponent.try_spend()
 SpellData (.tres) -> ArcaneBolt (Area3D) -> HurtboxComponent -> HealthComponent
 Health/Mana/SpellCaster signals -> MageHud
 Enemy.defeated -> WaveDirector -> RunDirector -> SessionUi
@@ -81,6 +86,7 @@ UpgradeData -> RunDirector -> owning Health/Mana/SpellLoadout component
 - `ManaComponent` — текущая мана и восстановление.
 - `HealthComponent` — изменяемое здоровье конкретной сущности.
 - `PlayerController` — скорость и текущее направление движения.
-- `TopDownCamera` — параметры визуального слежения.
+- `ThirdPersonCameraRig` — orbit, zoom, мышь/геймпад и защита камеры от стен.
+- `TopDownCamera` — сохранённая камера старой QA-арены.
 - `WaveDirector` — текущая волна, очередь появления и оставшиеся враги.
 - `RunDirector` — стадия сессии и временно применённое улучшение.

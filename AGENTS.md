@@ -4,7 +4,7 @@
 
 - Engine: Godot 4.7.2, Forward+ renderer.
 - Language: statically typed GDScript.
-- Perspective: fixed top-down 3D camera.
+- Perspective: player-relative third-person 3D camera with mouse orbit and collision avoidance.
 - Current scope: single-player vertical slice only.
 - Explicitly out of scope until approved: multiplayer, procedural world generation, live services, and open-world streaming.
 

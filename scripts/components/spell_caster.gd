@@ -2,6 +2,7 @@ class_name SpellCaster
 extends Node
 
 signal spell_cast(spell: SpellData)
+signal cast_direction_resolved(direction: Vector3)
 signal cast_failed(reason: StringName)
 signal cooldown_changed(remaining: float, total: float)
 
@@ -65,7 +66,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	var target_position: Variant
-	if event is InputEventJoypadButton:
+	if _uses_camera_center_aim():
+		target_position = _get_mouse_ground_position(_get_viewport_center())
+	elif event is InputEventJoypadButton:
 		target_position = _get_gamepad_target_position()
 	else:
 		target_position = _get_mouse_ground_position(get_viewport().get_mouse_position())
@@ -149,6 +152,7 @@ func cast_at(target_position: Vector3) -> bool:
 	_cooldown_timer.start(spell_data.cooldown_seconds)
 	set_process(true)
 	cooldown_changed.emit(_cooldown_timer.time_left, _cooldown_timer.wait_time)
+	cast_direction_resolved.emit(direction.normalized())
 	spell_cast.emit(spell_data)
 	return true
 
@@ -164,8 +168,24 @@ func _get_mouse_ground_position(screen_position: Vector2) -> Variant:
 
 	var ray_origin: Vector3 = camera.project_ray_origin(screen_position)
 	var ray_direction: Vector3 = camera.project_ray_normal(screen_position)
-	var casting_plane: Plane = Plane(Vector3.UP, cast_origin.global_position.y)
-	return casting_plane.intersects_ray(ray_origin, ray_direction)
+	var casting_plane: Plane = Plane(Vector3.UP, 0.05)
+	var intersection: Variant = casting_plane.intersects_ray(ray_origin, ray_direction)
+	if intersection is Vector3:
+		return intersection
+	ray_direction.y = 0.0
+	if ray_direction.length_squared() <= 0.001 or spell_data == null:
+		return null
+	return cast_origin.global_position + ray_direction.normalized() * spell_data.range_meters
+
+
+func _uses_camera_center_aim() -> bool:
+	var camera: Camera3D = get_viewport().get_camera_3d()
+	return camera != null and camera.projection == Camera3D.PROJECTION_PERSPECTIVE \
+		and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+
+
+func _get_viewport_center() -> Vector2:
+	return get_viewport().get_visible_rect().size * 0.5
 
 
 func _get_gamepad_target_position() -> Vector3:

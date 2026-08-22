@@ -12,9 +12,10 @@ enum State {
 
 @export_group("Movement")
 @export_range(1.0, 20.0, 0.1) var move_speed: float = 6.0
+@export_range(1.0, 2.5, 0.05) var sprint_multiplier: float = 1.55
 @export_range(1.0, 60.0, 0.5) var acceleration: float = 28.0
 @export_range(1.0, 60.0, 0.5) var deceleration: float = 34.0
-@export_range(1.0, 30.0, 0.5) var visual_turn_speed: float = 14.0
+@export_range(1.0, 30.0, 0.5) var turn_speed: float = 14.0
 
 var _gravity: float = float(ProjectSettings.get_setting("physics/3d/default_gravity", 18.0))
 var _body: CharacterBody3D
@@ -24,6 +25,8 @@ var _enabled: bool = true
 var _state: State = State.MOVE
 var _last_move_direction: Vector3 = Vector3.FORWARD
 var _was_moving: bool = false
+var _facing_override_direction: Vector3 = Vector3.ZERO
+var _facing_override_remaining: float = 0.0
 
 
 func _ready() -> void:
@@ -47,6 +50,8 @@ func set_enabled(enabled: bool) -> void:
 	set_physics_process(enabled and is_instance_valid(_body))
 	if not enabled and is_instance_valid(_body):
 		_body.velocity = Vector3.ZERO
+		_facing_override_direction = Vector3.ZERO
+		_facing_override_remaining = 0.0
 	if not enabled and _was_moving:
 		_was_moving = false
 		movement_activity_changed.emit(false)
@@ -62,7 +67,7 @@ func _physics_process(delta: float) -> void:
 		_body.velocity.x = _dash.dash_direction.x * _dash.dash_speed
 		_body.velocity.z = _dash.dash_direction.z * _dash.dash_speed
 		_body.move_and_slide()
-		_rotate_visuals(_dash.dash_direction, delta)
+		_rotate_body(_dash.dash_direction, delta)
 		return
 
 	var input_vector: Vector2 = Input.get_vector(
@@ -79,7 +84,10 @@ func _physics_process(delta: float) -> void:
 	if move_direction != Vector3.ZERO:
 		_last_move_direction = move_direction
 	var horizontal_velocity: Vector3 = Vector3(_body.velocity.x, 0.0, _body.velocity.z)
-	var target_velocity: Vector3 = move_direction * move_speed
+	var speed_multiplier: float = 1.0
+	if InputMap.has_action(&"sprint") and Input.is_action_pressed(&"sprint"):
+		speed_multiplier = sprint_multiplier
+	var target_velocity: Vector3 = move_direction * move_speed * speed_multiplier
 	var change_rate: float = acceleration if move_direction != Vector3.ZERO else deceleration
 
 	horizontal_velocity = horizontal_velocity.move_toward(target_velocity, change_rate * delta)
@@ -89,7 +97,11 @@ func _physics_process(delta: float) -> void:
 	_apply_gravity(delta)
 
 	_body.move_and_slide()
-	_rotate_visuals(move_direction, delta)
+	var facing_direction: Vector3 = move_direction
+	if _facing_override_remaining > 0.0:
+		_facing_override_remaining = maxf(0.0, _facing_override_remaining - delta)
+		facing_direction = _facing_override_direction
+	_rotate_body(facing_direction, delta)
 
 
 func request_dash(direction: Vector3 = Vector3.ZERO) -> bool:
@@ -116,6 +128,14 @@ func get_state_name() -> StringName:
 			return &"disabled"
 		_:
 			return &"unknown"
+
+
+func set_facing_direction(direction: Vector3, hold_seconds: float = 0.2) -> void:
+	direction.y = 0.0
+	if direction.length_squared() <= 0.001:
+		return
+	_facing_override_direction = direction.normalized()
+	_facing_override_remaining = maxf(0.0, hold_seconds)
 
 
 func _apply_gravity(delta: float) -> void:
@@ -164,10 +184,11 @@ func _camera_relative_direction(input_vector: Vector2) -> Vector3:
 	return (camera_right * input_vector.x + camera_forward * -input_vector.y).normalized()
 
 
-func _rotate_visuals(move_direction: Vector3, delta: float) -> void:
+func _rotate_body(move_direction: Vector3, delta: float) -> void:
 	if move_direction == Vector3.ZERO:
 		return
 
 	var target_yaw: float = atan2(-move_direction.x, -move_direction.z)
-	var turn_weight: float = 1.0 - exp(-visual_turn_speed * delta)
-	_visuals.rotation.y = lerp_angle(_visuals.rotation.y, target_yaw, turn_weight)
+	var turn_weight: float = 1.0 - exp(-turn_speed * delta)
+	_body.rotation.y = lerp_angle(_body.rotation.y, target_yaw, turn_weight)
+	_visuals.rotation.y = 0.0

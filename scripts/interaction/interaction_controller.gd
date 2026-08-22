@@ -79,7 +79,7 @@ func _requires_hold() -> bool:
 
 
 func _update_focus() -> void:
-	var facing: Vector3 = -_player.global_basis.z
+	var facing: Vector3 = _get_facing_direction()
 	var best: InteractableComponent
 	var best_score: float = -INF
 	for node: Node in get_tree().get_nodes_in_group(&"interactable"):
@@ -97,3 +97,13 @@ func _update_focus() -> void:
 		return
 	_focused = best
 	focus_changed.emit(_focused)
+
+
+func _get_facing_direction() -> Vector3:
+	var camera: Camera3D = get_viewport().get_camera_3d()
+	if is_instance_valid(camera) and camera.projection == Camera3D.PROJECTION_PERSPECTIVE:
+		var camera_forward: Vector3 = -camera.global_basis.z
+		camera_forward.y = 0.0
+		if camera_forward.length_squared() > 0.001:
+			return camera_forward.normalized()
+	return -_player.global_basis.z

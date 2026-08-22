@@ -35,8 +35,11 @@ func _run_checks() -> void:
 			failures.append("Persistent resource ids are missing or duplicated.")
 		persistent_ids[resource_node.persistent_id] = true
 	var camera: Camera3D = root.get_camera_3d()
-	if camera == null or camera.projection != Camera3D.PROJECTION_ORTHOGONAL:
-		failures.append("Survival camera is missing or not orthographic.")
+	if camera == null or camera.projection != Camera3D.PROJECTION_PERSPECTIVE:
+		failures.append("Survival camera is missing or not perspective.")
+	if session.third_person_camera == null \
+			or session.third_person_camera.get_spring_arm().collision_mask != 1:
+		failures.append("Third-person camera rig is missing world collision avoidance.")
 	if session.survival_hud == null or session.survival_tutorial == null:
 		failures.append("Survival HUD or contextual tutorial is missing.")
 	var inventory: InventoryComponent = session.get_player_inventory()

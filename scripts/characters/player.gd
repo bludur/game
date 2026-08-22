@@ -52,6 +52,7 @@ func _ready() -> void:
 	_health.damaged.connect(_on_damaged)
 	_health.died.connect(_on_died)
 	_spell_caster.spell_cast.connect(_on_spell_cast)
+	_spell_caster.cast_direction_resolved.connect(_on_cast_direction_resolved)
 	_dash.dash_started.connect(_on_dash_started)
 	_dash.dash_finished.connect(_on_dash_finished)
 	_controller.movement_activity_changed.connect(_animator.set_moving)
@@ -126,6 +127,10 @@ func reset_for_new_run() -> void:
 func _on_spell_cast(_spell: SpellData) -> void:
 	_sfx_pool.play_sfx(_cast_sound, -2.0)
 	_animator.play_cast()
+
+
+func _on_cast_direction_resolved(direction: Vector3) -> void:
+	_controller.set_facing_direction(direction)
 
 
 func _on_active_spell_changed(_spell: SpellData, _slot_index: int) -> void:

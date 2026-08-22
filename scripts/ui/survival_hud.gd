@@ -33,6 +33,7 @@ var _notification_tween: Tween
 @onready var _map_panel: PanelContainer = get_node("Root/MapPanel") as PanelContainer
 @onready var _map: SurvivalMap = get_node("Root/MapPanel/Map") as SurvivalMap
 @onready var _build_label: Label = get_node("Root/BuildInfo") as Label
+@onready var _crosshair: Label = get_node("Root/Crosshair") as Label
 @onready var _notification_timer: Timer = get_node("NotificationTimer") as Timer
 
 
@@ -262,6 +263,10 @@ func _on_interaction_focus_changed(interactable: InteractableComponent) -> void:
 
 func close_interfaces() -> void:
 	_close_interfaces()
+
+
+func set_crosshair_visible(is_visible: bool) -> void:
+	_crosshair.visible = is_visible
 
 
 func _on_build_mode_changed(active: bool) -> void:

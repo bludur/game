@@ -16,6 +16,10 @@ var _settings_from_pause: bool = false
 @onready var _pause_menu: PauseMenu = get_node("PauseMenu") as PauseMenu
 
 
+func _enter_tree() -> void:
+	SurvivalInputProfile.ensure_actions()
+
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	SurvivalInputProfile.ensure_actions()
@@ -73,6 +77,7 @@ func _start_session(session_scene: PackedScene) -> bool:
 		_current_run.connect(&"main_menu_requested", return_to_menu)
 	if _current_run is WorldSession:
 		(_current_run as WorldSession).bind_save_service(save_game_service)
+		(_current_run as WorldSession).set_session_paused(false)
 	return true
 
 
@@ -90,6 +95,7 @@ func toggle_pause() -> void:
 	get_tree().paused = next_paused
 	_pause_menu.set_open(next_paused)
 	_screen_host.visible = false
+	_set_current_run_paused(next_paused)
 
 
 func get_current_run() -> Node:
@@ -122,6 +128,7 @@ func _close_settings() -> void:
 func _resume_run() -> void:
 	get_tree().paused = false
 	_pause_menu.set_open(false)
+	_set_current_run_paused(false)
 
 
 func _show_main_menu() -> void:
@@ -142,3 +149,8 @@ func _clear_run() -> void:
 			_current_run.get_parent().remove_child(_current_run)
 		_current_run.queue_free()
 	_current_run = null
+
+
+func _set_current_run_paused(paused: bool) -> void:
+	if _current_run is WorldSession:
+		(_current_run as WorldSession).set_session_paused(paused)

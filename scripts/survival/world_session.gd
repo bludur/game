@@ -11,6 +11,7 @@ const WITCH_ECHO_SCENE: PackedScene = preload("res://scenes/survival/witch_echo.
 
 @onready var region: AshenGrove = get_node("RegionHost/AshenGrove") as AshenGrove
 @onready var player: MagePlayer = get_node("Player") as MagePlayer
+@onready var third_person_camera: ThirdPersonCameraRig = get_node("ThirdPersonCameraRig") as ThirdPersonCameraRig
 @onready var interaction_controller: InteractionController = get_node("InteractionController") as InteractionController
 @onready var pickups: Node3D = get_node("Pickups") as Node3D
 @onready var world_state: WorldState = get_node("WorldState") as WorldState
@@ -37,6 +38,8 @@ var _respawn_transform: Transform3D
 var _active_echo: WitchEcho
 var _ward_zones: Array[WardZone] = []
 var _cursed_zones: Array[CursedZone] = []
+var _interface_open: bool = false
+var _session_paused: bool = false
 
 
 func _ready() -> void:
@@ -44,6 +47,7 @@ func _ready() -> void:
 	SurvivalInputProfile.ensure_actions()
 	player.global_position = region.get_spawn_position()
 	player.reset_physics_interpolation()
+	third_person_camera.set_target(player)
 	interaction_controller.bind(player)
 	player.get_inventory_component().drop_requested.connect(_on_drop_requested)
 	player.defeated.connect(_on_player_defeated)
@@ -71,6 +75,7 @@ func _ready() -> void:
 	survival_hud.ritual_requested.connect(_on_ritual_requested)
 	survival_hud.interface_open_changed.connect(_on_interface_open_changed)
 	survival_hud.bind(self)
+	_refresh_camera_controls()
 	survival_tutorial.hint_requested.connect(notification_requested.emit)
 	survival_tutorial.bind(
 		world_state,
@@ -127,10 +132,25 @@ func _on_ritual_requested(ritual_id: StringName) -> void:
 
 
 func _on_interface_open_changed(open: bool) -> void:
+	_interface_open = open
 	player.set_controls_enabled(not open)
 	interaction_controller.set_enabled(not open)
 	if open and construction_system.build_mode:
 		construction_system.set_build_mode(false)
+	_refresh_camera_controls()
+
+
+func set_session_paused(paused: bool) -> void:
+	_session_paused = paused
+	_refresh_camera_controls()
+
+
+func _refresh_camera_controls() -> void:
+	var gameplay_input_active: bool = not _interface_open and not _session_paused
+	if is_instance_valid(third_person_camera):
+		third_person_camera.set_controls_enabled(gameplay_input_active)
+	if is_instance_valid(survival_hud):
+		survival_hud.set_crosshair_visible(gameplay_input_active)
 
 
 func get_region_id() -> StringName:

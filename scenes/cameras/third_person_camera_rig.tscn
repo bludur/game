@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/cameras/third_person_camera_rig.gd" id="1_camera"]
+
+[node name="ThirdPersonCameraRig" type="Node3D" groups=["third_person_camera"]]
+script = ExtResource("1_camera")
+
+[node name="PitchPivot" type="Node3D" parent="."]
+
+[node name="ShoulderOffset" type="Node3D" parent="PitchPivot"]
+position = Vector3(0.5, 0, 0)
+
+[node name="SpringArm3D" type="SpringArm3D" parent="PitchPivot/ShoulderOffset"]
+collision_mask = 1
+spring_length = 5.5
+margin = 0.25
+
+[node name="Camera3D" type="Camera3D" parent="PitchPivot/ShoulderOffset/SpringArm3D"]
+current = true
+fov = 70.0
+near = 0.12
+far = 160.0
