@@ -1,0 +1,114 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scripts/boss/rootbound_matriarch.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/components/health_component.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/components/hurtbox_component.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/components/movement_modifier_component.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/components/character_animator.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/components/sfx_pool_3d.tscn" id="6"]
+[ext_resource type="Resource" path="res://resources/boss_attacks/directed_strike.tres" id="7"]
+[ext_resource type="Resource" path="res://resources/boss_attacks/expanding_wave.tres" id="8"]
+[ext_resource type="Resource" path="res://resources/boss_attacks/summon_guard.tres" id="9"]
+
+[sub_resource type="CapsuleShape3D" id="Shape"]
+radius = 1.0
+height = 3.4
+
+[sub_resource type="StandardMaterial3D" id="BarkMaterial"]
+albedo_color = Color(0.12, 0.055, 0.09, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="BodyMesh"]
+material = SubResource("BarkMaterial")
+top_radius = 0.72
+bottom_radius = 1.2
+height = 3.0
+radial_segments = 9
+
+[sub_resource type="StandardMaterial3D" id="CoreMaterial"]
+albedo_color = Color(0.72, 0.05, 0.22, 1)
+emission_enabled = true
+emission = Color(0.86, 0.02, 0.16, 1)
+emission_energy_multiplier = 4.4
+
+[sub_resource type="SphereMesh" id="CoreMesh"]
+material = SubResource("CoreMaterial")
+radius = 0.46
+height = 0.92
+radial_segments = 14
+rings = 7
+
+[sub_resource type="PrismMesh" id="RootMesh"]
+material = SubResource("BarkMaterial")
+size = Vector3(0.45, 2.4, 0.55)
+
+[node name="RootboundMatriarch" type="CharacterBody3D" groups=["boss", "enemy"]]
+collision_layer = 4
+collision_mask = 1
+floor_snap_length = 0.25
+script = ExtResource("1")
+directed_strike = ExtResource("7")
+expanding_wave = ExtResource("8")
+summon_guard = ExtResource("9")
+move_speed = 2.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 1.7, 0)
+shape = SubResource("Shape")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.6
+target_desired_distance = 5.0
+radius = 1.0
+height = 3.4
+navigation_layers = 1
+
+[node name="HealthComponent" parent="." instance=ExtResource("2")]
+max_health = 460.0
+
+[node name="HurtboxComponent" parent="." instance=ExtResource("3")]
+position = Vector3(0, 1.7, 0)
+faction = &"enemy"
+
+[node name="MovementModifierComponent" parent="." instance=ExtResource("4")]
+
+[node name="SfxPool3D" parent="." instance=ExtResource("6")]
+position = Vector3(0, 1.7, 0)
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="ModelRoot" type="Node3D" parent="Visuals"]
+
+[node name="Body" type="MeshInstance3D" parent="Visuals/ModelRoot"]
+position = Vector3(0, 1.5, 0)
+mesh = SubResource("BodyMesh")
+
+[node name="Core" type="MeshInstance3D" parent="Visuals/ModelRoot"]
+position = Vector3(0, 1.7, -0.78)
+mesh = SubResource("CoreMesh")
+
+[node name="RootLeft" type="MeshInstance3D" parent="Visuals/ModelRoot"]
+position = Vector3(-0.85, 2.8, 0)
+rotation_degrees = Vector3(0, 0, -28)
+mesh = SubResource("RootMesh")
+
+[node name="RootRight" type="MeshInstance3D" parent="Visuals/ModelRoot"]
+position = Vector3(0.85, 2.8, 0)
+rotation_degrees = Vector3(0, 0, 28)
+mesh = SubResource("RootMesh")
+
+[node name="TelegraphGlow" type="OmniLight3D" parent="Visuals"]
+position = Vector3(0, 1.7, 0)
+light_color = Color(0.92, 0.04, 0.24, 1)
+light_energy = 2.6
+omni_range = 7.0
+shadow_enabled = false
+
+[node name="CharacterAnimator" parent="." instance=ExtResource("5")]
+
+[node name="StateTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="TargetRefreshTimer" type="Timer" parent="."]
+wait_time = 0.3
+autostart = true

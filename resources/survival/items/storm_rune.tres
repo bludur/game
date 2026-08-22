@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+item_id = &"storm_rune"
+display_name = "Руна бури"
+description = "Гудит от связанного внутри грозового заряда."
+item_type = 2
+max_stack_size = 10
+accent_color = Color(0.75, 0.86, 1, 1)

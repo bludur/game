@@ -1,0 +1,108 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/survival/ashen_grove.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/survival/regions/ashen_grove.tres" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/interaction/resource_node.tscn" id="3"]
+[ext_resource type="Resource" path="res://resources/survival/loot/grave_tree.tres" id="4"]
+[ext_resource type="Resource" path="res://resources/survival/loot/moonstone.tres" id="5"]
+[ext_resource type="Resource" path="res://resources/survival/loot/dusk_herb.tres" id="6"]
+[ext_resource type="Resource" path="res://resources/survival/loot/soul_fissure.tres" id="7"]
+
+[node name="AshenGrove" type="Node3D"]
+script = ExtResource("1")
+region_data = ExtResource("2")
+
+[node name="Resources" type="Node3D" parent="."]
+
+[node name="GraveTreeNorth" parent="Resources" instance=ExtResource("3")]
+position = Vector3(-12, 0, 38)
+persistent_id = &"grove_grave_tree_north"
+resource_kind = 0
+loot_table = ExtResource("4")
+accent_color = Color(0.48, 0.16, 0.58, 1)
+channel_duration = 0.9
+mana_cost = 8.0
+
+[node name="GraveTreeRuins" parent="Resources" instance=ExtResource("3")]
+position = Vector3(20, 0, 14)
+persistent_id = &"grove_grave_tree_ruins"
+resource_kind = 0
+loot_table = ExtResource("4")
+accent_color = Color(0.42, 0.12, 0.52, 1)
+channel_duration = 0.9
+mana_cost = 8.0
+
+[node name="GraveTreeSouth" parent="Resources" instance=ExtResource("3")]
+position = Vector3(18, 0, 43)
+persistent_id = &"grove_grave_tree_south"
+resource_kind = 0
+loot_table = ExtResource("4")
+accent_color = Color(0.46, 0.14, 0.56, 1)
+channel_duration = 0.9
+mana_cost = 8.0
+
+[node name="MoonstoneWest" parent="Resources" instance=ExtResource("3")]
+position = Vector3(-35, 0, 4)
+persistent_id = &"grove_moonstone_west"
+resource_kind = 1
+loot_table = ExtResource("5")
+accent_color = Color(0.3, 0.62, 1, 1)
+channel_duration = 1.2
+mana_cost = 14.0
+
+[node name="MoonstoneCrypt" parent="Resources" instance=ExtResource("3")]
+position = Vector3(34, 0, -45)
+persistent_id = &"grove_moonstone_crypt"
+resource_kind = 1
+loot_table = ExtResource("5")
+accent_color = Color(0.38, 0.72, 1, 1)
+channel_duration = 1.2
+mana_cost = 14.0
+
+[node name="MoonstoneRuins" parent="Resources" instance=ExtResource("3")]
+position = Vector3(35, 0, 6)
+persistent_id = &"grove_moonstone_ruins"
+resource_kind = 1
+loot_table = ExtResource("5")
+accent_color = Color(0.34, 0.68, 1, 1)
+channel_duration = 1.2
+mana_cost = 14.0
+
+[node name="DuskHerbA" parent="Resources" instance=ExtResource("3")]
+position = Vector3(-34, 0, -28)
+persistent_id = &"grove_dusk_herb_a"
+resource_kind = 2
+loot_table = ExtResource("6")
+accent_color = Color(0.28, 0.88, 0.5, 1)
+channel_duration = 0.55
+mana_cost = 4.0
+respawn_seconds = 90.0
+
+[node name="DuskHerbB" parent="Resources" instance=ExtResource("3")]
+position = Vector3(-47, 0, -42)
+persistent_id = &"grove_dusk_herb_b"
+resource_kind = 2
+loot_table = ExtResource("6")
+accent_color = Color(0.32, 0.82, 0.52, 1)
+channel_duration = 0.55
+mana_cost = 4.0
+respawn_seconds = 90.0
+
+[node name="DuskHerbC" parent="Resources" instance=ExtResource("3")]
+position = Vector3(-24, 0, -46)
+persistent_id = &"grove_dusk_herb_c"
+resource_kind = 2
+loot_table = ExtResource("6")
+accent_color = Color(0.3, 0.85, 0.5, 1)
+channel_duration = 0.55
+mana_cost = 4.0
+respawn_seconds = 90.0
+
+[node name="SoulFissure" parent="Resources" instance=ExtResource("3")]
+position = Vector3(44, 0, -24)
+persistent_id = &"grove_soul_fissure"
+resource_kind = 3
+loot_table = ExtResource("7")
+accent_color = Color(0.76, 0.22, 1, 1)
+channel_duration = 1.6
+mana_cost = 22.0

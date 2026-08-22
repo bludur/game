@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+item_id = &"soul_shard"
+display_name = "Осколок души"
+description = "Нестабильный фрагмент памяти, оставшийся в Пепельной роще."
+max_stack_size = 20
+accent_color = Color(0.76, 0.36, 1, 1)

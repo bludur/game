@@ -12,6 +12,10 @@ var _capture_action: StringName
 @onready var _language: OptionButton = get_node("Center/Card/Content/Language") as OptionButton
 @onready var _window_mode: OptionButton = get_node("Center/Card/Content/WindowMode") as OptionButton
 @onready var _graphics: OptionButton = get_node("Center/Card/Content/Graphics") as OptionButton
+@onready var _ui_scale: HSlider = get_node("Center/Card/Content/UiScaleRow/UiScale") as HSlider
+@onready var _flash_intensity: HSlider = get_node("Center/Card/Content/FlashRow/FlashIntensity") as HSlider
+@onready var _screen_shake: CheckButton = get_node("Center/Card/Content/ScreenShake") as CheckButton
+@onready var _hold_interact: CheckButton = get_node("Center/Card/Content/HoldInteract") as CheckButton
 @onready var _cast_button: Button = get_node("Center/Card/Content/RebindCast") as Button
 @onready var _dash_button: Button = get_node("Center/Card/Content/RebindDash") as Button
 @onready var _status: Label = get_node("Center/Card/Content/Status") as Label
@@ -62,6 +66,10 @@ func _sync_from_store() -> void:
 	_language.selected = 0 if _store.locale == "ru" else 1
 	_window_mode.selected = 1 if _store.window_mode == &"fullscreen" else 0
 	_graphics.selected = 1 if _store.graphics_quality == &"high" else 0
+	_ui_scale.value = _store.ui_scale
+	_flash_intensity.value = _store.flash_intensity
+	_screen_shake.button_pressed = _store.screen_shake_enabled
+	_hold_interact.button_pressed = _store.hold_to_interact
 	_status.text = ""
 
 
@@ -80,6 +88,12 @@ func _save_and_close() -> void:
 	_store.set_locale("ru" if _language.selected == 0 else "en")
 	_store.set_window_mode(&"fullscreen" if _window_mode.selected == 1 else &"windowed")
 	_store.set_graphics_quality(&"high" if _graphics.selected == 1 else &"low")
+	_store.set_accessibility(
+		_ui_scale.value,
+		_flash_intensity.value,
+		_screen_shake.button_pressed,
+		_hold_interact.button_pressed
+	)
 	_store.save_settings()
 	_capture_action = &""
 	close_requested.emit()
@@ -99,6 +113,10 @@ func refresh_text() -> void:
 	(get_node("Center/Card/Content/LanguageLabel") as Label).text = tr("SETTINGS_LANGUAGE")
 	(get_node("Center/Card/Content/WindowLabel") as Label).text = tr("SETTINGS_WINDOW")
 	(get_node("Center/Card/Content/GraphicsLabel") as Label).text = tr("SETTINGS_GRAPHICS")
+	(get_node("Center/Card/Content/UiScaleRow/Label") as Label).text = tr("SETTINGS_UI_SCALE")
+	(get_node("Center/Card/Content/FlashRow/Label") as Label).text = tr("SETTINGS_FLASH")
+	_screen_shake.text = tr("SETTINGS_SHAKE")
+	_hold_interact.text = tr("SETTINGS_HOLD_INTERACT")
 	_cast_button.text = tr("SETTINGS_REBIND_CAST")
 	_dash_button.text = tr("SETTINGS_REBIND_DASH")
 	(get_node("Center/Card/Content/Reset") as Button).text = tr("SETTINGS_RESET")

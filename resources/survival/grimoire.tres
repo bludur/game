@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="GrimoireData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/grimoire_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+starting_knowledge = Array[StringName]([&"first_witchfire", &"ashen_botany"])
+starting_recipes = Array[StringName]([&"brew_clear_root", &"distill_ward_essence", &"grind_ritual_chalk", &"spin_arcane_thread", &"prepare_gravewood", &"etch_arcane_rune", &"etch_frost_rune", &"etch_storm_rune", &"weave_soul_lattice", &"bind_witchfire_core", &"temper_ward", &"great_portal_focus"])

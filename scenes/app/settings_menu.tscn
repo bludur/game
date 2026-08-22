@@ -109,6 +109,51 @@ text = "SETTINGS_GRAPHICS"
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 
+[node name="UiScaleRow" type="HBoxContainer" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Center/Card/Content/UiScaleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SETTINGS_UI_SCALE"
+vertical_alignment = 1
+
+[node name="UiScale" type="HSlider" parent="Center/Card/Content/UiScaleRow"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+min_value = 0.8
+max_value = 1.4
+step = 0.1
+value = 1.0
+
+[node name="FlashRow" type="HBoxContainer" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Center/Card/Content/FlashRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SETTINGS_FLASH"
+vertical_alignment = 1
+
+[node name="FlashIntensity" type="HSlider" parent="Center/Card/Content/FlashRow"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+max_value = 1.0
+step = 0.1
+value = 0.7
+
+[node name="ScreenShake" type="CheckButton" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "SETTINGS_SHAKE"
+
+[node name="HoldInteract" type="CheckButton" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "SETTINGS_HOLD_INTERACT"
+
 [node name="RebindCast" type="Button" parent="Center/Card/Content"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2

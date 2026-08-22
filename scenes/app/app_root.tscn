@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/app/app_root.gd" id="1_app"]
 [ext_resource type="Script" path="res://scripts/app/settings_store.gd" id="2_store"]
@@ -6,14 +6,20 @@
 [ext_resource type="PackedScene" path="res://scenes/app/settings_menu.tscn" id="4_settings"]
 [ext_resource type="PackedScene" path="res://scenes/app/pause_menu.tscn" id="5_pause"]
 [ext_resource type="PackedScene" path="res://scenes/main/arena_run.tscn" id="6_run"]
+[ext_resource type="PackedScene" path="res://scenes/survival/world_session.tscn" id="7_world"]
+[ext_resource type="Script" path="res://scripts/app/save_game_service.gd" id="8_save"]
 
 [node name="AppRoot" type="Node"]
 process_mode = 3
 script = ExtResource("1_app")
 arena_run_scene = ExtResource("6_run")
+world_session_scene = ExtResource("7_world")
 
 [node name="SettingsStore" type="Node" parent="."]
 script = ExtResource("2_store")
+
+[node name="SaveGameService" type="Node" parent="."]
+script = ExtResource("8_save")
 
 [node name="RunHost" type="Node" parent="."]
 

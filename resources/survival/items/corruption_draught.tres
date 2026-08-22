@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+item_id = &"corruption_draught"
+display_name = "Отвар ясного корня"
+description = "Снижает Порчу и ненадолго укрепляет сопротивление."
+item_type = 1
+max_stack_size = 5
+accent_color = Color(0.32, 0.9, 0.72, 1)
+corruption_resistance = 0.35

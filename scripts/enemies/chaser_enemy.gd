@@ -159,13 +159,13 @@ func _update_chase(delta: float) -> void:
 		_transition_to(State.IDLE)
 		return
 
-	if _navigation_agent.is_navigation_finished():
-		velocity.x = 0.0
-		velocity.z = 0.0
-		return
-
-	var next_path_position: Vector3 = _navigation_agent.get_next_path_position()
-	var direction: Vector3 = next_path_position - global_position
+	var direction: Vector3
+	var map_rid: RID = _navigation_agent.get_navigation_map()
+	if map_rid.is_valid() and NavigationServer3D.map_get_iteration_id(map_rid) > 0 \
+			and not _navigation_agent.is_navigation_finished():
+		direction = _navigation_agent.get_next_path_position() - global_position
+	else:
+		direction = _target.global_position - global_position
 	direction.y = 0.0
 	if direction.length_squared() <= 0.001:
 		velocity.x = 0.0

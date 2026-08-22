@@ -30,6 +30,12 @@ if ($LASTEXITCODE -ne 0) {
     throw "Project smoke test failed with exit code $LASTEXITCODE."
 }
 
+Write-Host 'Running Ashen Grove survival smoke test...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_survival_smoke.log') --script 'res://tests/qa/survival_smoke_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Survival smoke test failed with exit code $LASTEXITCODE."
+}
+
 Write-Host 'Running enemy chase integration test...'
 & $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_enemy_chase.log') --script 'res://tests/qa/enemy_chase_test.gd'
 if ($LASTEXITCODE -ne 0) {
@@ -46,6 +52,24 @@ Write-Host 'Running performance smoke test...'
 & $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_performance.log') --script 'res://tests/qa/performance_smoke_test.gd'
 if ($LASTEXITCODE -ne 0) {
     throw "Performance smoke test failed with exit code $LASTEXITCODE."
+}
+
+Write-Host 'Running Ashen Grove performance smoke test...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_survival_performance.log') --script 'res://tests/qa/survival_performance_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Survival performance smoke test failed with exit code $LASTEXITCODE."
+}
+
+Write-Host 'Running accelerated survival soak test...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_survival_soak.log') --script 'res://tests/qa/survival_soak_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Survival soak test failed with exit code $LASTEXITCODE."
+}
+
+Write-Host 'Running Ashen Grove Compatibility renderer smoke test...'
+& $godotRunner -Console --headless --rendering-method gl_compatibility --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_survival_compatibility.log') --script 'res://tests/qa/survival_smoke_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Survival Compatibility smoke test failed with exit code $LASTEXITCODE."
 }
 
 Write-Host 'Running full release flow with five sessions...'

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+item_id = &"prepared_gravewood"
+display_name = "Закалённая могильная древесина"
+description = "Материал для устойчивых стен и ритуальных опор."
+max_stack_size = 30
+accent_color = Color(0.3, 0.16, 0.38, 1)

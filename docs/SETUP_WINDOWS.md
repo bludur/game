@@ -57,5 +57,6 @@ gh auth login
 
 Скрипт использует зафиксированный preset `Windows Desktop`, создаёт
 `build/windows/Witchroot.exe` со встроенным `.pck` и упаковывает его вместе с
-release notes в `build/Witchroot-0.2.0-Windows-x86_64.zip`. Каталог `build/`
+release notes в `build/Witchroot-0.3.0-dev-Windows-x86_64.zip`. Рядом
+создаётся файл `.sha256` для проверки целостности. Каталог `build/`
 намеренно исключён из Git.

@@ -1,0 +1,137 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/survival/starless_crypt.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/interaction/interactable_component.gd" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/boss/boss_encounter.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/boss/rootbound_matriarch.tscn" id="4"]
+
+[sub_resource type="CylinderMesh" id="MarkerMesh"]
+top_radius = 0.8
+bottom_radius = 1.1
+height = 2.2
+radial_segments = 8
+
+[sub_resource type="StandardMaterial3D" id="MarkerMaterial"]
+albedo_color = Color(0.14, 0.08, 0.19, 1)
+emission_enabled = true
+emission = Color(0.48, 0.12, 0.72, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="TorusMesh" id="CircleMesh"]
+inner_radius = 2.5
+outer_radius = 2.8
+rings = 32
+ring_segments = 5
+
+[sub_resource type="SphereShape3D" id="InteractShape"]
+radius = 1.5
+
+[sub_resource type="StandardMaterial3D" id="PurifyMaterial"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.14, 0.92, 0.72, 0.45)
+emission_enabled = true
+emission = Color(0.08, 0.95, 0.72, 1)
+emission_energy_multiplier = 2.8
+
+[node name="StarlessCrypt" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Entrance" type="Node3D" parent="."]
+position = Vector3(42, 0, -56)
+
+[node name="Marker" type="MeshInstance3D" parent="Entrance"]
+position = Vector3(0, 1.1, 0)
+material_override = SubResource("MarkerMaterial")
+mesh = SubResource("MarkerMesh")
+
+[node name="InteractableComponent" type="Area3D" parent="Entrance"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("2")
+prompt_text = "PROMPT_ENTER_CRYPT"
+interaction_distance = 3.2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Entrance/InteractableComponent"]
+position = Vector3(0, 1, 0)
+shape = SubResource("InteractShape")
+
+[node name="Exit" type="Node3D" parent="."]
+position = Vector3(42, 0, -69)
+
+[node name="Marker" type="MeshInstance3D" parent="Exit"]
+position = Vector3(0, 1.1, 0)
+material_override = SubResource("MarkerMaterial")
+mesh = SubResource("MarkerMesh")
+
+[node name="InteractableComponent" type="Area3D" parent="Exit"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("2")
+prompt_text = "PROMPT_EXIT_CRYPT"
+interaction_distance = 3.2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Exit/InteractableComponent"]
+position = Vector3(0, 1, 0)
+shape = SubResource("InteractShape")
+
+[node name="RunePuzzle" type="Node3D" parent="."]
+position = Vector3(36, 0, -76)
+
+[node name="Marker" type="MeshInstance3D" parent="RunePuzzle"]
+position = Vector3(0, 1.1, 0)
+material_override = SubResource("MarkerMaterial")
+mesh = SubResource("MarkerMesh")
+
+[node name="InteractableComponent" type="Area3D" parent="RunePuzzle"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("2")
+prompt_text = "PROMPT_SOLVE_RUNES"
+interaction_distance = 3.2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RunePuzzle/InteractableComponent"]
+position = Vector3(0, 1, 0)
+shape = SubResource("InteractShape")
+
+[node name="BossAltar" type="Node3D" parent="."]
+position = Vector3(42, 0, -80)
+
+[node name="Marker" type="MeshInstance3D" parent="BossAltar"]
+position = Vector3(0, 1.1, 0)
+material_override = SubResource("MarkerMaterial")
+mesh = SubResource("MarkerMesh")
+
+[node name="InteractableComponent" type="Area3D" parent="BossAltar"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("2")
+prompt_text = "PROMPT_AWAKEN_MATRIARCH"
+interaction_distance = 3.2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BossAltar/InteractableComponent"]
+position = Vector3(0, 1, 0)
+shape = SubResource("InteractShape")
+
+[node name="PurificationCircle" type="Node3D" parent="."]
+position = Vector3(42, 0.04, -84)
+
+[node name="Runes" type="MeshInstance3D" parent="PurificationCircle"]
+cast_shadow = 0
+material_override = SubResource("PurifyMaterial")
+mesh = SubResource("CircleMesh")
+
+[node name="InteractableComponent" type="Area3D" parent="PurificationCircle"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("2")
+prompt_text = "PROMPT_PURIFY_MATRIARCH"
+interaction_distance = 3.5
+interaction_priority = 6
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PurificationCircle/InteractableComponent"]
+shape = SubResource("InteractShape")
+
+[node name="BossEncounter" parent="." instance=ExtResource("3")]
+position = Vector3(42, 0, -82)
+boss_scene = ExtResource("4")

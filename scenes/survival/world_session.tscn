@@ -1,0 +1,196 @@
+[gd_scene load_steps=33 format=3]
+
+[ext_resource type="Script" path="res://scripts/survival/world_session.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/regions/ashen_grove.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/characters/player/player.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/cameras/top_down_camera.tscn" id="4"]
+[ext_resource type="Script" path="res://scripts/interaction/interaction_controller.gd" id="5"]
+[ext_resource type="Resource" path="res://resources/survival/item_catalog.tres" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/ui/survival_hud.tscn" id="7"]
+[ext_resource type="Script" path="res://scripts/survival/world_clock.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/survival/world_state.gd" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/survival/witchfire_hearth.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://scenes/survival/cursed_zone.tscn" id="11"]
+[ext_resource type="Script" path="res://scripts/survival/grimoire_state.gd" id="12"]
+[ext_resource type="Script" path="res://scripts/survival/crafting_system.gd" id="13"]
+[ext_resource type="Script" path="res://scripts/survival/ritual_system.gd" id="14"]
+[ext_resource type="Script" path="res://scripts/survival/construction_system.gd" id="15"]
+[ext_resource type="Resource" path="res://resources/survival/grimoire.tres" id="16"]
+[ext_resource type="Resource" path="res://resources/survival/recipe_catalog.tres" id="17"]
+[ext_resource type="Resource" path="res://resources/survival/ritual_catalog.tres" id="18"]
+[ext_resource type="Resource" path="res://resources/survival/building_catalog.tres" id="19"]
+[ext_resource type="Script" path="res://scripts/survival/threat_director.gd" id="20"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/chaser_enemy.tscn" id="21"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/cultist_enemy.tscn" id="22"]
+[ext_resource type="Script" path="res://scripts/navigation/arena_navigation.gd" id="23"]
+[ext_resource type="PackedScene" path="res://scenes/survival/starless_crypt.tscn" id="24"]
+[ext_resource type="Script" path="res://scripts/survival/survival_tutorial.gd" id="25"]
+[ext_resource type="PackedScene" path="res://scenes/audio/arena_audio_director.tscn" id="26"]
+
+[sub_resource type="TorusMesh" id="RitualMesh"]
+inner_radius = 5.7
+outer_radius = 6.0
+rings = 48
+ring_segments = 6
+
+[sub_resource type="StandardMaterial3D" id="RitualMaterial"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.54, 0.2, 0.95, 0.45)
+emission_enabled = true
+emission = Color(0.45, 0.14, 1, 1)
+emission_energy_multiplier = 2.4
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMaterial"]
+sky_top_color = Color(0.012, 0.018, 0.04, 1)
+sky_horizon_color = Color(0.19, 0.075, 0.22, 1)
+ground_bottom_color = Color(0.008, 0.012, 0.018, 1)
+ground_horizon_color = Color(0.09, 0.045, 0.1, 1)
+
+[sub_resource type="Sky" id="Sky"]
+sky_material = SubResource("SkyMaterial")
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 2
+sky = SubResource("Sky")
+ambient_light_source = 3
+ambient_light_color = Color(0.4, 0.37, 0.52, 1)
+ambient_light_energy = 0.54
+reflected_light_source = 2
+tonemap_mode = 3
+glow_enabled = true
+glow_intensity = 0.38
+fog_enabled = true
+fog_light_color = Color(0.12, 0.13, 0.18, 1)
+fog_light_energy = 0.42
+fog_density = 0.0035
+fog_height = 1.2
+fog_height_density = 0.08
+
+[node name="WorldSession" type="Node3D"]
+script = ExtResource("1")
+item_catalog = ExtResource("6")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-48, -28, 0)
+light_color = Color(0.72, 0.66, 0.88, 1)
+light_energy = 1.05
+shadow_enabled = true
+directional_shadow_max_distance = 72.0
+shadow_normal_bias = 1.6
+
+[node name="MoonFill" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(42, 150, 0)
+light_color = Color(0.22, 0.34, 0.78, 1)
+light_energy = 0.18
+shadow_enabled = false
+
+[node name="RegionHost" type="Node3D" parent="."]
+
+[node name="AshenGrove" parent="RegionHost" instance=ExtResource("2")]
+
+[node name="RegionNavigation" type="NavigationRegion3D" parent="RegionHost"]
+navigation_layers = 1
+script = ExtResource("23")
+arena_half_extent = 90.0
+cell_size = 4.0
+obstacle_clearance = 0.8
+
+[node name="StarlessCrypt" parent="RegionHost" instance=ExtResource("24")]
+
+[node name="Player" parent="." instance=ExtResource("3")]
+position = Vector3(0, 0.1, 58)
+auto_respawn = false
+
+[node name="TopDownCamera" parent="." instance=ExtResource("4")]
+
+[node name="InteractionController" type="Node" parent="."]
+script = ExtResource("5")
+
+[node name="Pickups" type="Node3D" parent="."]
+
+[node name="ConstructionHost" type="Node3D" parent="."]
+script = ExtResource("15")
+catalog = ExtResource("19")
+
+[node name="ThreatHost" type="Node3D" parent="."]
+
+[node name="ThreatSpawnPoints" type="Node3D" parent="."]
+
+[node name="NorthWest" type="Marker3D" parent="ThreatSpawnPoints"]
+position = Vector3(-62, 0.1, -48)
+
+[node name="NorthEast" type="Marker3D" parent="ThreatSpawnPoints"]
+position = Vector3(68, 0.1, -32)
+
+[node name="East" type="Marker3D" parent="ThreatSpawnPoints"]
+position = Vector3(74, 0.1, 24)
+
+[node name="SouthEast" type="Marker3D" parent="ThreatSpawnPoints"]
+position = Vector3(52, 0.1, 68)
+
+[node name="SouthWest" type="Marker3D" parent="ThreatSpawnPoints"]
+position = Vector3(-58, 0.1, 64)
+
+[node name="West" type="Marker3D" parent="ThreatSpawnPoints"]
+position = Vector3(-76, 0.1, 8)
+
+[node name="WorldState" type="Node" parent="."]
+script = ExtResource("9")
+
+[node name="WorldClock" type="Node" parent="."]
+script = ExtResource("8")
+day_duration_seconds = 720.0
+starting_time = 0.28
+
+[node name="GrimoireState" type="Node" parent="."]
+script = ExtResource("12")
+definition = ExtResource("16")
+
+[node name="CraftingSystem" type="Node" parent="."]
+script = ExtResource("13")
+catalog = ExtResource("17")
+
+[node name="RitualSystem" type="Node" parent="."]
+script = ExtResource("14")
+catalog = ExtResource("18")
+
+[node name="ThreatDirector" type="Node" parent="."]
+script = ExtResource("20")
+chaser_scene = ExtResource("21")
+cultist_scene = ExtResource("22")
+
+[node name="EvaluationTimer" type="Timer" parent="ThreatDirector"]
+wait_time = 2.0
+
+[node name="SurvivalTutorial" type="Node" parent="."]
+script = ExtResource("25")
+
+[node name="RitualCircle" type="Node3D" parent="."]
+position = Vector3(-24, 0.045, 8)
+
+[node name="Runes" type="MeshInstance3D" parent="RitualCircle"]
+cast_shadow = 0
+material_override = SubResource("RitualMaterial")
+mesh = SubResource("RitualMesh")
+
+[node name="WitchfireHearth" parent="." instance=ExtResource("10")]
+position = Vector3(-24, 0, 8)
+
+[node name="BogCurse" parent="." instance=ExtResource("11")]
+position = Vector3(-42, 0, -35)
+
+[node name="CryptCurse" parent="." instance=ExtResource("11")]
+position = Vector3(42, 0, -56)
+curse_radius = 13.0
+
+[node name="RespawnTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="SurvivalAudioDirector" parent="." instance=ExtResource("26")]
+
+[node name="SurvivalHud" parent="." instance=ExtResource("7")]

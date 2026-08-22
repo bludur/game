@@ -4,7 +4,8 @@ extends Node
 signal settings_changed()
 signal binding_conflict_resolved(action: StringName)
 
-const SCHEMA_VERSION: int = 1
+const SCHEMA_VERSION: int = 2
+const MIN_SUPPORTED_SCHEMA_VERSION: int = 1
 const DEFAULT_PATH: String = "user://settings.cfg"
 const SUPPORTED_LOCALES: PackedStringArray = ["ru", "en"]
 
@@ -16,6 +17,10 @@ var sfx_volume: float = 0.82
 var window_mode: StringName = &"windowed"
 var graphics_quality: StringName = &"high"
 var locale: String = "ru"
+var ui_scale: float = 1.0
+var flash_intensity: float = 0.7
+var screen_shake_enabled: bool = true
+var hold_to_interact: bool = false
 var _default_bindings: Dictionary[StringName, Array] = {}
 
 
@@ -34,7 +39,7 @@ func load_settings() -> bool:
 		_reset_values()
 		return false
 	var version: int = int(config.get_value("meta", "version", 0))
-	if version != SCHEMA_VERSION:
+	if version < MIN_SUPPORTED_SCHEMA_VERSION or version > SCHEMA_VERSION:
 		_reset_values()
 		return false
 	master_volume = clampf(float(config.get_value("audio", "master", 0.8)), 0.0, 1.0)
@@ -53,6 +58,10 @@ func load_settings() -> bool:
 	locale = String(config.get_value("general", "locale", "ru"))
 	if not SUPPORTED_LOCALES.has(locale):
 		locale = "ru"
+	ui_scale = clampf(float(config.get_value("accessibility", "ui_scale", 1.0)), 0.8, 1.4)
+	flash_intensity = clampf(float(config.get_value("accessibility", "flash_intensity", 0.7)), 0.0, 1.0)
+	screen_shake_enabled = bool(config.get_value("accessibility", "screen_shake_enabled", true))
+	hold_to_interact = bool(config.get_value("accessibility", "hold_to_interact", false))
 	_load_bindings(config)
 	return true
 
@@ -72,6 +81,10 @@ func save_settings() -> bool:
 	config.set_value("video", "window_mode", String(window_mode))
 	config.set_value("video", "graphics_quality", String(graphics_quality))
 	config.set_value("general", "locale", locale)
+	config.set_value("accessibility", "ui_scale", ui_scale)
+	config.set_value("accessibility", "flash_intensity", flash_intensity)
+	config.set_value("accessibility", "screen_shake_enabled", screen_shake_enabled)
+	config.set_value("accessibility", "hold_to_interact", hold_to_interact)
 	for action: StringName in _default_bindings:
 		var serialized: Array[Dictionary] = []
 		for event: InputEvent in InputMap.action_get_events(action):
@@ -111,6 +124,20 @@ func set_graphics_quality(quality: StringName) -> void:
 	settings_changed.emit()
 
 
+func set_accessibility(
+	next_ui_scale: float,
+	next_flash_intensity: float,
+	next_screen_shake_enabled: bool,
+	next_hold_to_interact: bool
+) -> void:
+	ui_scale = clampf(next_ui_scale, 0.8, 1.4)
+	flash_intensity = clampf(next_flash_intensity, 0.0, 1.0)
+	screen_shake_enabled = next_screen_shake_enabled
+	hold_to_interact = next_hold_to_interact
+	_apply_accessibility()
+	settings_changed.emit()
+
+
 func rebind_action(action: StringName, event: InputEvent) -> bool:
 	if not _default_bindings.has(action) or event == null:
 		return false
@@ -145,6 +172,7 @@ func apply_all() -> void:
 	_apply_audio()
 	_apply_window_mode()
 	_apply_graphics()
+	_apply_accessibility()
 	TranslationServer.set_locale(locale)
 
 
@@ -155,6 +183,10 @@ func _reset_values() -> void:
 	window_mode = &"windowed"
 	graphics_quality = &"high"
 	locale = "ru"
+	ui_scale = 1.0
+	flash_intensity = 0.7
+	screen_shake_enabled = true
+	hold_to_interact = false
 
 
 func _apply_audio() -> void:
@@ -178,6 +210,13 @@ func _apply_window_mode() -> void:
 
 func _apply_graphics() -> void:
 	get_viewport().msaa_3d = Viewport.MSAA_4X if graphics_quality == &"high" else Viewport.MSAA_DISABLED
+
+
+func _apply_accessibility() -> void:
+	get_tree().root.content_scale_factor = ui_scale
+	ProjectSettings.set_setting("witchroot/accessibility/flash_intensity", flash_intensity)
+	ProjectSettings.set_setting("witchroot/accessibility/screen_shake_enabled", screen_shake_enabled)
+	ProjectSettings.set_setting("witchroot/accessibility/hold_to_interact", hold_to_interact)
 
 
 func _sanitize_choice(value: StringName, allowed: Array[StringName], fallback: StringName) -> StringName:
@@ -298,29 +337,33 @@ func _deserialize_event(data: Dictionary) -> InputEvent:
 func _install_translations() -> void:
 	UiTranslations.ensure_registered()
 	_register_translation("en", {
-		"GAME_TITLE": "Witchroot: Arena of Omens",
-		"GAME_SUBTITLE": "TOP-DOWN SPELLCRAFT DEMO",
-		"MENU_START": "Begin Run", "MENU_SETTINGS": "Settings", "MENU_QUIT": "Quit",
+		"GAME_TITLE": "Witchroot",
+		"GAME_SUBTITLE": "MAGICAL DARK-FANTASY SURVIVAL",
+		"MENU_START": "Enter the Ashen Grove", "MENU_SETTINGS": "Settings", "MENU_QUIT": "Quit",
 		"MENU_RESUME": "Resume", "MENU_MAIN": "Main Menu", "MENU_BACK": "Back",
 		"SETTINGS_TITLE": "Settings", "SETTINGS_MASTER": "Master Volume",
 		"SETTINGS_MUSIC": "Music", "SETTINGS_SFX": "Sound Effects",
 		"SETTINGS_LANGUAGE": "Language", "SETTINGS_WINDOW": "Window Mode",
 		"SETTINGS_GRAPHICS": "Graphics", "SETTINGS_REBIND_CAST": "Rebind Cast",
 		"SETTINGS_REBIND_DASH": "Rebind Dash", "SETTINGS_RESET": "Reset Controls",
+		"SETTINGS_UI_SCALE": "Interface Scale", "SETTINGS_FLASH": "Flash Intensity",
+		"SETTINGS_SHAKE": "Screen Shake", "SETTINGS_HOLD_INTERACT": "Hold to Interact",
 		"SETTINGS_SAVE": "Save and Back", "SETTINGS_PRESS_INPUT": "Press a key or gamepad button…",
 		"WINDOWED": "Windowed", "FULLSCREEN": "Fullscreen", "QUALITY_LOW": "Low", "QUALITY_HIGH": "High",
 		"PAUSED": "Paused", "RESULT_MENU": "Return to Main Menu",
 	})
 	_register_translation("ru", {
-		"GAME_TITLE": "Witchroot: Арена знамений",
-		"GAME_SUBTITLE": "ДЕМО МАГИЧЕСКОЙ АРЕНЫ",
-		"MENU_START": "Начать забег", "MENU_SETTINGS": "Настройки", "MENU_QUIT": "Выход",
+		"GAME_TITLE": "Witchroot",
+		"GAME_SUBTITLE": "МАГИЧЕСКОЕ ВЫЖИВАНИЕ В ТЁМНОМ ФЭНТЕЗИ",
+		"MENU_START": "Войти в Пепельную рощу", "MENU_SETTINGS": "Настройки", "MENU_QUIT": "Выход",
 		"MENU_RESUME": "Продолжить", "MENU_MAIN": "Главное меню", "MENU_BACK": "Назад",
 		"SETTINGS_TITLE": "Настройки", "SETTINGS_MASTER": "Общая громкость",
 		"SETTINGS_MUSIC": "Музыка", "SETTINGS_SFX": "Эффекты",
 		"SETTINGS_LANGUAGE": "Язык", "SETTINGS_WINDOW": "Режим окна",
 		"SETTINGS_GRAPHICS": "Графика", "SETTINGS_REBIND_CAST": "Назначить атаку",
 		"SETTINGS_REBIND_DASH": "Назначить рывок", "SETTINGS_RESET": "Сбросить управление",
+		"SETTINGS_UI_SCALE": "Масштаб интерфейса", "SETTINGS_FLASH": "Интенсивность вспышек",
+		"SETTINGS_SHAKE": "Тряска экрана", "SETTINGS_HOLD_INTERACT": "Удерживать для взаимодействия",
 		"SETTINGS_SAVE": "Сохранить и назад", "SETTINGS_PRESS_INPUT": "Нажмите клавишу или кнопку геймпада…",
 		"WINDOWED": "В окне", "FULLSCREEN": "Полный экран", "QUALITY_LOW": "Низко", "QUALITY_HIGH": "Высоко",
 		"PAUSED": "Пауза", "RESULT_MENU": "Вернуться в главное меню",

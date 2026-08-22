@@ -6,8 +6,9 @@ $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $godotRunner = Join-Path $projectRoot 'tools\godot.ps1'
 $windowsDirectory = Join-Path $projectRoot 'build\windows'
 $executablePath = Join-Path $windowsDirectory 'Witchroot.exe'
-$archivePath = Join-Path $projectRoot 'build\Witchroot-0.2.0-Windows-x86_64.zip'
-$releaseNotesPath = Join-Path $projectRoot 'docs\RELEASE_NOTES_0_2_0.md'
+$archivePath = Join-Path $projectRoot 'build\Witchroot-0.3.0-dev-Windows-x86_64.zip'
+$checksumPath = "$archivePath.sha256"
+$releaseNotesPath = Join-Path $projectRoot 'docs\RELEASE_NOTES_0_3_0_DEV.md'
 
 New-Item -ItemType Directory -Path $windowsDirectory -Force | Out-Null
 
@@ -21,4 +22,7 @@ if (Test-Path -LiteralPath $archivePath) {
     Remove-Item -LiteralPath $archivePath -Force
 }
 Compress-Archive -LiteralPath $executablePath, $releaseNotesPath -DestinationPath $archivePath -CompressionLevel Optimal
+$hash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
+Set-Content -LiteralPath $checksumPath -Value "$hash  $(Split-Path -Leaf $archivePath)" -Encoding ascii
 Write-Host "Windows build ready: $archivePath"
+Write-Host "SHA-256: $checksumPath"

@@ -50,6 +50,13 @@ func _on_boss_spawned(boss: ArenaWarden) -> void:
 func _flash_color(color: Color, duration: float) -> void:
 	if _flash_tween != null:
 		_flash_tween.kill()
+	var intensity: float = clampf(float(ProjectSettings.get_setting(
+		"witchroot/accessibility/flash_intensity", 0.7
+	)), 0.0, 1.0)
+	color.a *= intensity
+	if color.a <= 0.001:
+		_flash.hide()
+		return
 	_flash.color = color
 	_flash.visible = true
 	_flash_tween = create_tween()

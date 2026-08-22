@@ -137,7 +137,7 @@ func _check_settings_round_trip(app: AppRoot) -> void:
 	settings.set_graphics_quality(&"high")
 	await process_frame
 	var start_button: Button = app.get_node("ScreenHost/MainMenu/Center/Card/Content/Start") as Button
-	_check(start_button.text == "Начать забег", "Runtime localization did not refresh the main menu.")
+	_check(start_button.text == "Войти в Пепельную рощу", "Runtime localization did not refresh the main menu.")
 
 
 func _check(condition: bool, message: String) -> void:

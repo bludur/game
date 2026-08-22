@@ -1,0 +1,381 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/survival_hud.gd" id="1_hud"]
+[ext_resource type="Script" path="res://scripts/ui/survival_map.gd" id="2_map"]
+
+[sub_resource type="StyleBoxFlat" id="Panel"]
+content_margin_left = 16.0
+content_margin_top = 14.0
+content_margin_right = 16.0
+content_margin_bottom = 14.0
+bg_color = Color(0.025, 0.028, 0.044, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.36, 0.18, 0.5, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="BarBackground"]
+bg_color = Color(0.06, 0.055, 0.09, 0.95)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="HealthFill"]
+bg_color = Color(0.69, 0.09, 0.22, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="ManaFill"]
+bg_color = Color(0.23, 0.29, 0.86, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="CorruptionFill"]
+bg_color = Color(0.54, 0.12, 0.67, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="Prompt"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.025, 0.028, 0.044, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.48, 0.32, 0.62, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="SurvivalHud" type="CanvasLayer"]
+layer = 2
+process_mode = 3
+script = ExtResource("1_hud")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Status" type="PanelContainer" parent="Root"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 352.0
+offset_bottom = 252.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Content" type="VBoxContainer" parent="Root/Status"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="HealthLabel" type="Label" parent="Root/Status/Content"]
+layout_mode = 2
+text = "SURVIVAL_HEALTH"
+
+[node name="HealthBar" type="ProgressBar" parent="Root/Status/Content"]
+custom_minimum_size = Vector2(300, 14)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("BarBackground")
+theme_override_styles/fill = SubResource("HealthFill")
+show_percentage = false
+value = 100.0
+
+[node name="ManaLabel" type="Label" parent="Root/Status/Content"]
+layout_mode = 2
+text = "SURVIVAL_MANA"
+
+[node name="ManaBar" type="ProgressBar" parent="Root/Status/Content"]
+custom_minimum_size = Vector2(300, 14)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("BarBackground")
+theme_override_styles/fill = SubResource("ManaFill")
+show_percentage = false
+value = 100.0
+
+[node name="CorruptionLabel" type="Label" parent="Root/Status/Content"]
+layout_mode = 2
+text = "SURVIVAL_CORRUPTION"
+
+[node name="CorruptionBar" type="ProgressBar" parent="Root/Status/Content"]
+custom_minimum_size = Vector2(300, 14)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("BarBackground")
+theme_override_styles/fill = SubResource("CorruptionFill")
+show_percentage = false
+
+[node name="CorruptionReason" type="Label" parent="Root/Status/Content"]
+layout_mode = 2
+text = "CORRUPTION_REASON_SAFE"
+theme_override_colors/font_color = Color(0.72, 0.67, 0.82, 1)
+theme_override_font_sizes/font_size = 13
+
+[node name="WorldInfo" type="PanelContainer" parent="Root"]
+layout_mode = 0
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -306.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 116.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Content" type="VBoxContainer" parent="Root/WorldInfo"]
+layout_mode = 2
+
+[node name="Time" type="Label" parent="Root/WorldInfo/Content"]
+layout_mode = 2
+text = "SURVIVAL_TIME"
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 17
+
+[node name="Threat" type="Label" parent="Root/WorldInfo/Content"]
+layout_mode = 2
+text = "SURVIVAL_THREAT"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.94, 0.45, 0.38, 1)
+
+[node name="Objective" type="Label" parent="Root"]
+layout_mode = 0
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 380.0
+offset_top = 24.0
+offset_right = -330.0
+offset_bottom = 80.0
+grow_horizontal = 2
+mouse_filter = 2
+text = "OBJECTIVE_FIRST_NIGHT"
+horizontal_alignment = 1
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.76, 1, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.015, 0.035, 0.95)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 17
+
+[node name="InteractionPrompt" type="Label" parent="Root"]
+layout_mode = 0
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -260.0
+offset_top = -92.0
+offset_right = 260.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+text = "SURVIVAL_INTERACT"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_colors/font_color = Color(0.96, 0.9, 1, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.015, 0.035, 0.95)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 18
+
+[node name="Notification" type="Label" parent="Root"]
+layout_mode = 0
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -330.0
+offset_top = 92.0
+offset_right = 330.0
+offset_bottom = 150.0
+grow_horizontal = 2
+mouse_filter = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.94, 0.82, 0.38, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.015, 0.035, 0.98)
+theme_override_constants/outline_size = 7
+theme_override_font_sizes/font_size = 20
+
+[node name="SurvivalWindow" type="PanelContainer" parent="Root"]
+layout_mode = 0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -390.0
+offset_top = -315.0
+offset_right = 390.0
+offset_bottom = 315.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Layout" type="VBoxContainer" parent="Root/SurvivalWindow"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Root/SurvivalWindow/Layout"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Root/SurvivalWindow/Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "WITCHROOT"
+theme_override_colors/font_color = Color(0.82, 0.66, 1, 1)
+theme_override_font_sizes/font_size = 22
+
+[node name="Close" type="Button" parent="Root/SurvivalWindow/Layout/Header"]
+custom_minimum_size = Vector2(112, 44)
+layout_mode = 2
+text = "SURVIVAL_CLOSE"
+
+[node name="Tabs" type="TabContainer" parent="Root/SurvivalWindow/Layout"]
+custom_minimum_size = Vector2(740, 520)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Inventory" type="VBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs"]
+layout_mode = 2
+
+[node name="Content" type="VBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs/Inventory"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Grid" type="GridContainer" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 4
+
+[node name="Actions" type="HBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="Split" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions"]
+custom_minimum_size = Vector2(180, 44)
+layout_mode = 2
+text = "SURVIVAL_SPLIT"
+
+[node name="Drop" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions"]
+custom_minimum_size = Vector2(180, 44)
+layout_mode = 2
+text = "SURVIVAL_DROP"
+
+[node name="Crafting" type="VBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs"]
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Root/SurvivalWindow/Layout/Tabs/Crafting"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs/Crafting/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 7
+
+[node name="Rituals" type="VBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs"]
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Root/SurvivalWindow/Layout/Tabs/Rituals"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs/Rituals/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 7
+
+[node name="MapPanel" type="PanelContainer" parent="Root"]
+layout_mode = 0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -300.0
+offset_right = 360.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Map" type="Control" parent="Root/MapPanel"]
+custom_minimum_size = Vector2(680, 560)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("2_map")
+
+[node name="BuildInfo" type="Label" parent="Root"]
+layout_mode = 0
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -330.0
+offset_top = -150.0
+offset_right = 330.0
+offset_bottom = -104.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+text = "SURVIVAL_BUILD"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_colors/font_color = Color(0.32, 1, 0.72, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.015, 0.035, 0.95)
+theme_override_constants/outline_size = 7
+theme_override_font_sizes/font_size = 18
+
+[node name="Hotkeys" type="Label" parent="Root"]
+layout_mode = 0
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -32.0
+offset_right = -20.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+text = "SURVIVAL_HOTKEYS"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.74, 0.7, 0.8, 0.88)
+theme_override_colors/font_outline_color = Color(0.02, 0.015, 0.035, 0.95)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 13
+
+[node name="NotificationTimer" type="Timer" parent="."]
+wait_time = 3.2
+one_shot = true

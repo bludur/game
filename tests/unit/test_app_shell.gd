@@ -36,10 +36,10 @@ func test_language_switch_updates_semantic_menu_keys() -> void:
 	app.settings_store.set_locale("ru")
 	await get_tree().process_frame
 	var start_button: Button = app.get_node("ScreenHost/MainMenu/Center/Card/Content/Start") as Button
-	assert_eq(start_button.text, "Начать забег")
+	assert_eq(start_button.text, "Войти в Пепельную рощу")
 	app.settings_store.set_locale("en")
 	await get_tree().process_frame
-	assert_eq(start_button.text, "Begin Run")
+	assert_eq(start_button.text, "Enter the Ashen Grove")
 
 
 func test_shell_controls_use_full_rect_anchors_and_large_targets() -> void:

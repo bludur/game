@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RegionData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/region_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+region_id = &"ashen_grove"
+display_name = "Пепельная роща"
+region_tier = 1
+authored_size = Vector2(192, 192)
+spawn_position = Vector3(0, 0.1, 58)
+boss_id = &"rootbound_matriarch"

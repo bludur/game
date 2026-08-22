@@ -1,0 +1,106 @@
+[gd_resource type="Resource" script_class="RitualCatalog" load_steps=21 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ritual_catalog.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/ritual_data.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/resources/item_amount_data.gd" id="3"]
+[ext_resource type="Resource" path="res://resources/survival/items/moonstone.tres" id="4"]
+[ext_resource type="Resource" path="res://resources/survival/items/dusk_herb.tres" id="5"]
+[ext_resource type="Resource" path="res://resources/survival/items/soul_shard.tres" id="6"]
+[ext_resource type="Resource" path="res://resources/survival/items/ward_essence.tres" id="7"]
+[ext_resource type="Resource" path="res://resources/survival/items/ritual_chalk.tres" id="8"]
+[ext_resource type="Resource" path="res://resources/survival/items/arcane_thread.tres" id="9"]
+
+[sub_resource type="Resource" id="Moon2"]
+script = ExtResource("3")
+item = ExtResource("4")
+quantity = 2
+[sub_resource type="Resource" id="Moon3"]
+script = ExtResource("3")
+item = ExtResource("4")
+quantity = 3
+[sub_resource type="Resource" id="Dusk3"]
+script = ExtResource("3")
+item = ExtResource("5")
+quantity = 3
+[sub_resource type="Resource" id="Soul1"]
+script = ExtResource("3")
+item = ExtResource("6")
+quantity = 1
+[sub_resource type="Resource" id="Soul2"]
+script = ExtResource("3")
+item = ExtResource("6")
+quantity = 2
+[sub_resource type="Resource" id="Ward1"]
+script = ExtResource("3")
+item = ExtResource("7")
+quantity = 1
+[sub_resource type="Resource" id="Ward2"]
+script = ExtResource("3")
+item = ExtResource("7")
+quantity = 2
+[sub_resource type="Resource" id="Chalk2"]
+script = ExtResource("3")
+item = ExtResource("8")
+quantity = 2
+[sub_resource type="Resource" id="Chalk3"]
+script = ExtResource("3")
+item = ExtResource("8")
+quantity = 3
+[sub_resource type="Resource" id="Thread1"]
+script = ExtResource("3")
+item = ExtResource("9")
+quantity = 1
+
+[sub_resource type="Resource" id="R_cleanse"]
+script = ExtResource("2")
+ritual_id = &"cleanse_ground"
+display_name = "Очистить проклятый участок"
+school = 0
+ingredients = Array[ExtResource("3")]([SubResource("Chalk2"), SubResource("Ward1")])
+result_flag = &"grove_patch_cleansed"
+preview_text = "Ослабляет Порчу у болотного алтаря."
+[sub_resource type="Resource" id="R_crypt"]
+script = ExtResource("2")
+ritual_id = &"unseal_crypt"
+display_name = "Снять печать Склепа"
+school = 0
+ingredients = Array[ExtResource("3")]([SubResource("Chalk3"), SubResource("Moon3"), SubResource("Soul2")])
+result_flag = &"crypt_unsealed"
+preview_text = "Открывает путь к Беззвёздной матери."
+[sub_resource type="Resource" id="R_rain"]
+script = ExtResource("2")
+ritual_id = &"call_rain"
+display_name = "Призвать пепельный дождь"
+school = 2
+ingredients = Array[ExtResource("3")]([SubResource("Dusk3"), SubResource("Soul1")])
+result_flag = &"ashen_rain_called"
+preview_text = "Ускоряет возвращение сумеречных трав."
+[sub_resource type="Resource" id="R_reveal"]
+script = ExtResource("2")
+ritual_id = &"reveal_resources"
+display_name = "Узреть скрытые жилы"
+school = 1
+ingredients = Array[ExtResource("3")]([SubResource("Moon2"), SubResource("Thread1")])
+result_flag = &"resources_revealed"
+preview_text = "Подсвечивает оставшиеся источники ресурсов."
+[sub_resource type="Resource" id="R_hearth"]
+script = ExtResource("2")
+ritual_id = &"bind_hearth"
+display_name = "Связать новый очаг"
+school = 0
+ingredients = Array[ExtResource("3")]([SubResource("Ward2"), SubResource("Chalk2")])
+result_flag = &"secondary_hearth_bound"
+preview_text = "Превращает оберег в новую точку возрождения."
+[sub_resource type="Resource" id="R_forbidden"]
+script = ExtResource("2")
+ritual_id = &"forbidden_sight"
+display_name = "Запретное зрение"
+school = 3
+ingredients = Array[ExtResource("3")]([SubResource("Soul2")])
+corruption_cost = 18.0
+result_flag = &"forbidden_sight_used"
+preview_text = "Раскрывает угрозы Рощи ценой 18 Порчи."
+
+[resource]
+script = ExtResource("1")
+rituals = Array[ExtResource("2")]([SubResource("R_cleanse"), SubResource("R_crypt"), SubResource("R_rain"), SubResource("R_reveal"), SubResource("R_hearth"), SubResource("R_forbidden")])

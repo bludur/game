@@ -1,5 +1,14 @@
 # Witchroot — survival-roadmap, этапы 11–20
 
+## Статус реализации — 22 августа 2026
+
+- Этапы 11–19 реализованы и покрыты unit/integration-тестами.
+- Инженерная часть этапа 20 реализована: HUD, карта, обучение, RU/EN,
+  accessibility, performance/soak/Compatibility gates, Windows preset,
+  release notes и SHA-256.
+- Перед снятием суффикса -dev остаётся провести десять внешних ручных
+  playtest-сессий и финальный баланс по их результатам.
+
 ## Цель
 
 Превратить боевую демоверсию `0.2.0` в одиночный survival action RPG про ведьму,

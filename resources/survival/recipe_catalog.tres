@@ -1,0 +1,178 @@
+[gd_resource type="Resource" script_class="RecipeCatalog" load_steps=38 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/recipe_catalog.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/recipe_data.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/resources/item_amount_data.gd" id="3"]
+[ext_resource type="Resource" path="res://resources/survival/items/gravewood.tres" id="4"]
+[ext_resource type="Resource" path="res://resources/survival/items/moonstone.tres" id="5"]
+[ext_resource type="Resource" path="res://resources/survival/items/dusk_herb.tres" id="6"]
+[ext_resource type="Resource" path="res://resources/survival/items/soul_shard.tres" id="7"]
+[ext_resource type="Resource" path="res://resources/survival/items/ash_resin.tres" id="8"]
+[ext_resource type="Resource" path="res://resources/survival/items/ward_essence.tres" id="9"]
+[ext_resource type="Resource" path="res://resources/survival/items/corruption_draught.tres" id="10"]
+[ext_resource type="Resource" path="res://resources/survival/items/ritual_chalk.tres" id="11"]
+[ext_resource type="Resource" path="res://resources/survival/items/arcane_thread.tres" id="12"]
+[ext_resource type="Resource" path="res://resources/survival/items/prepared_gravewood.tres" id="13"]
+[ext_resource type="Resource" path="res://resources/survival/items/arcane_rune.tres" id="14"]
+[ext_resource type="Resource" path="res://resources/survival/items/frost_rune.tres" id="15"]
+[ext_resource type="Resource" path="res://resources/survival/items/storm_rune.tres" id="16"]
+[ext_resource type="Resource" path="res://resources/survival/items/witchfire_core.tres" id="17"]
+[ext_resource type="Resource" path="res://resources/survival/items/matriarch_heart.tres" id="18"]
+[ext_resource type="Resource" path="res://resources/survival/items/portal_focus.tres" id="19"]
+
+[sub_resource type="Resource" id="A_grave1"]
+script = ExtResource("3")
+item = ExtResource("4")
+quantity = 1
+[sub_resource type="Resource" id="A_grave3"]
+script = ExtResource("3")
+item = ExtResource("4")
+quantity = 3
+[sub_resource type="Resource" id="A_moon1"]
+script = ExtResource("3")
+item = ExtResource("5")
+quantity = 1
+[sub_resource type="Resource" id="A_moon2"]
+script = ExtResource("3")
+item = ExtResource("5")
+quantity = 2
+[sub_resource type="Resource" id="A_dusk2"]
+script = ExtResource("3")
+item = ExtResource("6")
+quantity = 2
+[sub_resource type="Resource" id="A_soul1"]
+script = ExtResource("3")
+item = ExtResource("7")
+quantity = 1
+[sub_resource type="Resource" id="A_soul2"]
+script = ExtResource("3")
+item = ExtResource("7")
+quantity = 2
+[sub_resource type="Resource" id="A_resin1"]
+script = ExtResource("3")
+item = ExtResource("8")
+quantity = 1
+[sub_resource type="Resource" id="A_resin2"]
+script = ExtResource("3")
+item = ExtResource("8")
+quantity = 2
+[sub_resource type="Resource" id="A_ward2"]
+script = ExtResource("3")
+item = ExtResource("9")
+quantity = 2
+[sub_resource type="Resource" id="A_ward4"]
+script = ExtResource("3")
+item = ExtResource("9")
+quantity = 4
+[sub_resource type="Resource" id="A_chalk1"]
+script = ExtResource("3")
+item = ExtResource("11")
+quantity = 1
+[sub_resource type="Resource" id="A_thread1"]
+script = ExtResource("3")
+item = ExtResource("12")
+quantity = 1
+[sub_resource type="Resource" id="A_thread4"]
+script = ExtResource("3")
+item = ExtResource("12")
+quantity = 4
+[sub_resource type="Resource" id="A_heart1"]
+script = ExtResource("3")
+item = ExtResource("18")
+quantity = 1
+
+[sub_resource type="Resource" id="R01"]
+script = ExtResource("2")
+recipe_id = &"brew_clear_root"
+display_name = "Отвар ясного корня"
+station = 0
+ingredients = Array[ExtResource("3")]([SubResource("A_dusk2"), SubResource("A_moon1")])
+result_item = ExtResource("10")
+[sub_resource type="Resource" id="R02"]
+script = ExtResource("2")
+recipe_id = &"distill_ward_essence"
+display_name = "Эссенция оберега"
+station = 0
+ingredients = Array[ExtResource("3")]([SubResource("A_soul1"), SubResource("A_resin2")])
+result_item = ExtResource("9")
+[sub_resource type="Resource" id="R03"]
+script = ExtResource("2")
+recipe_id = &"grind_ritual_chalk"
+display_name = "Ритуальный мел"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_moon1"), SubResource("A_grave1")])
+result_item = ExtResource("11")
+result_quantity = 2
+[sub_resource type="Resource" id="R04"]
+script = ExtResource("2")
+recipe_id = &"spin_arcane_thread"
+display_name = "Тайная нить"
+station = 2
+ingredients = Array[ExtResource("3")]([SubResource("A_dusk2"), SubResource("A_soul1")])
+result_item = ExtResource("12")
+result_quantity = 2
+[sub_resource type="Resource" id="R05"]
+script = ExtResource("2")
+recipe_id = &"prepare_gravewood"
+display_name = "Закалить могильную древесину"
+station = 2
+ingredients = Array[ExtResource("3")]([SubResource("A_grave3"), SubResource("A_resin1")])
+result_item = ExtResource("13")
+result_quantity = 2
+[sub_resource type="Resource" id="R06"]
+script = ExtResource("2")
+recipe_id = &"etch_arcane_rune"
+display_name = "Тайная руна"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_moon1"), SubResource("A_soul1"), SubResource("A_chalk1")])
+result_item = ExtResource("14")
+[sub_resource type="Resource" id="R07"]
+script = ExtResource("2")
+recipe_id = &"etch_frost_rune"
+display_name = "Руна мороза"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_moon2"), SubResource("A_chalk1")])
+result_item = ExtResource("15")
+[sub_resource type="Resource" id="R08"]
+script = ExtResource("2")
+recipe_id = &"etch_storm_rune"
+display_name = "Руна бури"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_soul2"), SubResource("A_chalk1")])
+result_item = ExtResource("16")
+[sub_resource type="Resource" id="R09"]
+script = ExtResource("2")
+recipe_id = &"weave_soul_lattice"
+display_name = "Сплести решётку душ"
+station = 2
+ingredients = Array[ExtResource("3")]([SubResource("A_soul2"), SubResource("A_thread1")])
+result_item = ExtResource("9")
+result_quantity = 2
+[sub_resource type="Resource" id="R10"]
+script = ExtResource("2")
+recipe_id = &"bind_witchfire_core"
+display_name = "Сердцевина ведьминого огня"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_ward2"), SubResource("A_moon2")])
+result_item = ExtResource("17")
+[sub_resource type="Resource" id="R11"]
+script = ExtResource("2")
+recipe_id = &"temper_ward"
+display_name = "Усиленная эссенция"
+station = 0
+ingredients = Array[ExtResource("3")]([SubResource("A_ward2"), SubResource("A_dusk2")])
+result_item = ExtResource("9")
+result_quantity = 3
+[sub_resource type="Resource" id="R12"]
+script = ExtResource("2")
+recipe_id = &"great_portal_focus"
+display_name = "Фокус Великого портала"
+station = 2
+ingredients = Array[ExtResource("3")]([SubResource("A_heart1"), SubResource("A_ward4"), SubResource("A_thread4")])
+result_item = ExtResource("19")
+craft_seconds = 12.0
+knowledge_id = &"great_portal"
+
+[resource]
+script = ExtResource("1")
+recipes = Array[ExtResource("2")]([SubResource("R01"), SubResource("R02"), SubResource("R03"), SubResource("R04"), SubResource("R05"), SubResource("R06"), SubResource("R07"), SubResource("R08"), SubResource("R09"), SubResource("R10"), SubResource("R11"), SubResource("R12")])

@@ -22,6 +22,8 @@ var _dash_sound: AudioStreamWAV
 @onready var _spell_caster: SpellCaster = get_node("SpellCaster") as SpellCaster
 @onready var _spell_loadout: SpellLoadout = get_node("SpellLoadout") as SpellLoadout
 @onready var _dash: DashComponent = get_node("DashComponent") as DashComponent
+@onready var _inventory: InventoryComponent = get_node("InventoryComponent") as InventoryComponent
+@onready var _corruption: CorruptionComponent = get_node("CorruptionComponent") as CorruptionComponent
 @onready var _cast_origin: Marker3D = get_node("CastOrigin") as Marker3D
 @onready var _visuals: Node3D = get_node("Visuals") as Node3D
 @onready var _respawn_timer: Timer = get_node("RespawnTimer") as Timer
@@ -78,6 +80,24 @@ func get_spell_loadout() -> SpellLoadout:
 
 func get_dash_component() -> DashComponent:
 	return _dash
+
+
+func get_inventory_component() -> InventoryComponent:
+	return _inventory
+
+
+func get_corruption_component() -> CorruptionComponent:
+	return _corruption
+
+
+func set_respawn_transform(next_transform: Transform3D) -> void:
+	_spawn_transform = next_transform
+
+
+func respawn_at(next_transform: Transform3D) -> void:
+	_spawn_transform = next_transform
+	_restore_player()
+	respawned.emit()
 
 
 func request_dash(direction: Vector3 = Vector3.ZERO) -> bool:

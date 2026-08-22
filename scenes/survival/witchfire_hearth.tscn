@@ -1,0 +1,77 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/survival/witchfire_hearth.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/survival/ward_zone.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/interaction/interactable_component.gd" id="3"]
+
+[sub_resource type="CylinderMesh" id="BaseMesh"]
+top_radius = 1.25
+bottom_radius = 1.55
+height = 0.7
+radial_segments = 10
+
+[sub_resource type="StandardMaterial3D" id="BaseMaterial"]
+albedo_color = Color(0.12, 0.09, 0.16, 1)
+roughness = 0.86
+
+[sub_resource type="SphereMesh" id="FlameMesh"]
+radius = 0.48
+height = 1.2
+radial_segments = 12
+rings = 6
+
+[sub_resource type="StandardMaterial3D" id="FlameMaterial"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.12, 0.9, 0.78, 0.75)
+emission_enabled = true
+emission = Color(0.08, 0.95, 0.8, 1)
+emission_energy_multiplier = 5.0
+
+[sub_resource type="SphereShape3D" id="WardShape"]
+radius = 9.0
+
+[sub_resource type="SphereShape3D" id="InteractShape"]
+radius = 1.8
+
+[node name="WitchfireHearth" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Base" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.35, 0)
+material_override = SubResource("BaseMaterial")
+mesh = SubResource("BaseMesh")
+
+[node name="Flame" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.2, 0)
+cast_shadow = 0
+material_override = SubResource("FlameMaterial")
+mesh = SubResource("FlameMesh")
+
+[node name="Light" type="OmniLight3D" parent="."]
+position = Vector3(0, 2.2, 0)
+light_color = Color(0.18, 1, 0.78, 1)
+light_energy = 2.2
+omni_range = 14.0
+shadow_enabled = true
+
+[node name="WardZone" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("2")
+protection_radius = 9.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WardZone"]
+shape = SubResource("WardShape")
+
+[node name="InteractableComponent" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("3")
+prompt_text = "PROMPT_REST_SAVE"
+interaction_distance = 3.2
+interaction_priority = 4
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractableComponent"]
+position = Vector3(0, 0.8, 0)
+shape = SubResource("InteractShape")

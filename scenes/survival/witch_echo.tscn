@@ -1,0 +1,41 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/survival/witch_echo.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/interaction/interactable_component.gd" id="2"]
+
+[sub_resource type="SphereMesh" id="Mesh"]
+radius = 0.65
+height = 1.3
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="Material"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.55, 0.22, 0.9, 0.54)
+emission_enabled = true
+emission = Color(0.52, 0.16, 1, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="SphereShape3D" id="Shape"]
+radius = 1.0
+
+[node name="WitchEcho" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Echo" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.8, 0)
+material_override = SubResource("Material")
+mesh = SubResource("Mesh")
+
+[node name="InteractableComponent" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("2")
+prompt_text = "PROMPT_RECOVER_ECHO"
+interaction_distance = 3.2
+interaction_priority = 5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractableComponent"]
+position = Vector3(0, 0.8, 0)
+shape = SubResource("Shape")

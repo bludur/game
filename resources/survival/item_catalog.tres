@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemCatalog" load_steps=19 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/item_catalog.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/survival/items/gravewood.tres" id="2"]
+[ext_resource type="Resource" path="res://resources/survival/items/moonstone.tres" id="3"]
+[ext_resource type="Resource" path="res://resources/survival/items/dusk_herb.tres" id="4"]
+[ext_resource type="Resource" path="res://resources/survival/items/soul_shard.tres" id="5"]
+[ext_resource type="Resource" path="res://resources/survival/items/ash_resin.tres" id="6"]
+[ext_resource type="Resource" path="res://resources/survival/items/ward_essence.tres" id="7"]
+[ext_resource type="Resource" path="res://resources/survival/items/corruption_draught.tres" id="8"]
+[ext_resource type="Resource" path="res://resources/survival/items/ritual_chalk.tres" id="9"]
+[ext_resource type="Resource" path="res://resources/survival/items/arcane_thread.tres" id="10"]
+[ext_resource type="Resource" path="res://resources/survival/items/matriarch_heart.tres" id="11"]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="12"]
+[ext_resource type="Resource" path="res://resources/survival/items/prepared_gravewood.tres" id="13"]
+[ext_resource type="Resource" path="res://resources/survival/items/arcane_rune.tres" id="14"]
+[ext_resource type="Resource" path="res://resources/survival/items/frost_rune.tres" id="15"]
+[ext_resource type="Resource" path="res://resources/survival/items/storm_rune.tres" id="16"]
+[ext_resource type="Resource" path="res://resources/survival/items/witchfire_core.tres" id="17"]
+[ext_resource type="Resource" path="res://resources/survival/items/portal_focus.tres" id="18"]
+
+[resource]
+script = ExtResource("1")
+items = Array[ExtResource("12")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("11"), ExtResource("13"), ExtResource("14"), ExtResource("15"), ExtResource("16"), ExtResource("17"), ExtResource("18")])

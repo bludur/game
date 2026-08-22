@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+item_id = &"arcane_rune"
+display_name = "Тайная руна"
+description = "Стабилизирует чистую ману и усиливает Тайную школу."
+item_type = 2
+max_stack_size = 10
+accent_color = Color(0.64, 0.34, 1, 1)

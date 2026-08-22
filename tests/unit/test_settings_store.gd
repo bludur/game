@@ -16,6 +16,7 @@ func test_settings_round_trip_with_schema_version_and_safe_values() -> void:
 	store.set_audio_levels(0.45, 0.55, 0.65)
 	store.set_locale("en")
 	store.set_graphics_quality(&"low")
+	store.set_accessibility(1.2, 0.3, false, true)
 	assert_true(store.save_settings())
 	store.queue_free()
 	await get_tree().process_frame
@@ -26,6 +27,10 @@ func test_settings_round_trip_with_schema_version_and_safe_values() -> void:
 	assert_eq(loaded.sfx_volume, 0.65)
 	assert_eq(loaded.locale, "en")
 	assert_eq(loaded.graphics_quality, &"low")
+	assert_eq(loaded.ui_scale, 1.2)
+	assert_eq(loaded.flash_intensity, 0.3)
+	assert_false(loaded.screen_shake_enabled)
+	assert_true(loaded.hold_to_interact)
 
 
 func test_unknown_schema_falls_back_to_defaults() -> void:

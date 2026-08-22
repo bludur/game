@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://scripts/characters/player.gd" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/components/player_controller.tscn" id="2_controller"]
@@ -11,6 +11,8 @@
 [ext_resource type="PackedScene" path="res://scenes/components/dash_component.tscn" id="9_dash"]
 [ext_resource type="PackedScene" path="res://assets/models/mage_player.glb" id="10_model"]
 [ext_resource type="PackedScene" path="res://scenes/components/character_animator.tscn" id="11_animator"]
+[ext_resource type="PackedScene" path="res://scenes/components/inventory_component.tscn" id="12_inventory"]
+[ext_resource type="PackedScene" path="res://scenes/components/corruption_component.tscn" id="13_corruption"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
 radius = 0.42
@@ -89,6 +91,10 @@ faction = &"player"
 [node name="SpellLoadout" parent="." instance=ExtResource("8_loadout")]
 
 [node name="DashComponent" parent="." instance=ExtResource("9_dash")]
+
+[node name="InventoryComponent" parent="." instance=ExtResource("12_inventory")]
+
+[node name="CorruptionComponent" parent="." instance=ExtResource("13_corruption")]
 
 [node name="SfxPool3D" parent="." instance=ExtResource("7_sfx")]
 position = Vector3(0, 1, 0)

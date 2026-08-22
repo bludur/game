@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="LootTableData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/loot_table_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/loot_entry_data.gd" id="2"]
+[ext_resource type="Resource" path="res://resources/survival/items/gravewood.tres" id="3"]
+[ext_resource type="Resource" path="res://resources/survival/items/ash_resin.tres" id="4"]
+
+[sub_resource type="Resource" id="Entry_wood"]
+script = ExtResource("2")
+item = ExtResource("3")
+minimum_quantity = 3
+maximum_quantity = 5
+weight = 4.0
+
+[sub_resource type="Resource" id="Entry_resin"]
+script = ExtResource("2")
+item = ExtResource("4")
+minimum_quantity = 2
+maximum_quantity = 3
+weight = 1.0
+
+[resource]
+script = ExtResource("1")
+entries = Array[ExtResource("2")]([SubResource("Entry_wood"), SubResource("Entry_resin")])
