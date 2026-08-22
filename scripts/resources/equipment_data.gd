@@ -11,6 +11,7 @@ enum Tier {
 	WORN,
 	BOUND,
 	RELIC,
+	ECLIPSE,
 }
 
 enum Condition {

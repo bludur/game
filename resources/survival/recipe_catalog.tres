@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RecipeCatalog" load_steps=77 format=3]
+[gd_resource type="Resource" script_class="RecipeCatalog" load_steps=101 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/recipe_catalog.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/resources/recipe_data.gd" id="2"]
@@ -36,6 +36,44 @@
 [ext_resource type="Resource" path="res://resources/survival/items/moonwell_locket.tres" id="34"]
 [ext_resource type="Resource" path="res://resources/survival/items/last_ember_charm.tres" id="35"]
 [ext_resource type="Resource" path="res://resources/survival/items/hollow_eye_relic.tres" id="36"]
+[ext_resource type="Resource" path="res://resources/survival/items/moonfrost_crystal.tres" id="37"]
+[ext_resource type="Resource" path="res://resources/survival/items/nightglass.tres" id="38"]
+[ext_resource type="Resource" path="res://resources/survival/items/pale_root.tres" id="39"]
+[ext_resource type="Resource" path="res://resources/survival/items/umbral_pelt.tres" id="40"]
+[ext_resource type="Resource" path="res://resources/survival/items/lunar_alloy.tres" id="41"]
+[ext_resource type="Resource" path="res://resources/survival/items/shadow_thread.tres" id="42"]
+[ext_resource type="Resource" path="res://resources/survival/items/moonspine_focus.tres" id="43"]
+[ext_resource type="Resource" path="res://resources/survival/items/eclipse_raiment.tres" id="44"]
+[ext_resource type="Resource" path="res://resources/survival/items/eclipse_talisman.tres" id="45"]
+
+[sub_resource type="Resource" id="A_moonfrost2"]
+script = ExtResource("3")
+item = ExtResource("37")
+quantity = 2
+[sub_resource type="Resource" id="A_nightglass2"]
+script = ExtResource("3")
+item = ExtResource("38")
+quantity = 2
+[sub_resource type="Resource" id="A_pale2"]
+script = ExtResource("3")
+item = ExtResource("39")
+quantity = 2
+[sub_resource type="Resource" id="A_pelt2"]
+script = ExtResource("3")
+item = ExtResource("40")
+quantity = 2
+[sub_resource type="Resource" id="A_alloy1"]
+script = ExtResource("3")
+item = ExtResource("41")
+quantity = 1
+[sub_resource type="Resource" id="A_alloy2"]
+script = ExtResource("3")
+item = ExtResource("41")
+quantity = 2
+[sub_resource type="Resource" id="A_shadow2"]
+script = ExtResource("3")
+item = ExtResource("42")
+quantity = 2
 
 [sub_resource type="Resource" id="A_grave1"]
 script = ExtResource("3")
@@ -331,6 +369,57 @@ station = 1
 ingredients = Array[ExtResource("3")]([SubResource("A_heart1"), SubResource("A_storm1"), SubResource("A_ward2")])
 result_item = ExtResource("36")
 
+[sub_resource type="Resource" id="R30"]
+script = ExtResource("2")
+recipe_id = &"smelt_lunar_alloy"
+display_name = "Лунный сплав"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_moonfrost2"), SubResource("A_nightglass2")])
+result_item = ExtResource("41")
+
+[sub_resource type="Resource" id="R31"]
+script = ExtResource("2")
+recipe_id = &"weave_shadow_thread"
+display_name = "Сумеречная нить"
+station = 0
+ingredients = Array[ExtResource("3")]([SubResource("A_pale2"), SubResource("A_pelt2")])
+result_item = ExtResource("42")
+result_quantity = 2
+
+[sub_resource type="Resource" id="R32"]
+script = ExtResource("2")
+recipe_id = &"forge_moonspine_focus"
+display_name = "Фокус лунного хребта"
+station = 2
+ingredients = Array[ExtResource("3")]([SubResource("A_alloy2"), SubResource("A_moonfrost2"), SubResource("A_ward2")])
+result_item = ExtResource("43")
+craft_seconds = 12.0
+
+[sub_resource type="Resource" id="R33"]
+script = ExtResource("2")
+recipe_id = &"weave_eclipse_raiment"
+display_name = "Облачение затмения"
+station = 2
+ingredients = Array[ExtResource("3")]([SubResource("A_shadow2"), SubResource("A_pelt2"), SubResource("A_alloy1")])
+result_item = ExtResource("44")
+craft_seconds = 12.0
+
+[sub_resource type="Resource" id="R34"]
+script = ExtResource("2")
+recipe_id = &"bind_eclipse_talisman"
+display_name = "Талисман затмения"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_nightglass2"), SubResource("A_alloy1"), SubResource("A_soul1")])
+result_item = ExtResource("45")
+
+[sub_resource type="Resource" id="R35"]
+script = ExtResource("2")
+recipe_id = &"brew_deep_frostward"
+display_name = "Глубокий настой инеевой кожи"
+station = 0
+ingredients = Array[ExtResource("3")]([SubResource("A_pale2"), SubResource("A_moonfrost2")])
+result_item = ExtResource("23")
+
 [resource]
 script = ExtResource("1")
-recipes = Array[ExtResource("2")]([SubResource("R01"), SubResource("R02"), SubResource("R03"), SubResource("R04"), SubResource("R05"), SubResource("R06"), SubResource("R07"), SubResource("R08"), SubResource("R09"), SubResource("R10"), SubResource("R11"), SubResource("R12"), SubResource("R13"), SubResource("R14"), SubResource("R15"), SubResource("R16"), SubResource("R17"), SubResource("R18"), SubResource("R19"), SubResource("R20"), SubResource("R21"), SubResource("R22"), SubResource("R23"), SubResource("R24"), SubResource("R25"), SubResource("R26"), SubResource("R27"), SubResource("R28"), SubResource("R29")])
+recipes = Array[ExtResource("2")]([SubResource("R01"), SubResource("R02"), SubResource("R03"), SubResource("R04"), SubResource("R05"), SubResource("R06"), SubResource("R07"), SubResource("R08"), SubResource("R09"), SubResource("R10"), SubResource("R11"), SubResource("R12"), SubResource("R13"), SubResource("R14"), SubResource("R15"), SubResource("R16"), SubResource("R17"), SubResource("R18"), SubResource("R19"), SubResource("R20"), SubResource("R21"), SubResource("R22"), SubResource("R23"), SubResource("R24"), SubResource("R25"), SubResource("R26"), SubResource("R27"), SubResource("R28"), SubResource("R29"), SubResource("R30"), SubResource("R31"), SubResource("R32"), SubResource("R33"), SubResource("R34"), SubResource("R35")])

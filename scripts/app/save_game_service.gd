@@ -5,7 +5,7 @@ signal save_completed(slot_index: int)
 signal load_completed(slot_index: int)
 signal save_failed(slot_index: int, reason: String)
 
-const CURRENT_VERSION: int = 4
+const CURRENT_VERSION: int = 5
 const SLOT_COUNT: int = 2
 
 @export var save_directory: String = "user://saves/witchroot/"
@@ -154,6 +154,14 @@ func _migrate(snapshot: Dictionary) -> Dictionary:
 			grimoire_data["active_nodes"] = []
 		snapshot["grimoire"] = grimoire_data
 		version = 4
+	if version < 5:
+		var world_data: Dictionary = snapshot.get("world_state", {}) as Dictionary
+		if not world_data.has("regions"):
+			world_data["regions"] = {}
+		if not world_data.has("active_region_id"):
+			world_data["active_region_id"] = String(snapshot.get("region_id", "ashen_grove"))
+		snapshot["world_state"] = world_data
+		version = 5
 	snapshot["version"] = version
 	return snapshot
 

@@ -26,6 +26,8 @@ var _selected_grimoire_node_id: StringName = &""
 @onready var _corruption_bar: ProgressBar = get_node("Root/Status/Content/CorruptionBar") as ProgressBar
 @onready var _corruption_label: Label = get_node("Root/Status/Content/CorruptionLabel") as Label
 @onready var _corruption_reason: Label = get_node("Root/Status/Content/CorruptionReason") as Label
+@onready var _cold_bar: ProgressBar = get_node("Root/Status/Content/ColdBar") as ProgressBar
+@onready var _cold_label: Label = get_node("Root/Status/Content/ColdLabel") as Label
 @onready var _time_label: Label = get_node("Root/WorldInfo/Content/Time") as Label
 @onready var _threat_label: Label = get_node("Root/WorldInfo/Content/Threat") as Label
 @onready var _objective_label: Label = get_node("Root/Objective") as Label
@@ -125,6 +127,7 @@ func bind(session: WorldSession) -> void:
 	session.player.get_ward_component().active_changed.connect(_on_ward_active_changed)
 	session.player.get_status_effect_component().effects_changed.connect(_on_effects_changed)
 	session.player.get_corruption_component().corruption_changed.connect(_on_corruption_changed)
+	session.cold_exposure.exposure_changed.connect(_on_cold_exposure_changed)
 	session.world_clock.time_changed.connect(_on_time_changed)
 	session.threat_director.threat_changed.connect(_on_threat_changed)
 	session.interaction_controller.focus_changed.connect(_on_interaction_focus_changed)
@@ -142,6 +145,11 @@ func bind(session: WorldSession) -> void:
 	_on_ward_active_changed(session.player.get_ward_component().is_active)
 	_on_effects_changed(session.player.get_status_effect_component().active_effects)
 	_on_corruption_changed(corruption.current_corruption, corruption.maximum_corruption, &"safe")
+	_on_cold_exposure_changed(
+		session.cold_exposure.current_exposure,
+		session.cold_exposure.maximum_exposure,
+		false
+	)
 	_on_time_changed(session.world_clock.normalized_time, session.world_clock.day_number)
 	_refresh_inventory()
 	_refresh_equipment()
@@ -184,6 +192,15 @@ func show_notification(message: String) -> void:
 	_notification_tween.tween_property(_notification, "modulate:a", 1.0, 0.18)
 	_notification_timer.start(3.2)
 	_refresh_objective()
+
+
+func rebind_region() -> void:
+	if _session == null:
+		return
+	_map.bind(_session.player, _session.world_state, _session.region.poi_catalog)
+	_session.cold_exposure.refresh()
+	_refresh_objective()
+	_refresh_grimoire()
 
 
 func _build_inventory_grid() -> void:
@@ -561,6 +578,16 @@ func _on_corruption_changed(current: float, maximum: float, reason: StringName) 
 	_corruption_reason.text = tr("CORRUPTION_REASON_%s" % String(reason).to_upper())
 
 
+func _on_cold_exposure_changed(current: float, maximum: float, protected: bool) -> void:
+	var active: bool = _session != null and _session.get_region_id() == &"moonbound_expanse"
+	_cold_bar.visible = active
+	_cold_label.visible = active
+	_cold_bar.max_value = maximum
+	_cold_bar.value = current
+	_cold_label.text = tr("SURVIVAL_COLD_PROTECTED") if protected \
+		else tr("SURVIVAL_COLD") % floori(current)
+
+
 func _on_time_changed(_normalized_time: float, day_number: int) -> void:
 	_time_label.text = tr("SURVIVAL_TIME") % [day_number, _session.world_clock.get_time_label()]
 
@@ -727,7 +754,15 @@ func _add_empty_label(container: Container) -> void:
 
 
 func _refresh_objective() -> void:
-	if _session.world_state.has_progression_flag(&"matriarch_defeated"):
+	if _session.get_region_id() == &"moonbound_expanse" \
+			and _session.world_state.has_progression_flag(&"moon_eater_defeated"):
+		_objective_label.text = tr("OBJECTIVE_MOON_COMPLETE")
+	elif _session.get_region_id() == &"moonbound_expanse" \
+			and _session.world_state.has_ritual_flag(&"moon_eclipse_path_open"):
+		_objective_label.text = tr("OBJECTIVE_MOON_EATER")
+	elif _session.get_region_id() == &"moonbound_expanse":
+		_objective_label.text = tr("OBJECTIVE_MOON_RITUAL")
+	elif _session.world_state.has_progression_flag(&"matriarch_defeated"):
 		_objective_label.text = tr("OBJECTIVE_PORTAL")
 	elif _session.world_state.has_progression_flag(&"crypt_puzzle_solved"):
 		_objective_label.text = tr("OBJECTIVE_MATRIARCH")

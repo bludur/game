@@ -148,6 +148,16 @@ func clear_runtime_enemies() -> void:
 	_clear_runtime_enemies(true)
 
 
+func set_encounter_table(next_table: EncounterTableData) -> void:
+	_clear_runtime_enemies(false)
+	encounter_table = next_table
+	_initialize_lair_runtime()
+
+
+func set_ward_zones(next_zones: Array[WardZone]) -> void:
+	_ward_zones = next_zones
+
+
 func sync_from_world_state() -> void:
 	_clear_runtime_enemies(false)
 	_restore_raid_state()

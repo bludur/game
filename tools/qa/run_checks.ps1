@@ -42,6 +42,12 @@ if ($LASTEXITCODE -ne 0) {
     throw "Ashen Grove world-content test failed with exit code $LASTEXITCODE."
 }
 
+Write-Host 'Running Moonbound region transition and content test...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_moonbound_region.log') --script 'res://tests/qa/moonbound_region_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Moonbound region test failed with exit code $LASTEXITCODE."
+}
+
 Write-Host 'Running third-person locomotion course regression...'
 & $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_locomotion_course.log') --script 'res://tests/qa/third_person_locomotion_course_test.gd'
 if ($LASTEXITCODE -ne 0) {

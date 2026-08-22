@@ -1,0 +1,66 @@
+[gd_resource type="Resource" script_class="RegionPoiCatalog" load_steps=8 format=3]
+[ext_resource type="Script" path="res://scripts/resources/region_poi_catalog.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/region_poi_data.gd" id="2"]
+
+[sub_resource type="Resource" id="Gate"]
+script = ExtResource("2")
+poi_id = &"moonbound_gate"
+display_name = "Врата мёртвой луны"
+kind = 0
+world_position = Vector3(0, 0, 60)
+discovery_radius = 16.0
+audio_radius = 24.0
+map_color = Color(0.48, 0.62, 1, 1)
+loot_hint = &"moonfrost_crystal"
+
+[sub_resource type="Resource" id="Haven"]
+script = ExtResource("2")
+poi_id = &"pale_haven"
+display_name = "Бледное убежище"
+kind = 1
+world_position = Vector3(-28, 0, 24)
+discovery_radius = 17.0
+audio_radius = 26.0
+audio_mood = 4
+map_color = Color(0.25, 0.92, 0.86, 1)
+loot_hint = &"pale_root"
+
+[sub_resource type="Resource" id="Observatory"]
+script = ExtResource("2")
+poi_id = &"eclipse_observatory"
+display_name = "Обсерватория затмения"
+kind = 2
+world_position = Vector3(34, 0, 18)
+discovery_radius = 16.0
+audio_radius = 25.0
+audio_mood = 1
+map_color = Color(0.66, 0.54, 1, 1)
+loot_hint = &"nightglass"
+
+[sub_resource type="Resource" id="Mine"]
+script = ExtResource("2")
+poi_id = &"nightglass_mine"
+display_name = "Шахта ночного стекла"
+kind = 8
+world_position = Vector3(-42, 0, -24)
+discovery_radius = 16.0
+audio_radius = 24.0
+audio_mood = 3
+map_color = Color(0.3, 0.2, 0.56, 1)
+loot_hint = &"nightglass"
+
+[sub_resource type="Resource" id="Sanctum"]
+script = ExtResource("2")
+poi_id = &"moon_eater_sanctum"
+display_name = "Святилище Пожирателя Луны"
+kind = 4
+world_position = Vector3(24, 0, -48)
+discovery_radius = 18.0
+audio_radius = 30.0
+audio_mood = 3
+map_color = Color(0.86, 0.3, 0.72, 1)
+loot_hint = &"moon_eater_heart"
+
+[resource]
+script = ExtResource("1")
+points = Array[ExtResource("2")]([SubResource("Gate"), SubResource("Haven"), SubResource("Observatory"), SubResource("Mine"), SubResource("Sanctum")])

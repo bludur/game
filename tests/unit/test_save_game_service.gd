@@ -79,11 +79,34 @@ func test_version_two_migration_grants_one_safe_starter_loadout() -> void:
 		"world_state": {},
 	}
 	var migrated: Dictionary = _service.call("_migrate", legacy_snapshot) as Dictionary
-	assert_eq(migrated["version"], 4)
+	assert_eq(migrated["version"], 5)
 	assert_eq(
 		(migrated["player"] as Dictionary)["equipment"],
 		{"focus": "novice_wand", "robe": "ashweave_mantle", "talisman": "quicksilver_knot"}
 	)
 	assert_eq((migrated["grimoire"] as Dictionary)["active_nodes"], [])
+	assert_eq((migrated["world_state"] as Dictionary)["active_region_id"], "ashen_grove")
 	var migrated_again: Dictionary = _service.call("_migrate", migrated) as Dictionary
 	assert_eq((migrated_again["player"] as Dictionary)["equipment"], (migrated["player"] as Dictionary)["equipment"])
+
+
+func test_active_region_and_both_region_states_survive_save_load() -> void:
+	var session: WorldSession = WORLD_SCENE.instantiate() as WorldSession
+	add_child_autofree(session)
+	await get_tree().process_frame
+	session.world_state.set_progression_flag(&"matriarch_defeated")
+	session.get_player_inventory().add_item(session.item_catalog.get_item(&"portal_focus"), 1)
+	assert_true(session.request_region_transition(&"moonbound_expanse", &"portal_focus"))
+	await get_tree().process_frame
+	session.player.global_position = Vector3(17.0, 0.1, -19.0)
+	assert_true(_service.save_game(session, 0))
+	assert_eq(_service.read_snapshot(0)["region_id"], "moonbound_expanse")
+	assert_true(session.request_region_transition(&"ashen_grove"))
+	await get_tree().process_frame
+	assert_true(_service.load_game(session, 0))
+	await get_tree().process_frame
+	assert_eq(session.get_region_id(), &"moonbound_expanse")
+	assert_almost_eq(session.player.global_position.x, 17.0, 0.01)
+	assert_almost_eq(session.player.global_position.z, -19.0, 0.01)
+	assert_true(session.world_state.region_states.has(&"ashen_grove"))
+	assert_true(session.world_state.region_states.has(&"moonbound_expanse"))

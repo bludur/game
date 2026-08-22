@@ -6,10 +6,20 @@ signal notification_requested(message: String)
 
 const PICKUP_SCENE: PackedScene = preload("res://scenes/interaction/world_pickup.tscn")
 const WITCH_ECHO_SCENE: PackedScene = preload("res://scenes/survival/witch_echo.tscn")
+const MOONBOUND_REGION_SCENE: PackedScene = preload("res://scenes/regions/moonbound_expanse.tscn")
+const ASHEN_REGION_SCENE: PackedScene = preload("res://scenes/regions/ashen_grove.tscn")
+const ASHEN_ENCOUNTERS: EncounterTableData = preload("res://resources/survival/encounters/ashen_grove_encounters.tres")
+const MOONBOUND_ENCOUNTERS: EncounterTableData = preload("res://resources/survival/encounters/moonbound_encounters.tres")
+const MOONBOUND_RECIPE_IDS: Array[StringName] = [
+	&"smelt_lunar_alloy", &"weave_shadow_thread", &"forge_moonspine_focus",
+	&"weave_eclipse_raiment", &"bind_eclipse_talisman", &"brew_deep_frostward",
+]
 
 @export var item_catalog: ItemCatalog
 
-@onready var region: AshenGrove = get_node("RegionHost/AshenGrove") as AshenGrove
+@onready var region: SurvivalRegion = get_node("RegionHost/AshenGrove") as SurvivalRegion
+@onready var _region_host: Node3D = get_node("RegionHost") as Node3D
+@onready var _inactive_region_content: Node3D = get_node("InactiveRegionContent") as Node3D
 @onready var player: MagePlayer = get_node("Player") as MagePlayer
 @onready var third_person_camera: ThirdPersonCameraRig = get_node("ThirdPersonCameraRig") as ThirdPersonCameraRig
 @onready var interaction_controller: InteractionController = get_node("InteractionController") as InteractionController
@@ -22,6 +32,7 @@ const WITCH_ECHO_SCENE: PackedScene = preload("res://scenes/survival/witch_echo.
 @onready var _respawn_timer: Timer = get_node("RespawnTimer") as Timer
 @onready var grimoire: GrimoireState = get_node("GrimoireState") as GrimoireState
 @onready var progress_journal: ProgressJournal = get_node("ProgressJournal") as ProgressJournal
+@onready var cold_exposure: ColdExposureComponent = get_node("ColdExposureComponent") as ColdExposureComponent
 @onready var crafting_system: CraftingSystem = get_node("CraftingSystem") as CraftingSystem
 @onready var ritual_system: RitualSystem = get_node("RitualSystem") as RitualSystem
 @onready var construction_system: ConstructionSystem = get_node("ConstructionHost") as ConstructionSystem
@@ -33,6 +44,7 @@ const WITCH_ECHO_SCENE: PackedScene = preload("res://scenes/survival/witch_echo.
 @onready var survival_hud: SurvivalHud = get_node("SurvivalHud") as SurvivalHud
 @onready var survival_tutorial: SurvivalTutorial = get_node("SurvivalTutorial") as SurvivalTutorial
 @onready var _bog_curse: CursedZone = get_node("BogCurse") as CursedZone
+@onready var _crypt_curse: CursedZone = get_node("CryptCurse") as CursedZone
 @onready var _world_environment: WorldEnvironment = get_node("WorldEnvironment") as WorldEnvironment
 @onready var region_discovery: RegionDiscovery = get_node("RegionDiscovery") as RegionDiscovery
 @onready var weather_director: WeatherDirector = get_node("WeatherDirector") as WeatherDirector
@@ -45,11 +57,18 @@ var _ward_zones: Array[WardZone] = []
 var _cursed_zones: Array[CursedZone] = []
 var _interface_open: bool = false
 var _session_paused: bool = false
+var _ashen_aux_nodes: Array[Node3D] = []
+var _ashen_aux_parents: Dictionary = {}
+var _region_transitioning: bool = false
 
 
 func _ready() -> void:
 	UiTranslations.ensure_registered()
 	SurvivalInputProfile.ensure_actions()
+	world_state.active_region_id = region.get_region_id()
+	_ashen_aux_nodes = [starless_crypt, witchfire_hearth, _ritual_circle, _bog_curse, _crypt_curse]
+	for auxiliary: Node3D in _ashen_aux_nodes:
+		_ashen_aux_parents[auxiliary] = auxiliary.get_parent()
 	player.global_position = region.get_spawn_position()
 	player.reset_physics_interpolation()
 	third_person_camera.set_target(player)
@@ -61,6 +80,7 @@ func _ready() -> void:
 	_respawn_timer.timeout.connect(_on_respawn_timeout)
 	witchfire_hearth.rest_requested.connect(_on_rest_requested)
 	world_clock.time_changed.connect(_on_time_changed)
+	cold_exposure.bind(player)
 	progress_journal.bind(world_state, grimoire)
 	player.set_grimoire_modifier_provider(grimoire.get_spell_profile)
 	crafting_system.bind(player.get_inventory_component(), grimoire)
@@ -94,10 +114,8 @@ func _ready() -> void:
 	starless_crypt.notification_requested.connect(notification_requested.emit)
 	starless_crypt.boss_defeated.connect(_on_matriarch_defeated)
 	region_discovery.poi_discovered.connect(_on_poi_discovered)
-	region_discovery.bind(player, world_state, region.poi_catalog)
 	weather_director.bind(player, world_clock, _world_environment)
 	weather_director.weather_changed.connect(_on_weather_changed)
-	region_audio_director.bind(player, region.poi_catalog)
 	survival_hud.craft_requested.connect(_on_craft_requested)
 	survival_hud.ritual_requested.connect(_on_ritual_requested)
 	survival_hud.interface_open_changed.connect(_on_interface_open_changed)
@@ -113,13 +131,7 @@ func _ready() -> void:
 		world_clock,
 		ritual_system
 	)
-	for child: Node in get_children():
-		if child is CursedZone:
-			_cursed_zones.append(child as CursedZone)
-	for resource_node: ResourceNode in region.get_persistent_resources():
-		resource_node.loot_ready.connect(_spawn_pickup)
-		resource_node.extraction_started.connect(_on_extraction_started)
-		resource_node.state_changed.connect(_on_resource_state_changed)
+	_bind_active_region_content()
 	_validate_persistent_ids()
 	_on_time_changed(world_clock.normalized_time, world_clock.day_number)
 
@@ -142,6 +154,7 @@ func _physics_process(delta: float) -> void:
 	player.get_corruption_component().update_exposure(
 		delta, world_clock.is_night(), in_ward, in_cursed_zone
 	)
+	cold_exposure.advance(delta, get_region_id() == &"moonbound_expanse", in_ward)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -184,6 +197,23 @@ func get_region_id() -> StringName:
 	return region.get_region_id()
 
 
+func request_region_transition(
+	target_region_id: StringName,
+	required_item_id: StringName = &""
+) -> bool:
+	if _region_transitioning or target_region_id == get_region_id():
+		return false
+	if target_region_id == &"moonbound_expanse" \
+			and not world_state.has_progression_flag(&"matriarch_defeated"):
+		notification_requested.emit(tr("NOTICE_PORTAL_DORMANT"))
+		return false
+	if not required_item_id.is_empty() \
+			and not player.get_inventory_component().has_item_id(required_item_id, 1):
+		notification_requested.emit(tr("NOTICE_PORTAL_NEEDS_FOCUS"))
+		return false
+	return _perform_region_transition(target_region_id, true)
+
+
 func get_player_inventory() -> InventoryComponent:
 	return player.get_inventory_component()
 
@@ -206,9 +236,7 @@ func apply_camera_settings(store: SettingsStore) -> void:
 
 
 func serialize_game() -> Dictionary:
-	construction_system.flush_world_state()
-	for resource_node: ResourceNode in region.get_persistent_resources():
-		world_state.set_resource_state(resource_node.persistent_id, resource_node.serialize_state())
+	_capture_active_region_state()
 	if is_instance_valid(_active_echo):
 		world_state.echo_state = _active_echo.serialize_state()
 	else:
@@ -221,6 +249,7 @@ func serialize_game() -> Dictionary:
 			"corruption": player.get_corruption_component().serialize_state(),
 			"status_effects": player.get_status_effect_component().serialize_state(),
 			"equipment": player.get_equipment_component().serialize_state(),
+			"cold": cold_exposure.serialize_state(),
 			"health": player.get_health_component().current_health,
 		},
 		"clock": world_clock.serialize_state(),
@@ -230,8 +259,9 @@ func serialize_game() -> Dictionary:
 
 
 func apply_game(snapshot: Dictionary) -> bool:
-	if StringName(String(snapshot.get("region_id", ""))) != get_region_id():
-		push_error("WorldSession.apply_game: save belongs to another region.")
+	var target_region_id: StringName = StringName(String(snapshot.get("region_id", "ashen_grove")))
+	if target_region_id != &"ashen_grove" and target_region_id != &"moonbound_expanse":
+		push_error("WorldSession.apply_game: save has an unknown active region.")
 		return false
 	var player_data: Dictionary = snapshot.get("player", {}) as Dictionary
 	player.global_position = _data_to_vector3(player_data.get("position", {}) as Dictionary)
@@ -243,23 +273,167 @@ func apply_game(snapshot: Dictionary) -> bool:
 	)
 	player.get_corruption_component().apply_state(player_data.get("corruption", {}) as Dictionary)
 	player.get_status_effect_component().apply_state(player_data.get("status_effects", []) as Array)
+	cold_exposure.apply_state(player_data.get("cold", {}) as Dictionary)
 	var health: HealthComponent = player.get_health_component()
 	health.reset()
 	health.take_damage(maxf(0.0, health.max_health - float(player_data.get("health", health.max_health))))
 	world_clock.apply_state(snapshot.get("clock", {}) as Dictionary)
 	grimoire.apply_state(snapshot.get("grimoire", grimoire.serialize_state()) as Dictionary)
 	world_state.apply_state(snapshot.get("world_state", {}) as Dictionary)
+	if target_region_id != get_region_id():
+		if not _perform_region_transition(target_region_id, false, false):
+			return false
+	else:
+		_restore_active_region_state()
 	_sync_grimoire_fragments_from_world()
+	player.global_position = _data_to_vector3(player_data.get("position", {}) as Dictionary)
+	player.reset_physics_interpolation()
+	_respawn_transform = Transform3D(Basis.IDENTITY, _hearth_spawn_position())
+	player.set_respawn_transform(_respawn_transform)
+	_apply_all_ritual_world_effects()
+	threat_director.sync_from_world_state()
+	if get_region_id() == &"ashen_grove":
+		starless_crypt.sync_from_state()
+	elif region is MoonboundExpanse:
+		(region as MoonboundExpanse).sync_from_state()
+	_restore_saved_echo()
+	return true
+
+
+func _perform_region_transition(
+	target_region_id: StringName,
+	notify_player: bool,
+	capture_current: bool = true
+) -> bool:
+	if target_region_id != &"ashen_grove" and target_region_id != &"moonbound_expanse":
+		return false
+	_region_transitioning = true
+	if capture_current:
+		_capture_active_region_state()
+	threat_director.clear_runtime_enemies()
+	construction_system.restore_buildings([])
+	if get_region_id() == &"ashen_grove":
+		_set_ashen_auxiliary_active(false)
+	region.process_mode = Node.PROCESS_MODE_DISABLED
+	region.visible = false
+	region.position.y = -1000.0
+	region.queue_free()
+	var region_scene: PackedScene = MOONBOUND_REGION_SCENE \
+		if target_region_id == &"moonbound_expanse" else ASHEN_REGION_SCENE
+	var next_region: SurvivalRegion = region_scene.instantiate() as SurvivalRegion
+	if next_region == null:
+		_region_transitioning = false
+		return false
+	_region_host.add_child(next_region)
+	region = next_region
+	if target_region_id == &"ashen_grove":
+		_set_ashen_auxiliary_active(true)
+	world_state.active_region_id = target_region_id
+	_bind_active_region_content()
+	_restore_active_region_state()
+	var region_state: Dictionary = world_state.get_region_state(target_region_id)
+	var spawn_position: Vector3 = region.get_spawn_position()
+	if region_state.has("player_position"):
+		spawn_position = _data_to_vector3(region_state.get("player_position", {}) as Dictionary)
+	player.global_position = spawn_position
+	player.reset_physics_interpolation()
+	_respawn_transform = Transform3D(Basis.IDENTITY, _hearth_spawn_position())
+	player.set_respawn_transform(_respawn_transform)
+	survival_hud.rebind_region()
+	_region_transitioning = false
+	if notify_player:
+		notification_requested.emit(tr("NOTICE_REGION_ENTERED") % region.region_data.display_name)
+	if is_instance_valid(_save_game_service):
+		_save_game_service.save_game(self, 0)
+	return true
+
+
+func _capture_active_region_state() -> void:
+	if region == null:
+		return
+	construction_system.flush_world_state()
+	for resource_node: ResourceNode in region.get_persistent_resources():
+		world_state.set_resource_state(resource_node.persistent_id, resource_node.serialize_state())
+	world_state.set_region_state(get_region_id(), {
+		"player_position": _vector3_to_data(player.global_position),
+		"buildings": world_state.building_states.duplicate(true),
+		"raid": world_state.raid_state.duplicate(true),
+		"region_tier": world_state.region_tier,
+	})
+
+
+func _restore_active_region_state() -> void:
+	var state: Dictionary = world_state.get_region_state(get_region_id())
+	world_state.region_tier = int(state.get("region_tier", region.region_data.region_tier))
+	var buildings: Array = state.get("buildings", world_state.building_states) as Array
+	world_state.building_states.assign(buildings)
+	world_state.raid_state = (state.get("raid", {}) as Dictionary).duplicate(true)
+	construction_system.restore_buildings(world_state.building_states)
 	for resource_node: ResourceNode in region.get_persistent_resources():
 		if world_state.resource_states.has(resource_node.persistent_id):
 			resource_node.apply_state(world_state.resource_states[resource_node.persistent_id])
-	_respawn_transform = Transform3D(Basis.IDENTITY, _hearth_spawn_position())
-	construction_system.restore_buildings(world_state.building_states)
-	_apply_all_ritual_world_effects()
+
+
+func _bind_active_region_content() -> void:
+	region_discovery.bind(player, world_state, region.poi_catalog)
+	region_audio_director.bind(player, region.poi_catalog)
+	_cursed_zones.clear()
+	_ward_zones.clear()
+	if get_region_id() == &"ashen_grove":
+		_cursed_zones.assign([_bog_curse, _crypt_curse])
+		_ward_zones.append(witchfire_hearth.ward_zone)
+	else:
+		for hearth: WitchfireHearth in region.get_hearths():
+			_ward_zones.append(hearth.ward_zone)
+	for hearth: WitchfireHearth in region.get_hearths():
+		if not hearth.rest_requested.is_connected(_on_rest_requested):
+			hearth.rest_requested.connect(_on_rest_requested)
+	for resource_node: ResourceNode in region.get_persistent_resources():
+		if not resource_node.loot_ready.is_connected(_spawn_pickup):
+			resource_node.loot_ready.connect(_spawn_pickup)
+		if not resource_node.extraction_started.is_connected(_on_extraction_started):
+			resource_node.extraction_started.connect(_on_extraction_started)
+		if not resource_node.state_changed.is_connected(_on_resource_state_changed):
+			resource_node.state_changed.connect(_on_resource_state_changed)
+	for child: Node in region.find_children("*", "RegionPortal", true, false):
+		var portal: RegionPortal = child as RegionPortal
+		if portal != null and not portal.transition_requested.is_connected(request_region_transition):
+			portal.transition_requested.connect(request_region_transition)
+	if region is MoonboundExpanse:
+		var moonbound: MoonboundExpanse = region as MoonboundExpanse
+		moonbound.bind(player, world_state, item_catalog)
+		if not moonbound.notification_requested.is_connected(notification_requested.emit):
+			moonbound.notification_requested.connect(notification_requested.emit)
+		if not moonbound.guardian_defeated.is_connected(_on_moon_eater_defeated):
+			moonbound.guardian_defeated.connect(_on_moon_eater_defeated)
+		for recipe_id: StringName in MOONBOUND_RECIPE_IDS:
+			grimoire.unlock_recipe(recipe_id)
+	threat_director.set_ward_zones(_ward_zones)
+	threat_director.set_encounter_table(
+		MOONBOUND_ENCOUNTERS if get_region_id() == &"moonbound_expanse" else ASHEN_ENCOUNTERS
+	)
 	threat_director.sync_from_world_state()
-	starless_crypt.sync_from_state()
-	_restore_saved_echo()
-	return true
+	if is_instance_valid(survival_hud) and survival_hud.is_node_ready():
+		survival_hud.rebind_region()
+
+
+func _set_ashen_auxiliary_active(active: bool) -> void:
+	for auxiliary: Node3D in _ashen_aux_nodes:
+		if active and auxiliary.get_parent() == _inactive_region_content:
+			var original_parent: Node = _ashen_aux_parents.get(auxiliary) as Node
+			if original_parent != null:
+				auxiliary.reparent(original_parent, false)
+				auxiliary.visible = true
+				auxiliary.process_mode = Node.PROCESS_MODE_INHERIT
+		elif not active and auxiliary.get_parent() != _inactive_region_content:
+			auxiliary.reparent(_inactive_region_content, false)
+			auxiliary.visible = false
+			auxiliary.process_mode = Node.PROCESS_MODE_DISABLED
+
+
+func _on_moon_eater_defeated() -> void:
+	if is_instance_valid(_save_game_service):
+		_save_game_service.save_game(self, 0)
 
 
 func _spawn_pickup(item: ItemData, quantity: int, world_position: Vector3) -> void:
@@ -424,6 +598,9 @@ func _on_matriarch_defeated() -> void:
 
 
 func request_grimoire_respec() -> bool:
+	if not witchfire_hearth.is_inside_tree():
+		notification_requested.emit(tr("NOTICE_GRIMOIRE_RESPEC_HEARTH"))
+		return false
 	var flat_offset: Vector3 = player.global_position - witchfire_hearth.global_position
 	flat_offset.y = 0.0
 	if flat_offset.length() > 6.0:
@@ -596,7 +773,11 @@ func _on_time_changed(normalized_time: float, _day_number: int) -> void:
 
 
 func _hearth_spawn_position() -> Vector3:
-	return witchfire_hearth.global_position + Vector3(0, 0.1, 3.0)
+	if get_region_id() == &"ashen_grove" and witchfire_hearth.is_inside_tree():
+		return witchfire_hearth.global_position + Vector3(0, 0.1, 3.0)
+	var hearths: Array[WitchfireHearth] = region.get_hearths()
+	return hearths[0].global_position + Vector3(0, 0.1, 3.0) \
+		if not hearths.is_empty() else region.get_spawn_position()
 
 
 func _vector3_to_data(value: Vector3) -> Dictionary:

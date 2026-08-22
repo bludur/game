@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/survival/ashen_grove.gd" id="1"]
 [ext_resource type="Resource" path="res://resources/survival/regions/ashen_grove.tres" id="2"]
@@ -8,11 +8,17 @@
 [ext_resource type="Resource" path="res://resources/survival/loot/dusk_herb.tres" id="6"]
 [ext_resource type="Resource" path="res://resources/survival/loot/soul_fissure.tres" id="7"]
 [ext_resource type="Resource" path="res://resources/survival/regions/ashen_grove_pois.tres" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/survival/region_portal.tscn" id="9"]
 
 [node name="AshenGrove" type="Node3D"]
 script = ExtResource("1")
 region_data = ExtResource("2")
 poi_catalog = ExtResource("8")
+
+[node name="GreatPortal" parent="." instance=ExtResource("9")]
+position = Vector3(0, 0, 66)
+target_region_id = &"moonbound_expanse"
+required_item_id = &"portal_focus"
 
 [node name="Resources" type="Node3D" parent="."]
 

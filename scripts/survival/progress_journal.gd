@@ -14,6 +14,23 @@ func get_entries() -> Array[Dictionary]:
 	var entries: Array[Dictionary] = []
 	if _world_state == null or _grimoire == null:
 		return entries
+	if _world_state.active_region_id == &"moonbound_expanse":
+		if not _world_state.has_ritual_flag(&"moon_eclipse_path_open"):
+			entries.append(_entry(
+				&"moon_ritual", "Открыть путь затмения",
+				"Соберите 2 ночных стекла и 2 кристалла лунного инея у Обсерватории."
+			))
+		elif not _world_state.has_progression_flag(&"moon_eater_defeated"):
+			entries.append(_entry(
+				&"moon_eater", "Победить Пожирателя Луны",
+				"Используйте смену света и тени хранителя, чтобы выбирать момент атаки."
+			))
+		else:
+			entries.append(_entry(
+				&"moon_complete", "Вернуться с сердцем затмения",
+				"Предел покорён. Великий портал вернёт вас в Пепельную рощу."
+			))
+		return entries
 	if not _world_state.has_ritual_flag(&"crypt_unsealed"):
 		entries.append(_entry(
 			&"unseal_crypt", "Открыть Беззвёздный склеп",

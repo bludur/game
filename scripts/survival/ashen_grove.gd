@@ -1,8 +1,5 @@
 class_name AshenGrove
-extends Node3D
-
-@export var region_data: RegionData
-@export var poi_catalog: RegionPoiCatalog
+extends SurvivalRegion
 
 var _ground_material: StandardMaterial3D
 var _stone_material: StandardMaterial3D
@@ -18,31 +15,6 @@ func _ready() -> void:
 	_build_boundaries()
 	_build_verticality()
 	_build_landmarks()
-
-
-func get_region_id() -> StringName:
-	return region_data.region_id if region_data != null else &"unknown"
-
-
-func get_spawn_position() -> Vector3:
-	return region_data.spawn_position if region_data != null else Vector3.ZERO
-
-
-func get_persistent_resources() -> Array[ResourceNode]:
-	var result: Array[ResourceNode] = []
-	for child: Node in get_node("Resources").get_children():
-		if child is ResourceNode:
-			result.append(child as ResourceNode)
-	return result
-
-
-func get_pois() -> Array[RegionPoiData]:
-	return poi_catalog.points if poi_catalog != null else []
-
-
-func get_poi_position(poi_id: StringName) -> Vector3:
-	var poi: RegionPoiData = poi_catalog.get_poi(poi_id) if poi_catalog != null else null
-	return poi.world_position if poi != null else Vector3.ZERO
 
 
 func set_crypt_unsealed(unsealed: bool) -> void:

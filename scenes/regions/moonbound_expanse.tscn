@@ -1,0 +1,179 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="Script" path="res://scripts/survival/moonbound_expanse.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/survival/regions/moonbound_expanse.tres" id="2"]
+[ext_resource type="Resource" path="res://resources/survival/regions/moonbound_expanse_pois.tres" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/interaction/resource_node.tscn" id="4"]
+[ext_resource type="Resource" path="res://resources/survival/loot/moonfrost_crystal.tres" id="5"]
+[ext_resource type="Resource" path="res://resources/survival/loot/nightglass.tres" id="6"]
+[ext_resource type="Resource" path="res://resources/survival/loot/pale_root.tres" id="7"]
+[ext_resource type="Resource" path="res://resources/survival/loot/umbral_pelt.tres" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/survival/witchfire_hearth.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/survival/region_portal.tscn" id="10"]
+[ext_resource type="Script" path="res://scripts/interaction/interactable_component.gd" id="11"]
+[ext_resource type="PackedScene" path="res://scenes/boss/boss_encounter.tscn" id="12"]
+[ext_resource type="PackedScene" path="res://scenes/boss/moon_eater.tscn" id="13"]
+
+[sub_resource type="SphereShape3D" id="InteractShape"]
+radius = 1.8
+
+[sub_resource type="CylinderMesh" id="AltarMesh"]
+top_radius = 1.1
+bottom_radius = 1.5
+height = 1.1
+radial_segments = 10
+
+[sub_resource type="StandardMaterial3D" id="RitualMaterial"]
+albedo_color = Color(0.18, 0.28, 0.58, 1)
+emission_enabled = true
+emission = Color(0.36, 0.58, 1, 1)
+emission_energy_multiplier = 2.6
+
+[sub_resource type="StandardMaterial3D" id="BossMaterial"]
+albedo_color = Color(0.3, 0.12, 0.42, 1)
+emission_enabled = true
+emission = Color(0.72, 0.18, 0.82, 1)
+emission_energy_multiplier = 2.8
+
+[node name="MoonboundExpanse" type="Node3D"]
+script = ExtResource("1")
+region_data = ExtResource("2")
+poi_catalog = ExtResource("3")
+
+[node name="Resources" type="Node3D" parent="."]
+
+[node name="MoonfrostNorth" parent="Resources" instance=ExtResource("4")]
+position = Vector3(-12, 0, 46)
+persistent_id = &"moon_moonfrost_north"
+resource_kind = 1
+loot_table = ExtResource("5")
+accent_color = Color(0.38, 0.78, 1, 1)
+
+[node name="MoonfrostMine" parent="Resources" instance=ExtResource("4")]
+position = Vector3(-36, 0, -18)
+persistent_id = &"moon_moonfrost_mine"
+resource_kind = 1
+loot_table = ExtResource("5")
+accent_color = Color(0.38, 0.78, 1, 1)
+
+[node name="MoonfrostSanctum" parent="Resources" instance=ExtResource("4")]
+position = Vector3(18, 0, -36)
+persistent_id = &"moon_moonfrost_sanctum"
+resource_kind = 1
+loot_table = ExtResource("5")
+accent_color = Color(0.38, 0.78, 1, 1)
+
+[node name="NightglassEast" parent="Resources" instance=ExtResource("4")]
+position = Vector3(42, 0, 12)
+persistent_id = &"moon_nightglass_east"
+resource_kind = 3
+loot_table = ExtResource("6")
+accent_color = Color(0.24, 0.18, 0.56, 1)
+
+[node name="NightglassMine" parent="Resources" instance=ExtResource("4")]
+position = Vector3(-46, 0, -29)
+persistent_id = &"moon_nightglass_mine"
+resource_kind = 3
+loot_table = ExtResource("6")
+accent_color = Color(0.24, 0.18, 0.56, 1)
+
+[node name="NightglassSanctum" parent="Resources" instance=ExtResource("4")]
+position = Vector3(31, 0, -41)
+persistent_id = &"moon_nightglass_sanctum"
+resource_kind = 3
+loot_table = ExtResource("6")
+accent_color = Color(0.24, 0.18, 0.56, 1)
+
+[node name="PaleRootHaven" parent="Resources" instance=ExtResource("4")]
+position = Vector3(-22, 0, 31)
+persistent_id = &"moon_pale_root_haven"
+resource_kind = 2
+loot_table = ExtResource("7")
+accent_color = Color(0.68, 0.84, 0.7, 1)
+
+[node name="PaleRootWest" parent="Resources" instance=ExtResource("4")]
+position = Vector3(-55, 0, 4)
+persistent_id = &"moon_pale_root_west"
+resource_kind = 2
+loot_table = ExtResource("7")
+accent_color = Color(0.68, 0.84, 0.7, 1)
+
+[node name="PaleRootSouth" parent="Resources" instance=ExtResource("4")]
+position = Vector3(2, 0, -54)
+persistent_id = &"moon_pale_root_south"
+resource_kind = 2
+loot_table = ExtResource("7")
+accent_color = Color(0.68, 0.84, 0.7, 1)
+
+[node name="UmbralPeltObservatory" parent="Resources" instance=ExtResource("4")]
+position = Vector3(30, 0, 24)
+persistent_id = &"moon_umbral_pelt_observatory"
+resource_kind = 0
+loot_table = ExtResource("8")
+accent_color = Color(0.32, 0.2, 0.46, 1)
+
+[node name="UmbralPeltMine" parent="Resources" instance=ExtResource("4")]
+position = Vector3(-31, 0, -36)
+persistent_id = &"moon_umbral_pelt_mine"
+resource_kind = 0
+loot_table = ExtResource("8")
+accent_color = Color(0.32, 0.2, 0.46, 1)
+
+[node name="UmbralPeltSanctum" parent="Resources" instance=ExtResource("4")]
+position = Vector3(38, 0, -52)
+persistent_id = &"moon_umbral_pelt_sanctum"
+resource_kind = 0
+loot_table = ExtResource("8")
+accent_color = Color(0.32, 0.2, 0.46, 1)
+
+[node name="PaleHaven" parent="." instance=ExtResource("9")]
+position = Vector3(-28, 0, 24)
+persistent_id = &"hearth_pale_haven"
+
+[node name="ReturnPortal" parent="." instance=ExtResource("10")]
+position = Vector3(0, 0, 64)
+target_region_id = &"ashen_grove"
+
+[node name="EclipseRitual" type="Node3D" parent="."]
+position = Vector3(34, 0, 18)
+
+[node name="Altar" type="MeshInstance3D" parent="EclipseRitual"]
+position = Vector3(0, 0.55, 0)
+material_override = SubResource("RitualMaterial")
+mesh = SubResource("AltarMesh")
+
+[node name="InteractableComponent" type="Area3D" parent="EclipseRitual"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("11")
+prompt_text = "PROMPT_MOON_RITUAL"
+interaction_distance = 3.2
+interaction_priority = 5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EclipseRitual/InteractableComponent"]
+position = Vector3(0, 0.8, 0)
+shape = SubResource("InteractShape")
+
+[node name="GuardianAltar" type="Node3D" parent="."]
+position = Vector3(24, 0, -48)
+
+[node name="Altar" type="MeshInstance3D" parent="GuardianAltar"]
+position = Vector3(0, 0.55, 0)
+material_override = SubResource("BossMaterial")
+mesh = SubResource("AltarMesh")
+
+[node name="InteractableComponent" type="Area3D" parent="GuardianAltar"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("11")
+prompt_text = "PROMPT_AWAKEN_MOON_EATER"
+interaction_distance = 3.2
+interaction_priority = 5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GuardianAltar/InteractableComponent"]
+position = Vector3(0, 0.8, 0)
+shape = SubResource("InteractShape")
+
+[node name="BossEncounter" parent="." instance=ExtResource("12")]
+position = Vector3(24, 0, -48)
+boss_scene = ExtResource("13")

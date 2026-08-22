@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3]
+[gd_scene load_steps=39 format=3]
 
 [ext_resource type="Script" path="res://scripts/survival/world_session.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/regions/ashen_grove.tscn" id="2"]
@@ -31,6 +31,7 @@
 [ext_resource type="Script" path="res://scripts/audio/region_audio_director.gd" id="29"]
 [ext_resource type="Resource" path="res://resources/survival/encounters/ashen_grove_encounters.tres" id="30"]
 [ext_resource type="Script" path="res://scripts/survival/progress_journal.gd" id="38"]
+[ext_resource type="Script" path="res://scripts/survival/cold_exposure_component.gd" id="39"]
 
 [sub_resource type="TorusMesh" id="RitualMesh"]
 inner_radius = 5.7
@@ -95,6 +96,11 @@ shadow_enabled = false
 
 [node name="RegionHost" type="Node3D" parent="."]
 
+[node name="InactiveRegionContent" type="Node3D" parent="."]
+position = Vector3(0, -1000, 0)
+process_mode = 4
+visible = false
+
 [node name="AshenGrove" parent="RegionHost" instance=ExtResource("2")]
 
 [node name="RegionNavigation" type="NavigationRegion3D" parent="RegionHost"]
@@ -158,6 +164,9 @@ definition = ExtResource("16")
 
 [node name="ProgressJournal" type="Node" parent="."]
 script = ExtResource("38")
+
+[node name="ColdExposureComponent" type="Node" parent="."]
+script = ExtResource("39")
 
 [node name="CraftingSystem" type="Node" parent="."]
 script = ExtResource("13")

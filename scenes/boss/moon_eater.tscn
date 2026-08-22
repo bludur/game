@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/boss/arena_warden.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/boss/moon_eater.gd" id="2"]
+
+[node name="MoonEater" instance=ExtResource("1")]
+script = ExtResource("2")
+move_speed = 2.1
+preferred_distance = 6.5
+
+[node name="HealthComponent" parent="." index="2"]
+max_health = 460.0

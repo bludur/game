@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+item_id = &"moon_eater_heart"
+display_name = "Сердце Пожирателя Луны"
+description = "Сохраняет ритм света и тени поверженного хранителя."
+item_type = 3
+max_stack_size = 1
+accent_color = Color(0.72, 0.72, 1, 1)

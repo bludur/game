@@ -43,7 +43,7 @@ func get_matching_entries(
 
 
 func is_valid_catalog() -> bool:
-	if region_id.is_empty() or roles.size() != 6 or mutations.size() != 2 or lairs.is_empty():
+	if region_id.is_empty() or roles.size() < 3 or mutations.size() > 2 or lairs.is_empty():
 		return false
 	var role_ids: Dictionary[StringName, bool] = {}
 	for role: EnemyRoleData in roles:

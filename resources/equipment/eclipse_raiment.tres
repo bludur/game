@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/equipment_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+equipment_id = &"eclipse_raiment"
+display_name = "Облачение затмения"
+description = "Тёплое реликтовое облачение из сумеречной нити."
+slot = 1
+tier = 3
+accent_color = Color(0.28, 0.22, 0.52, 1)
+mana_cost_multiplier = 0.85
+effect_duration_multiplier = 1.25
+incoming_damage_multiplier = 0.8
+visual_variant = 3

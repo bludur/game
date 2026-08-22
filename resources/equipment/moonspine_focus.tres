@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/equipment_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+equipment_id = &"moonspine_focus"
+display_name = "Фокус лунного хребта"
+description = "Фокус четвёртого tier: усиливает Мороз и ускоряет снаряды."
+slot = 0
+tier = 3
+accent_color = Color(0.42, 0.76, 1, 1)
+cooldown_multiplier = 0.9
+damage_multiplier = 1.15
+projectile_speed_multiplier = 1.2
+school_affinity = 1
+affinity_damage_multiplier = 1.2
+visual_variant = 3

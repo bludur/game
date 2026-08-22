@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+item_id = &"shadow_thread"
+display_name = "Сумеречная нить"
+description = "Тёплая нить из шкуры и бледного корня."
+accent_color = Color(0.42, 0.28, 0.58, 1)

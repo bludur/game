@@ -91,7 +91,7 @@ func test_equipment_state_uses_stable_ids_and_missing_items_fall_back_safely() -
 	assert_eq(_equipment.get_equipped_item(EquipmentData.Slot.ROBE).item_id, &"wardkeeper_raiment")
 
 
-func test_catalog_contains_twelve_valid_equipment_items_across_three_tiers() -> void:
+func test_catalog_contains_fifteen_valid_equipment_items_across_four_tiers() -> void:
 	var equipment_count: int = 0
 	var slots: Dictionary[int, bool] = {}
 	var tiers: Dictionary[int, bool] = {}
@@ -102,9 +102,9 @@ func test_catalog_contains_twelve_valid_equipment_items_across_three_tiers() -> 
 		assert_true(item.is_valid_definition())
 		slots[item.equipment.slot] = true
 		tiers[item.equipment.tier] = true
-	assert_eq(equipment_count, 12)
+	assert_eq(equipment_count, 15)
 	assert_eq(slots.size(), 3)
-	assert_eq(tiers.size(), 3)
+	assert_eq(tiers.size(), 4)
 
 
 func test_nine_non_starter_equipment_recipes_are_authored() -> void:

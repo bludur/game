@@ -18,10 +18,10 @@ func _run_checks() -> void:
 	if session.get_player_inventory().capacity != 24:
 		failures.append("Survival inventory does not expose 24 slots.")
 	if session.item_catalog == null or not session.item_catalog.is_valid_catalog() \
-			or session.item_catalog.items.size() != 36:
+			or session.item_catalog.items.size() != 46:
 		failures.append("Survival item catalog is invalid or incomplete.")
-	if session.crafting_system.catalog.recipes.size() != 29:
-		failures.append("Expected twenty-nine authored recipes including equipment.")
+	if session.crafting_system.catalog.recipes.size() != 35:
+		failures.append("Expected thirty-five authored recipes including Moonbound equipment.")
 	if session.ritual_system.catalog.rituals.size() != 6:
 		failures.append("Expected six authored rituals.")
 	if session.construction_system.catalog.pieces.size() != 10:
