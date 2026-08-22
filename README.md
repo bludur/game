@@ -70,4 +70,5 @@ SHA-256. Подробности: [docs/SETUP_WINDOWS.md](docs/SETUP_WINDOWS.md).
 
 Архитектура и работа с ИИ: [docs/AI_WORKFLOW.md](docs/AI_WORKFLOW.md).
 План и статус survival-этапов:
-[docs/godot-prompter/plans/survival_roadmap_stages_11_20.md](docs/godot-prompter/plans/survival_roadmap_stages_11_20.md).
+[этапы 11–20](docs/godot-prompter/plans/survival_roadmap_stages_11_20.md) и
+[следующие этапы 21–30](docs/godot-prompter/plans/survival_roadmap_stages_21_30.md).
