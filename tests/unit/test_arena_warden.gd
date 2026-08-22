@@ -53,7 +53,7 @@ func test_wave_hazard_only_damages_after_activation() -> void:
 
 
 func test_boss_death_cancels_pending_telegraph() -> void:
-	var main: Node = preload("res://scenes/main/main.tscn").instantiate()
+	var main: Node = preload("res://scenes/main/arena_run.tscn").instantiate()
 	add_child_autofree(main)
 	await get_tree().process_frame
 	var encounter: BossEncounter = main.get_node("BossEncounter") as BossEncounter

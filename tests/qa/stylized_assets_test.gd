@@ -1,6 +1,6 @@
 extends SceneTree
 
-const MAIN_SCENE: PackedScene = preload("res://scenes/main/main.tscn")
+const MAIN_SCENE: PackedScene = preload("res://scenes/main/arena_run.tscn")
 const MODEL_PATHS: PackedStringArray = [
 	"res://assets/models/mage_player.glb",
 	"res://assets/models/shadow_chaser.glb",

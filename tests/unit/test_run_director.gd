@@ -1,6 +1,6 @@
 extends GutTest
 
-const MAIN_SCENE: PackedScene = preload("res://scenes/main/main.tscn")
+const MAIN_SCENE: PackedScene = preload("res://scenes/main/arena_run.tscn")
 
 
 func test_complete_run_reaches_upgrade_victory_and_clean_restart() -> void:

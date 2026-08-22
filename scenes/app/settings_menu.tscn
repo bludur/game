@@ -1,0 +1,132 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/app/settings_menu.gd" id="1_settings"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_card"]
+bg_color = Color(0.035, 0.018, 0.07, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.3, 0.9, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+content_margin_left = 28.0
+content_margin_top = 18.0
+content_margin_right = 28.0
+content_margin_bottom = 18.0
+
+[node name="SettingsMenu" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_settings")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.012, 0.045, 1)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 12.0
+offset_right = -20.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Card" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBox_card")
+
+[node name="Content" type="VBoxContainer" parent="Center/Card"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Title" type="Label" parent="Center/Card/Content"]
+layout_mode = 2
+text = "SETTINGS_TITLE"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 26
+
+[node name="MasterLabel" type="Label" parent="Center/Card/Content"]
+layout_mode = 2
+text = "SETTINGS_MASTER"
+[node name="Master" type="HSlider" parent="Center/Card/Content"]
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+
+[node name="MusicLabel" type="Label" parent="Center/Card/Content"]
+layout_mode = 2
+text = "SETTINGS_MUSIC"
+[node name="Music" type="HSlider" parent="Center/Card/Content"]
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+
+[node name="SfxLabel" type="Label" parent="Center/Card/Content"]
+layout_mode = 2
+text = "SETTINGS_SFX"
+[node name="Sfx" type="HSlider" parent="Center/Card/Content"]
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+
+[node name="LanguageLabel" type="Label" parent="Center/Card/Content"]
+layout_mode = 2
+text = "SETTINGS_LANGUAGE"
+[node name="Language" type="OptionButton" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+
+[node name="WindowLabel" type="Label" parent="Center/Card/Content"]
+layout_mode = 2
+text = "SETTINGS_WINDOW"
+[node name="WindowMode" type="OptionButton" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+
+[node name="GraphicsLabel" type="Label" parent="Center/Card/Content"]
+layout_mode = 2
+text = "SETTINGS_GRAPHICS"
+[node name="Graphics" type="OptionButton" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+
+[node name="RebindCast" type="Button" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "SETTINGS_REBIND_CAST"
+[node name="RebindDash" type="Button" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "SETTINGS_REBIND_DASH"
+[node name="Reset" type="Button" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "SETTINGS_RESET"
+[node name="Status" type="Label" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.85, 0.68, 1, 1)
+[node name="Save" type="Button" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "SETTINGS_SAVE"

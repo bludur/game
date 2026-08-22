@@ -24,6 +24,7 @@ var _wave_director: WaveDirector
 
 
 func _ready() -> void:
+	UiTranslations.ensure_registered()
 	_bind_player()
 	_bind_wave_director()
 
@@ -67,13 +68,13 @@ func _bind_player() -> void:
 func _on_health_changed(current: float, maximum: float) -> void:
 	_health_bar.max_value = maximum
 	_health_bar.value = current
-	_health_label.text = "HEALTH  %d / %d" % [ceili(current), ceili(maximum)]
+	_health_label.text = tr("HUD_HEALTH") % [ceili(current), ceili(maximum)]
 
 
 func _on_mana_changed(current: float, maximum: float) -> void:
 	_mana_bar.max_value = maximum
 	_mana_bar.value = current
-	_mana_label.text = "MANA  %d / %d" % [floori(current), floori(maximum)]
+	_mana_label.text = tr("HUD_MANA") % [floori(current), floori(maximum)]
 
 
 func _on_cooldown_changed(remaining: float, total: float) -> void:
@@ -81,27 +82,27 @@ func _on_cooldown_changed(remaining: float, total: float) -> void:
 	_cooldown_bar.value = total - remaining
 	var spell_name: String = _active_spell.display_name.to_upper() if _active_spell != null else "SPELL"
 	if remaining <= 0.0:
-		_spell_label.text = "%s  READY" % spell_name
+		_spell_label.text = tr("HUD_READY") % spell_name
 	else:
-		_spell_label.text = "%s  %.1fs" % [spell_name, remaining]
+		_spell_label.text = tr("HUD_COOLDOWN") % [spell_name, remaining]
 
 
 func _on_active_spell_changed(spell: SpellData, slot_index: int) -> void:
 	_active_spell = spell
-	_slot_label.text = "[1] BOLT   [2] FROST   [3] LIGHTNING   ACTIVE: %d" % (slot_index + 1)
+	_slot_label.text = tr("HUD_SLOTS") % (slot_index + 1)
 	_on_cooldown_changed(_spell_caster.get_cooldown_remaining(), spell.cooldown_seconds)
 
 
 func _on_dash_cooldown_changed(remaining: float, total: float) -> void:
 	_dash_bar.max_value = total
 	_dash_bar.value = total - remaining
-	_dash_label.text = "DASH  READY" if remaining <= 0.0 else "DASH  %.1fs" % remaining
+	_dash_label.text = tr("HUD_DASH_READY") if remaining <= 0.0 else tr("HUD_DASH_COOLDOWN") % remaining
 
 
 func _on_wave_started(wave_number: int, wave_name: String, total_enemies: int) -> void:
-	_wave_label.text = "WAVE %d/3  •  %s  •  %d LEFT" % [wave_number, wave_name.to_upper(), total_enemies]
+	_wave_label.text = tr("HUD_WAVE_NAME") % [wave_number, wave_name.to_upper(), total_enemies]
 
 
 func _on_enemy_count_changed(remaining: int) -> void:
 	var wave_number: int = _wave_director.get_current_wave_number() if is_instance_valid(_wave_director) else 0
-	_wave_label.text = "WAVE %d/3  •  %d LEFT" % [wave_number, remaining]
+	_wave_label.text = tr("HUD_WAVE") % [wave_number, remaining]

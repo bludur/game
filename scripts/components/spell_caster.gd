@@ -64,7 +64,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not _enabled or not event.is_action_pressed(&"primary_spell"):
 		return
 
-	var target_position: Variant = _get_mouse_ground_position(get_viewport().get_mouse_position())
+	var target_position: Variant
+	if event is InputEventJoypadButton:
+		target_position = _get_gamepad_target_position()
+	else:
+		target_position = _get_mouse_ground_position(get_viewport().get_mouse_position())
 	if target_position is Vector3:
 		cast_at(target_position as Vector3)
 	else:
@@ -162,6 +166,18 @@ func _get_mouse_ground_position(screen_position: Vector2) -> Variant:
 	var ray_direction: Vector3 = camera.project_ray_normal(screen_position)
 	var casting_plane: Plane = Plane(Vector3.UP, cast_origin.global_position.y)
 	return casting_plane.intersects_ray(ray_origin, ray_direction)
+
+
+func _get_gamepad_target_position() -> Vector3:
+	var aim: Vector2 = Input.get_vector(&"aim_left", &"aim_right", &"aim_up", &"aim_down")
+	var direction: Vector3
+	if aim.length_squared() > 0.12:
+		direction = Vector3(aim.x, 0.0, aim.y).normalized()
+	else:
+		direction = -caster_body.global_basis.z
+		direction.y = 0.0
+		direction = direction.normalized()
+	return cast_origin.global_position + direction * spell_data.range_meters
 
 
 func _is_configured() -> bool:

@@ -1,6 +1,8 @@
 class_name SessionUi
 extends CanvasLayer
 
+signal main_menu_requested()
+
 var _run_director: RunDirector
 var _upgrade_options: Array[UpgradeData] = []
 
@@ -18,13 +20,16 @@ var _upgrade_options: Array[UpgradeData] = []
 @onready var _result_title: Label = get_node("Root/ResultOverlay/Center/Card/Content/Title") as Label
 @onready var _result_subtitle: Label = get_node("Root/ResultOverlay/Center/Card/Content/Subtitle") as Label
 @onready var _restart_button: Button = get_node("Root/ResultOverlay/Center/Card/Content/Restart") as Button
+@onready var _main_menu_button: Button = get_node("Root/ResultOverlay/Center/Card/Content/MainMenu") as Button
 @onready var _announcement_timer: Timer = get_node("AnnouncementTimer") as Timer
 
 
 func _ready() -> void:
+	UiTranslations.ensure_registered()
 	for index: int in _upgrade_buttons.size():
 		_upgrade_buttons[index].pressed.connect(_on_upgrade_pressed.bind(index))
 	_restart_button.pressed.connect(_on_restart_pressed)
+	_main_menu_button.pressed.connect(main_menu_requested.emit)
 	_announcement_timer.timeout.connect(_on_announcement_timeout)
 	call_deferred("_bind_run_director")
 
@@ -55,9 +60,9 @@ func _sync_to_state(state: RunDirector.State) -> void:
 	_result_overlay.visible = state == RunDirector.State.VICTORY or state == RunDirector.State.DEFEAT
 	match state:
 		RunDirector.State.INTRO:
-			_show_announcement("THE WITCHING HOUR", "Survive the omens. Choose your power. Break the conclave.", 0.0)
+			_show_announcement(tr("RUN_INTRO_TITLE"), tr("RUN_INTRO_SUBTITLE"), 0.0)
 		RunDirector.State.FINAL:
-			_show_announcement("FINAL WAVE", "The Red Conclave has arrived.", 1.4)
+			_show_announcement(tr("RUN_FINAL_TITLE"), tr("RUN_FINAL_SUBTITLE"), 1.4)
 		RunDirector.State.COMBAT:
 			_announcement.visible = false
 		_:
@@ -73,7 +78,7 @@ func _on_upgrade_requested(options: Array[UpgradeData]) -> void:
 	_choice_overlay.visible = true
 	_result_overlay.visible = false
 	_announcement.visible = false
-	_upgrade_title.text = "CHOOSE ONE RUNE"
+	_upgrade_title.text = tr("RUN_UPGRADE_TITLE")
 	for index: int in _upgrade_buttons.size():
 		var button: Button = _upgrade_buttons[index]
 		if index >= _upgrade_options.size():
@@ -94,15 +99,15 @@ func _on_upgrade_pressed(option_index: int) -> void:
 
 func _on_victory_reached() -> void:
 	_show_result(
-		"VICTORY",
-		"The conclave is broken. Your chosen rune endures until the next run."
+		tr("RUN_VICTORY"),
+		tr("RUN_VICTORY_TEXT")
 	)
 
 
 func _on_defeat_reached() -> void:
 	_show_result(
-		"DEFEAT",
-		"The arena claimed the mage. Begin again with a clean spellbook."
+		tr("RUN_DEFEAT"),
+		tr("RUN_DEFEAT_TEXT")
 	)
 
 

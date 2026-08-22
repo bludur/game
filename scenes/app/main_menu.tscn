@@ -1,0 +1,102 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/app/main_menu.gd" id="1_menu"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_card"]
+bg_color = Color(0.035, 0.018, 0.075, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.62, 0.3, 1, 0.9)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 42.0
+content_margin_top = 36.0
+content_margin_right = 42.0
+content_margin_bottom = 36.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_button"]
+bg_color = Color(0.12, 0.06, 0.2, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.56, 0.34, 0.84, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.025, 0.02, 0.07, 1)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Card" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBox_card")
+
+[node name="Content" type="VBoxContainer" parent="Center/Card"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Center/Card/Content"]
+layout_mode = 2
+text = "GAME_TITLE"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9, 0.72, 1, 1)
+theme_override_font_sizes/font_size = 34
+
+[node name="Subtitle" type="Label" parent="Center/Card/Content"]
+layout_mode = 2
+text = "TOP-DOWN SPELLCRAFT DEMO"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.66, 0.62, 0.76, 1)
+
+[node name="Start" type="Button" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(420, 58)
+layout_mode = 2
+text = "MENU_START"
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBox_button")
+
+[node name="Settings" type="Button" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(420, 54)
+layout_mode = 2
+text = "MENU_SETTINGS"
+theme_override_styles/normal = SubResource("StyleBox_button")
+
+[node name="Quit" type="Button" parent="Center/Card/Content"]
+custom_minimum_size = Vector2(420, 54)
+layout_mode = 2
+text = "MENU_QUIT"
+theme_override_styles/normal = SubResource("StyleBox_button")
