@@ -97,7 +97,7 @@ func bind(session: WorldSession) -> void:
 	_build_inventory_grid()
 	_build_recipe_list()
 	_build_ritual_list()
-	_map.bind(session.player, session.world_state)
+	_map.bind(session.player, session.world_state, session.region.poi_catalog)
 	_inventory.inventory_changed.connect(_refresh_inventory)
 	_equipment.equipment_changed.connect(_on_equipment_changed)
 	session.player.get_health_component().health_changed.connect(_on_health_changed)

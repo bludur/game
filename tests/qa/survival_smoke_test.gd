@@ -30,8 +30,13 @@ func _run_checks() -> void:
 		if session.get_player_inventory().get_item_count(starter_id) != 1:
 			failures.append("New survival session is missing starter equipment: %s." % starter_id)
 	var resources: Array[ResourceNode] = session.region.get_persistent_resources()
-	if resources.size() < 10:
-		failures.append("Ashen Grove has too few authored resource nodes.")
+	if resources.size() != 18:
+		failures.append("Ashen Grove does not expose eighteen redistributed resource nodes.")
+	if session.region.get_pois().size() != 12:
+		failures.append("Ashen Grove does not expose twelve authored POIs.")
+	if session.region_discovery == null or session.weather_director == null \
+			or session.region_audio_director == null:
+		failures.append("Discovery, weather, or regional audio system is missing.")
 	var persistent_ids: Dictionary[StringName, bool] = {}
 	for resource_node: ResourceNode in resources:
 		if resource_node.persistent_id.is_empty() or persistent_ids.has(resource_node.persistent_id):

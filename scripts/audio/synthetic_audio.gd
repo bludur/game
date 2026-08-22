@@ -21,6 +21,7 @@ static var _victory_cache: AudioStreamWAV
 static var _defeat_result_cache: AudioStreamWAV
 static var _ambience_cache: AudioStreamWAV
 static var _music_cache: AudioStreamWAV
+static var _region_ambience_cache: Dictionary[int, AudioStreamWAV] = {}
 
 
 static func release_cached_streams() -> void:
@@ -37,6 +38,7 @@ static func release_cached_streams() -> void:
 	_defeat_result_cache = null
 	_ambience_cache = null
 	_music_cache = null
+	_region_ambience_cache.clear()
 
 
 static func create_tone(
@@ -169,6 +171,27 @@ static func create_music_loop() -> AudioStreamWAV:
 		samples[sample_index] = sample * pulse * _edge_fade(time, duration, 0.08)
 	_music_cache = _create_wav(samples, true)
 	return _music_cache
+
+
+static func create_region_ambience(mood: int) -> AudioStreamWAV:
+	if _region_ambience_cache.has(mood):
+		return _region_ambience_cache[mood]
+	var base_frequencies: PackedFloat32Array = PackedFloat32Array([47.0, 61.0, 38.0, 31.0, 72.0])
+	var base: float = base_frequencies[clampi(mood, 0, base_frequencies.size() - 1)]
+	var duration: float = 6.0
+	var sample_count: int = ceili(duration * float(MIX_RATE))
+	var samples: PackedFloat32Array = PackedFloat32Array()
+	samples.resize(sample_count)
+	for sample_index: int in sample_count:
+		var time: float = float(sample_index) / float(MIX_RATE)
+		var slow_pulse: float = 0.62 + sin(TAU * (0.07 + float(mood) * 0.013) * time) * 0.28
+		var sample: float = sin(TAU * base * time) * 0.075
+		sample += sin(TAU * base * 1.51 * time + float(mood)) * 0.038
+		sample += sin(TAU * (base * 3.0 + 7.0) * time) * 0.009 * slow_pulse
+		samples[sample_index] = sample * _edge_fade(time, duration, 0.08)
+	var stream: AudioStreamWAV = _create_wav(samples, true)
+	_region_ambience_cache[mood] = stream
+	return stream
 
 
 static func _create_chirp(

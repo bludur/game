@@ -32,6 +32,10 @@ const WITCH_ECHO_SCENE: PackedScene = preload("res://scenes/survival/witch_echo.
 @onready var survival_hud: SurvivalHud = get_node("SurvivalHud") as SurvivalHud
 @onready var survival_tutorial: SurvivalTutorial = get_node("SurvivalTutorial") as SurvivalTutorial
 @onready var _bog_curse: CursedZone = get_node("BogCurse") as CursedZone
+@onready var _world_environment: WorldEnvironment = get_node("WorldEnvironment") as WorldEnvironment
+@onready var region_discovery: RegionDiscovery = get_node("RegionDiscovery") as RegionDiscovery
+@onready var weather_director: WeatherDirector = get_node("WeatherDirector") as WeatherDirector
+@onready var region_audio_director: RegionAudioDirector = get_node("RegionAudioDirector") as RegionAudioDirector
 
 var _save_game_service: SaveGameService
 var _respawn_transform: Transform3D
@@ -76,6 +80,11 @@ func _ready() -> void:
 	starless_crypt.bind(player, world_state, grimoire, item_catalog)
 	starless_crypt.notification_requested.connect(notification_requested.emit)
 	starless_crypt.boss_defeated.connect(_on_matriarch_defeated)
+	region_discovery.poi_discovered.connect(_on_poi_discovered)
+	region_discovery.bind(player, world_state, region.poi_catalog)
+	weather_director.bind(player, world_clock, _world_environment)
+	weather_director.weather_changed.connect(_on_weather_changed)
+	region_audio_director.bind(player, region.poi_catalog)
 	survival_hud.craft_requested.connect(_on_craft_requested)
 	survival_hud.ritual_requested.connect(_on_ritual_requested)
 	survival_hud.interface_open_changed.connect(_on_interface_open_changed)
@@ -329,6 +338,19 @@ func _on_functional_piece_used(piece: BuildingPiece, interactor: MagePlayer) -> 
 			_rest_player_at(piece.global_position, piece.persistent_id, interactor, true)
 		BuildingPieceData.FunctionalKind.WARD:
 			notification_requested.emit(tr("NOTICE_WARD_FUEL") % piece.get_ward_fuel())
+
+
+func _on_poi_discovered(poi: RegionPoiData) -> void:
+	var key: String = "MAP_POI_%s" % String(poi.poi_id).to_upper()
+	var poi_name: String = tr(key)
+	if poi_name == key:
+		poi_name = poi.display_name
+	notification_requested.emit(tr("NOTICE_POI_DISCOVERED") % poi_name)
+
+
+func _on_weather_changed(weather: WeatherDirector.Weather) -> void:
+	var key: String = "NOTICE_WEATHER_%s" % WeatherDirector.Weather.keys()[weather]
+	notification_requested.emit(tr(key))
 
 
 func _on_hunt_started() -> void:

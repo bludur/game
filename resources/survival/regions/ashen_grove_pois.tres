@@ -1,0 +1,149 @@
+[gd_resource type="Resource" script_class="RegionPoiCatalog" load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/region_poi_catalog.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/region_poi_data.gd" id="2"]
+
+[sub_resource type="Resource" id="Awakening"]
+script = ExtResource("2")
+poi_id = &"awakening_circle"
+display_name = "Круг пробуждения"
+kind = 0
+world_position = Vector3(0, 0, 58)
+discovery_radius = 18.0
+audio_radius = 24.0
+map_color = Color(0.62, 0.34, 1, 1)
+loot_hint = &"gravewood"
+
+[sub_resource type="Resource" id="Hearth"]
+script = ExtResource("2")
+poi_id = &"hearth_clearing"
+display_name = "Поляна ведьминого огня"
+kind = 1
+world_position = Vector3(-24, 0, 8)
+discovery_radius = 18.0
+audio_radius = 28.0
+audio_mood = 4
+map_color = Color(0.12, 0.95, 0.72, 1)
+loot_hint = &"prepared_gravewood"
+
+[sub_resource type="Resource" id="Ruins"]
+script = ExtResource("2")
+poi_id = &"broken_observatory"
+display_name = "Разбитая обсерватория"
+kind = 2
+world_position = Vector3(29, 0, 17)
+discovery_radius = 17.0
+audio_radius = 26.0
+audio_mood = 1
+map_color = Color(0.72, 0.55, 0.82, 1)
+loot_hint = &"moonstone"
+
+[sub_resource type="Resource" id="Bog"]
+script = ExtResource("2")
+poi_id = &"whispering_bog"
+display_name = "Шепчущее болото"
+kind = 3
+world_position = Vector3(-42, 0, -35)
+discovery_radius = 18.0
+audio_radius = 30.0
+audio_mood = 2
+map_color = Color(0.16, 0.56, 0.42, 1)
+loot_hint = &"dusk_herb"
+
+[sub_resource type="Resource" id="Crypt"]
+script = ExtResource("2")
+poi_id = &"starless_crypt_gate"
+display_name = "Врата Беззвёздного склепа"
+kind = 4
+world_position = Vector3(42, 0, -56)
+discovery_radius = 18.0
+audio_radius = 32.0
+audio_mood = 3
+map_color = Color(0.88, 0.18, 0.4, 1)
+loot_hint = &"soul_shard"
+
+[sub_resource type="Resource" id="Bridge"]
+script = ExtResource("2")
+poi_id = &"ash_bridge"
+display_name = "Пепельный мост"
+kind = 5
+world_position = Vector3(4, 0, -16)
+discovery_radius = 13.0
+audio_radius = 20.0
+audio_mood = 1
+map_color = Color(0.65, 0.48, 0.38, 1)
+loot_hint = &"ash_resin"
+
+[sub_resource type="Resource" id="Tower"]
+script = ExtResource("2")
+poi_id = &"hollow_watchtower"
+display_name = "Полая дозорная башня"
+kind = 6
+world_position = Vector3(-61, 0, 28)
+discovery_radius = 15.0
+audio_radius = 24.0
+audio_mood = 1
+map_color = Color(0.58, 0.46, 0.7, 1)
+loot_hint = &"gravewood"
+
+[sub_resource type="Resource" id="Moonwell"]
+script = ExtResource("2")
+poi_id = &"dead_moonwell"
+display_name = "Колодец мёртвой луны"
+kind = 7
+world_position = Vector3(58, 0, 42)
+discovery_radius = 15.0
+audio_radius = 24.0
+map_color = Color(0.32, 0.68, 1, 1)
+loot_hint = &"moonstone"
+
+[sub_resource type="Resource" id="Cave"]
+script = ExtResource("2")
+poi_id = &"root_cave"
+display_name = "Пещера корней"
+kind = 8
+world_position = Vector3(-58, 0, -62)
+discovery_radius = 16.0
+audio_radius = 26.0
+audio_mood = 3
+map_color = Color(0.45, 0.28, 0.36, 1)
+loot_hint = &"dusk_herb"
+
+[sub_resource type="Resource" id="Stones"]
+script = ExtResource("2")
+poi_id = &"pilgrim_stones"
+display_name = "Камни пилигримов"
+kind = 9
+world_position = Vector3(6, 0, -72)
+discovery_radius = 14.0
+audio_radius = 20.0
+map_color = Color(0.7, 0.62, 0.52, 1)
+loot_hint = &"ritual_chalk"
+
+[sub_resource type="Resource" id="Gallows"]
+script = ExtResource("2")
+poi_id = &"witch_gallows"
+display_name = "Ведьмины виселицы"
+kind = 10
+world_position = Vector3(-64, 0, -4)
+discovery_radius = 14.0
+audio_radius = 24.0
+audio_mood = 3
+map_color = Color(0.7, 0.26, 0.42, 1)
+loot_hint = &"soul_shard"
+
+[sub_resource type="Resource" id="Chapel"]
+script = ExtResource("2")
+poi_id = &"drowned_chapel"
+display_name = "Утонувшая часовня"
+kind = 11
+world_position = Vector3(63, 0, -18)
+discovery_radius = 17.0
+audio_radius = 28.0
+audio_mood = 2
+map_color = Color(0.26, 0.62, 0.62, 1)
+loot_hint = &"ward_essence"
+
+[resource]
+script = ExtResource("1")
+points = Array[ExtResource("2")]([SubResource("Awakening"), SubResource("Hearth"), SubResource("Ruins"), SubResource("Bog"), SubResource("Crypt"), SubResource("Bridge"), SubResource("Tower"), SubResource("Moonwell"), SubResource("Cave"), SubResource("Stones"), SubResource("Gallows"), SubResource("Chapel")])

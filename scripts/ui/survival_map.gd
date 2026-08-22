@@ -3,6 +3,7 @@ extends Control
 
 var _player: MagePlayer
 var _world_state: WorldState
+var _poi_catalog: RegionPoiCatalog
 
 
 func _ready() -> void:
@@ -10,9 +11,10 @@ func _ready() -> void:
 	_sync_processing()
 
 
-func bind(player: MagePlayer, world_state: WorldState) -> void:
+func bind(player: MagePlayer, world_state: WorldState, poi_catalog: RegionPoiCatalog = null) -> void:
 	_player = player
 	_world_state = world_state
+	_poi_catalog = poi_catalog
 	queue_redraw()
 
 
@@ -30,16 +32,24 @@ func _draw() -> void:
 	var map_rect: Rect2 = Rect2(Vector2(18, 18), size - Vector2(36, 36))
 	draw_rect(map_rect, Color(0.035, 0.045, 0.055, 0.96), true)
 	draw_rect(map_rect, Color(0.42, 0.22, 0.58, 0.9), false, 3.0)
-	for landmark: Dictionary in [
-		{"name": tr("MAP_AWAKENING"), "position": Vector2(0, 58), "color": Color(0.62, 0.34, 1)},
-		{"name": tr("MAP_HEARTH"), "position": Vector2(-24, 8), "color": Color(0.12, 0.95, 0.72)},
-		{"name": tr("MAP_RUINS"), "position": Vector2(29, 17), "color": Color(0.72, 0.55, 0.82)},
-		{"name": tr("MAP_BOG"), "position": Vector2(-42, -35), "color": Color(0.16, 0.56, 0.42)},
-		{"name": tr("MAP_CRYPT"), "position": Vector2(42, -56), "color": Color(0.88, 0.18, 0.4)},
-	]:
-		var point: Vector2 = _world_to_map(landmark["position"] as Vector2, map_rect)
-		draw_circle(point, 5.0, landmark["color"] as Color)
-		draw_string(ThemeDB.fallback_font, point + Vector2(8, 4), String(landmark["name"]), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.88, 0.84, 0.94))
+	_draw_discovery_fog(map_rect)
+	if _poi_catalog != null:
+		for poi: RegionPoiData in _poi_catalog.points:
+			if not _is_poi_discovered(poi.poi_id):
+				continue
+			var point: Vector2 = _world_to_map(
+				Vector2(poi.world_position.x, poi.world_position.z), map_rect
+			)
+			draw_circle(point, 5.0, poi.map_color)
+			draw_string(
+				ThemeDB.fallback_font,
+				point + Vector2(8, 4),
+				_poi_name(poi),
+				HORIZONTAL_ALIGNMENT_LEFT,
+				-1,
+				13,
+				Color(0.88, 0.84, 0.94)
+			)
 	if is_instance_valid(_player):
 		var player_point: Vector2 = _world_to_map(Vector2(_player.global_position.x, _player.global_position.z), map_rect)
 		draw_circle(player_point, 7.0, Color(1, 0.88, 0.28))
@@ -54,3 +64,47 @@ func _world_to_map(world: Vector2, map_rect: Rect2) -> Vector2:
 		clampf((world.y + 96.0) / 192.0, 0.0, 1.0)
 	)
 	return map_rect.position + Vector2(normalized.x * map_rect.size.x, normalized.y * map_rect.size.y)
+
+
+func _draw_discovery_fog(map_rect: Rect2) -> void:
+	const CELL_COUNT: int = 16
+	var cell_size: Vector2 = map_rect.size / float(CELL_COUNT)
+	for y: int in CELL_COUNT:
+		for x: int in CELL_COUNT:
+			var normalized: Vector2 = (Vector2(x, y) + Vector2(0.5, 0.5)) / float(CELL_COUNT)
+			var world_point: Vector2 = normalized * 192.0 - Vector2(96.0, 96.0)
+			if _is_world_point_revealed(world_point):
+				continue
+			draw_rect(
+				Rect2(map_rect.position + Vector2(x, y) * cell_size, cell_size + Vector2.ONE),
+				Color(0.006, 0.008, 0.016, 0.92),
+				true
+			)
+
+
+func _is_world_point_revealed(world_point: Vector2) -> bool:
+	if is_instance_valid(_player):
+		var player_point: Vector2 = Vector2(_player.global_position.x, _player.global_position.z)
+		if player_point.distance_squared_to(world_point) <= 12.0 * 12.0:
+			return true
+	if _poi_catalog == null:
+		return false
+	for poi: RegionPoiData in _poi_catalog.points:
+		if not _is_poi_discovered(poi.poi_id):
+			continue
+		var poi_point: Vector2 = Vector2(poi.world_position.x, poi.world_position.z)
+		var reveal_radius: float = poi.discovery_radius * 1.45
+		if poi_point.distance_squared_to(world_point) <= reveal_radius * reveal_radius:
+			return true
+	return false
+
+
+func _is_poi_discovered(poi_id: StringName) -> bool:
+	return _world_state != null \
+		and _world_state.has_progression_flag(RegionDiscovery._flag_for(poi_id))
+
+
+func _poi_name(poi: RegionPoiData) -> String:
+	var key: String = "MAP_POI_%s" % String(poi.poi_id).to_upper()
+	var translated: String = tr(key)
+	return poi.display_name if translated == key else translated

@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3]
+[gd_scene load_steps=36 format=3]
 
 [ext_resource type="Script" path="res://scripts/survival/world_session.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/regions/ashen_grove.tscn" id="2"]
@@ -26,6 +26,9 @@
 [ext_resource type="PackedScene" path="res://scenes/survival/starless_crypt.tscn" id="24"]
 [ext_resource type="Script" path="res://scripts/survival/survival_tutorial.gd" id="25"]
 [ext_resource type="PackedScene" path="res://scenes/audio/arena_audio_director.tscn" id="26"]
+[ext_resource type="Script" path="res://scripts/survival/region_discovery.gd" id="27"]
+[ext_resource type="Script" path="res://scripts/survival/weather_director.gd" id="28"]
+[ext_resource type="Script" path="res://scripts/audio/region_audio_director.gd" id="29"]
 
 [sub_resource type="TorusMesh" id="RitualMesh"]
 inner_radius = 5.7
@@ -192,5 +195,14 @@ wait_time = 2.0
 one_shot = true
 
 [node name="SurvivalAudioDirector" parent="." instance=ExtResource("26")]
+
+[node name="RegionDiscovery" type="Node" parent="."]
+script = ExtResource("27")
+
+[node name="WeatherDirector" type="Node3D" parent="."]
+script = ExtResource("28")
+
+[node name="RegionAudioDirector" type="Node" parent="."]
+script = ExtResource("29")
 
 [node name="SurvivalHud" parent="." instance=ExtResource("7")]

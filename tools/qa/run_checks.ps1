@@ -36,6 +36,12 @@ if ($LASTEXITCODE -ne 0) {
     throw "Survival smoke test failed with exit code $LASTEXITCODE."
 }
 
+Write-Host 'Running Ashen Grove world-content and navigation test...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_ashen_grove_world.log') --script 'res://tests/qa/ashen_grove_world_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Ashen Grove world-content test failed with exit code $LASTEXITCODE."
+}
+
 Write-Host 'Running third-person locomotion course regression...'
 & $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_locomotion_course.log') --script 'res://tests/qa/third_person_locomotion_course_test.gd'
 if ($LASTEXITCODE -ne 0) {

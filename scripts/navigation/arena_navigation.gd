@@ -1,7 +1,7 @@
 class_name ArenaNavigation
 extends NavigationRegion3D
 
-@export_range(4.0, 64.0, 0.5) var arena_half_extent: float = 11.0
+@export_range(4.0, 128.0, 0.5) var arena_half_extent: float = 11.0
 @export_range(0.5, 4.0, 0.25) var cell_size: float = 1.0
 @export_range(0.0, 3.0, 0.05) var obstacle_clearance: float = 0.55
 
@@ -34,10 +34,19 @@ func rebuild_navigation_mesh() -> void:
 			polygon.append(_get_vertex_index(Vector2i(x_index + 1, z_index), vertices, vertex_indices))
 			polygons.append(polygon)
 
+	var navigation_map: RID = get_world_3d().navigation_map
+	NavigationServer3D.map_set_active(navigation_map, true)
+	NavigationServer3D.map_set_use_async_iterations(navigation_map, false)
+	mesh.cell_size = NavigationServer3D.map_get_cell_size(navigation_map)
+	mesh.cell_height = NavigationServer3D.map_get_cell_height(navigation_map)
 	mesh.vertices = vertices
 	for polygon: PackedInt32Array in polygons:
 		mesh.add_polygon(polygon)
 	navigation_mesh = mesh
+	NavigationServer3D.region_set_enabled(get_rid(), true)
+	NavigationServer3D.region_set_use_async_iterations(get_rid(), false)
+	NavigationServer3D.region_set_map(get_rid(), navigation_map)
+	NavigationServer3D.region_set_navigation_mesh(get_rid(), mesh)
 
 
 func _get_vertex_index(
