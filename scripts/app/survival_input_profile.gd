@@ -16,6 +16,13 @@ static func ensure_actions() -> void:
 	_add_key_action(&"crafting", KEY_C, JOY_BUTTON_Y)
 	_add_key_action(&"ritual", KEY_R, JOY_BUTTON_X)
 	_add_key_action(&"build_mode", KEY_B, JOY_BUTTON_LEFT_SHOULDER)
+	_add_key_action(&"build_repair", KEY_H, JOY_BUTTON_Y)
+	_add_key_action(&"build_dismantle", KEY_G, JOY_BUTTON_X)
+	_add_keyboard_action(&"build_category_foundations", KEY_1)
+	_add_keyboard_action(&"build_category_walls", KEY_2)
+	_add_keyboard_action(&"build_category_roofs", KEY_3)
+	_add_keyboard_action(&"build_category_stations", KEY_4)
+	_add_keyboard_action(&"build_category_magic", KEY_5)
 	_add_key_action(&"use_consumable", KEY_X, JOY_BUTTON_DPAD_DOWN)
 	_add_key_action(&"quick_save", KEY_F5, JOY_BUTTON_START)
 	_add_key_action(&"region_map", KEY_M, JOY_BUTTON_RIGHT_STICK)
@@ -81,6 +88,12 @@ static func _add_key_action(action: StringName, key: Key, joy_button: JoyButton)
 	var joy_event: InputEventJoypadButton = InputEventJoypadButton.new()
 	joy_event.button_index = joy_button
 	InputMap.action_add_event(action, joy_event)
+
+
+static func _add_keyboard_action(action: StringName, key: Key) -> void:
+	if not InputMap.has_action(action):
+		InputMap.add_action(action, 0.2)
+	_add_key_event(action, key)
 
 
 static func _add_mouse_action(action: StringName, button: MouseButton) -> void:

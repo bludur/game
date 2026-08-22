@@ -78,6 +78,12 @@ if ($LASTEXITCODE -ne 0) {
     throw "Survival performance smoke test failed with exit code $LASTEXITCODE."
 }
 
+Write-Host 'Running 250-piece construction performance test...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_construction_performance.log') --script 'res://tests/qa/construction_performance_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Construction performance test failed with exit code $LASTEXITCODE."
+}
+
 Write-Host 'Running accelerated survival soak test...'
 & $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_survival_soak.log') --script 'res://tests/qa/survival_soak_test.gd'
 if ($LASTEXITCODE -ne 0) {

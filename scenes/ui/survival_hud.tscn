@@ -472,6 +472,125 @@ theme_override_colors/font_outline_color = Color(0.02, 0.015, 0.035, 0.95)
 theme_override_constants/outline_size = 7
 theme_override_font_sizes/font_size = 18
 
+[node name="BuildPanel" type="PanelContainer" parent="Root"]
+layout_mode = 0
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 170.0
+offset_top = 18.0
+offset_right = -170.0
+offset_bottom = 78.0
+grow_horizontal = 2
+mouse_filter = 0
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Categories" type="HBoxContainer" parent="Root/BuildPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Foundations" type="Button" parent="Root/BuildPanel/Categories"]
+custom_minimum_size = Vector2(130, 34)
+layout_mode = 2
+text = "[1] BUILD_FOUNDATIONS"
+
+[node name="Walls" type="Button" parent="Root/BuildPanel/Categories"]
+custom_minimum_size = Vector2(130, 34)
+layout_mode = 2
+text = "[2] BUILD_WALLS"
+
+[node name="Roofs" type="Button" parent="Root/BuildPanel/Categories"]
+custom_minimum_size = Vector2(130, 34)
+layout_mode = 2
+text = "[3] BUILD_ROOFS"
+
+[node name="Stations" type="Button" parent="Root/BuildPanel/Categories"]
+custom_minimum_size = Vector2(130, 34)
+layout_mode = 2
+text = "[4] BUILD_STATIONS"
+
+[node name="Magic" type="Button" parent="Root/BuildPanel/Categories"]
+custom_minimum_size = Vector2(130, 34)
+layout_mode = 2
+text = "[5] BUILD_MAGIC"
+
+[node name="StorageWindow" type="PanelContainer" parent="Root"]
+layout_mode = 0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -390.0
+offset_top = -280.0
+offset_right = 390.0
+offset_bottom = 280.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Layout" type="VBoxContainer" parent="Root/StorageWindow"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Root/StorageWindow/Layout"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Root/StorageWindow/Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "STORAGE_TITLE"
+theme_override_font_sizes/font_size = 22
+
+[node name="Close" type="Button" parent="Root/StorageWindow/Layout/Header"]
+layout_mode = 2
+text = "×"
+
+[node name="Hint" type="Label" parent="Root/StorageWindow/Layout"]
+layout_mode = 2
+text = "STORAGE_HINT"
+horizontal_alignment = 1
+
+[node name="Columns" type="HBoxContainer" parent="Root/StorageWindow/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Inventory" type="VBoxContainer" parent="Root/StorageWindow/Layout/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="Root/StorageWindow/Layout/Columns/Inventory"]
+layout_mode = 2
+text = "STORAGE_INVENTORY"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Root/StorageWindow/Layout/Columns/Inventory"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="Root/StorageWindow/Layout/Columns/Inventory/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Chest" type="VBoxContainer" parent="Root/StorageWindow/Layout/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="Root/StorageWindow/Layout/Columns/Chest"]
+layout_mode = 2
+text = "STORAGE_CHEST"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Root/StorageWindow/Layout/Columns/Chest"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="Root/StorageWindow/Layout/Columns/Chest/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="Hotkeys" type="Label" parent="Root"]
 layout_mode = 0
 anchors_preset = 12

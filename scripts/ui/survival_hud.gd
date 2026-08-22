@@ -11,6 +11,8 @@ var _equipment: EquipmentComponent
 var _selected_slot: int = -1
 var _slot_buttons: Array[Button] = []
 var _notification_tween: Tween
+var _build_category_buttons: Array[Button] = []
+var _storage_piece: BuildingPiece
 
 @onready var _health_bar: ProgressBar = get_node("Root/Status/Content/HealthBar") as ProgressBar
 @onready var _health_label: Label = get_node("Root/Status/Content/HealthLabel") as Label
@@ -43,6 +45,11 @@ var _notification_tween: Tween
 @onready var _map_panel: PanelContainer = get_node("Root/MapPanel") as PanelContainer
 @onready var _map: SurvivalMap = get_node("Root/MapPanel/Map") as SurvivalMap
 @onready var _build_label: Label = get_node("Root/BuildInfo") as Label
+@onready var _build_panel: PanelContainer = get_node("Root/BuildPanel") as PanelContainer
+@onready var _storage_window: PanelContainer = get_node("Root/StorageWindow") as PanelContainer
+@onready var _storage_title: Label = get_node("Root/StorageWindow/Layout/Header/Title") as Label
+@onready var _storage_inventory_list: VBoxContainer = get_node("Root/StorageWindow/Layout/Columns/Inventory/Scroll/List") as VBoxContainer
+@onready var _storage_chest_list: VBoxContainer = get_node("Root/StorageWindow/Layout/Columns/Chest/Scroll/List") as VBoxContainer
 @onready var _crosshair: Label = get_node("Root/Crosshair") as Label
 @onready var _active_effects_panel: PanelContainer = get_node("Root/ActiveEffects") as PanelContainer
 @onready var _active_effects_label: Label = get_node("Root/ActiveEffects/Content") as Label
@@ -58,7 +65,19 @@ func _ready() -> void:
 	_map_panel.visible = false
 	_prompt.visible = false
 	_build_label.visible = false
+	_build_panel.visible = false
+	_storage_window.visible = false
 	_notification.modulate.a = 0.0
+	_build_category_buttons = [
+		get_node("Root/BuildPanel/Categories/Foundations") as Button,
+		get_node("Root/BuildPanel/Categories/Walls") as Button,
+		get_node("Root/BuildPanel/Categories/Roofs") as Button,
+		get_node("Root/BuildPanel/Categories/Stations") as Button,
+		get_node("Root/BuildPanel/Categories/Magic") as Button,
+	]
+	for category: int in _build_category_buttons.size():
+		_build_category_buttons[category].text = "[%d] %s" % [category + 1, tr(_category_key(category))]
+		_build_category_buttons[category].pressed.connect(_select_build_category.bind(category))
 	_split_button.pressed.connect(_split_selected_stack)
 	_drop_button.pressed.connect(_drop_selected_item)
 	_use_button.pressed.connect(_use_selected_preparation)
@@ -67,6 +86,7 @@ func _ready() -> void:
 	_robe_button.pressed.connect(_unequip_slot.bind(EquipmentData.Slot.ROBE))
 	_talisman_button.pressed.connect(_unequip_slot.bind(EquipmentData.Slot.TALISMAN))
 	(get_node("Root/SurvivalWindow/Layout/Header/Close") as Button).pressed.connect(_close_interfaces)
+	(get_node("Root/StorageWindow/Layout/Header/Close") as Button).pressed.connect(_close_storage)
 	_notification_timer.timeout.connect(_hide_notification)
 
 
@@ -91,6 +111,7 @@ func bind(session: WorldSession) -> void:
 	session.interaction_controller.focus_changed.connect(_on_interaction_focus_changed)
 	session.construction_system.build_mode_changed.connect(_on_build_mode_changed)
 	session.construction_system.selection_changed.connect(_on_build_selection_changed)
+	session.construction_system.category_changed.connect(_on_build_category_changed)
 	session.notification_requested.connect(show_notification)
 	var health: HealthComponent = session.player.get_health_component()
 	var mana: ManaComponent = session.player.get_mana_component()
@@ -106,6 +127,12 @@ func bind(session: WorldSession) -> void:
 	_refresh_inventory()
 	_refresh_equipment()
 	_refresh_objective()
+	_on_build_category_changed(session.construction_system.active_category)
+
+
+func _process(_delta: float) -> void:
+	if _session != null and _session.construction_system.build_mode:
+		_refresh_build_label()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -193,6 +220,8 @@ func _refresh_inventory() -> void:
 		or _inventory.slots[_selected_slot].item.equipment == null
 	_refresh_equipment_comparison()
 	_refresh_recipe_availability()
+	if _storage_window.visible:
+		_refresh_storage()
 
 
 func _refresh_recipe_availability() -> void:
@@ -315,6 +344,8 @@ func _equipment_summary(equipment: EquipmentData) -> String:
 func _toggle_survival_window(tab_index: int) -> void:
 	var should_open: bool = not _survival_window.visible or _tabs.current_tab != tab_index
 	_map_panel.visible = false
+	_storage_window.visible = false
+	_storage_piece = null
 	_survival_window.visible = should_open
 	if should_open:
 		_tabs.current_tab = tab_index
@@ -327,6 +358,8 @@ func _toggle_survival_window(tab_index: int) -> void:
 func _toggle_map() -> void:
 	var should_open: bool = not _map_panel.visible
 	_survival_window.visible = false
+	_storage_window.visible = false
+	_storage_piece = null
 	_map_panel.visible = should_open
 	_emit_interface_state()
 
@@ -334,11 +367,15 @@ func _toggle_map() -> void:
 func _close_interfaces() -> void:
 	_survival_window.visible = false
 	_map_panel.visible = false
+	_storage_window.visible = false
+	_storage_piece = null
 	_emit_interface_state()
 
 
 func _emit_interface_state() -> void:
-	interface_open_changed.emit(_survival_window.visible or _map_panel.visible)
+	interface_open_changed.emit(
+		_survival_window.visible or _map_panel.visible or _storage_window.visible
+	)
 
 
 func _on_health_changed(current: float, maximum: float) -> void:
@@ -416,6 +453,7 @@ func set_crosshair_visible(is_visible: bool) -> void:
 
 func _on_build_mode_changed(active: bool) -> void:
 	_build_label.visible = active
+	_build_panel.visible = active
 	if active:
 		_close_interfaces()
 		_on_build_selection_changed(_session.construction_system.get_selected_piece())
@@ -423,7 +461,137 @@ func _on_build_mode_changed(active: bool) -> void:
 
 func _on_build_selection_changed(piece: BuildingPieceData) -> void:
 	if piece != null:
-		_build_label.text = tr("SURVIVAL_BUILD") % _building_name(piece)
+		_refresh_build_label()
+
+
+func _refresh_build_label() -> void:
+	var piece: BuildingPieceData = _session.construction_system.get_selected_piece()
+	if piece == null:
+		return
+	var reason_key: String = "BUILD_REASON_%s" % String(
+		_session.construction_system.placement_reason
+	).to_upper()
+	_build_label.text = tr("SURVIVAL_BUILD") % [
+		_building_name(piece),
+		tr(reason_key),
+	]
+
+
+func _select_build_category(category: int) -> void:
+	if _session != null:
+		_session.construction_system.select_category(category)
+
+
+func _on_build_category_changed(category: int) -> void:
+	for index: int in _build_category_buttons.size():
+		_build_category_buttons[index].disabled = index == category
+
+
+func _category_key(category: int) -> String:
+	match category:
+		BuildingPieceData.Category.FOUNDATIONS:
+			return "BUILD_FOUNDATIONS"
+		BuildingPieceData.Category.WALLS:
+			return "BUILD_WALLS"
+		BuildingPieceData.Category.ROOFS:
+			return "BUILD_ROOFS"
+		BuildingPieceData.Category.STATIONS:
+			return "BUILD_STATIONS"
+		_:
+			return "BUILD_MAGIC"
+
+
+func open_crafting_station(station_name: String) -> void:
+	_storage_window.visible = false
+	_storage_piece = null
+	_map_panel.visible = false
+	_survival_window.visible = true
+	_tabs.current_tab = 1
+	_refresh_inventory()
+	show_notification(tr("NOTICE_STATION_OPENED") % station_name)
+	_emit_interface_state()
+
+
+func open_storage(piece: BuildingPiece) -> void:
+	if piece == null or piece.piece_data.functional_kind != BuildingPieceData.FunctionalKind.STORAGE:
+		return
+	_storage_piece = piece
+	_survival_window.visible = false
+	_map_panel.visible = false
+	_storage_window.visible = true
+	_storage_title.text = tr("STORAGE_TITLE") % _building_name(piece.piece_data)
+	_refresh_storage()
+	_emit_interface_state()
+
+
+func _close_storage() -> void:
+	_storage_window.visible = false
+	_storage_piece = null
+	_emit_interface_state()
+
+
+func _refresh_storage() -> void:
+	_clear_container(_storage_inventory_list)
+	_clear_container(_storage_chest_list)
+	if not is_instance_valid(_storage_piece):
+		_close_storage()
+		return
+	for slot: InventorySlot in _inventory.slots:
+		if slot.is_empty():
+			continue
+		var inventory_button: Button = Button.new()
+		inventory_button.text = "%s  ×%d  →" % [_item_name(slot.item), slot.quantity]
+		inventory_button.pressed.connect(_store_one_item.bind(slot.item.item_id))
+		_storage_inventory_list.add_child(inventory_button)
+	for raw_entry: Variant in _storage_piece.get_storage_entries():
+		if raw_entry is not Dictionary:
+			continue
+		var entry: Dictionary = raw_entry as Dictionary
+		var item_id: StringName = StringName(String(entry.get("item_id", "")))
+		var item: ItemData = _session.item_catalog.get_item(item_id)
+		if item == null:
+			continue
+		var chest_button: Button = Button.new()
+		chest_button.text = "←  %s  ×%d" % [_item_name(item), int(entry.get("quantity", 0))]
+		chest_button.pressed.connect(_withdraw_one_item.bind(item_id))
+		_storage_chest_list.add_child(chest_button)
+	if not _has_live_children(_storage_inventory_list):
+		_add_empty_label(_storage_inventory_list)
+	if not _has_live_children(_storage_chest_list):
+		_add_empty_label(_storage_chest_list)
+
+
+func _store_one_item(item_id: StringName) -> void:
+	if is_instance_valid(_storage_piece) and _storage_piece.store_item(_inventory, item_id, 1):
+		_refresh_storage()
+	else:
+		show_notification(tr("NOTICE_STORAGE_FULL"))
+
+
+func _withdraw_one_item(item_id: StringName) -> void:
+	if is_instance_valid(_storage_piece) and _storage_piece.withdraw_item(_inventory, item_id, 1):
+		_refresh_storage()
+	else:
+		show_notification(tr("NOTICE_INVENTORY_FULL"))
+
+
+func _clear_container(container: Container) -> void:
+	for child: Node in container.get_children():
+		child.queue_free()
+
+
+func _has_live_children(container: Container) -> bool:
+	for child: Node in container.get_children():
+		if not child.is_queued_for_deletion():
+			return true
+	return false
+
+
+func _add_empty_label(container: Container) -> void:
+	var label: Label = Label.new()
+	label.text = tr("SURVIVAL_EMPTY_SLOT")
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	container.add_child(label)
 
 
 func _refresh_objective() -> void:

@@ -58,12 +58,15 @@ func _ready() -> void:
 	world_clock.time_changed.connect(_on_time_changed)
 	crafting_system.bind(player.get_inventory_component(), grimoire)
 	ritual_system.bind(player, player.get_inventory_component(), world_state, _ritual_circle)
-	construction_system.bind(player, player.get_inventory_component(), world_state)
+	construction_system.bind(player, player.get_inventory_component(), world_state, item_catalog)
 	crafting_system.crafting_succeeded.connect(_on_crafting_succeeded)
 	crafting_system.crafting_failed.connect(_on_crafting_failed)
 	ritual_system.ritual_completed.connect(_on_ritual_completed)
 	ritual_system.ritual_failed.connect(_on_ritual_failed)
 	construction_system.piece_built.connect(_on_piece_built)
+	construction_system.functional_piece_used.connect(_on_functional_piece_used)
+	construction_system.placement_failed.connect(_on_construction_failed)
+	construction_system.build_mode_changed.connect(_on_build_mode_changed)
 	_respawn_transform = Transform3D(Basis.IDENTITY, region.get_spawn_position())
 	_ward_zones.append(witchfire_hearth.ward_zone)
 	threat_director.bind(player, world_clock, _threat_host, _threat_spawn_points, _ward_zones)
@@ -181,6 +184,7 @@ func apply_camera_settings(store: SettingsStore) -> void:
 
 
 func serialize_game() -> Dictionary:
+	construction_system.flush_world_state()
 	for resource_node: ResourceNode in region.get_persistent_resources():
 		world_state.set_resource_state(resource_node.persistent_id, resource_node.serialize_state())
 	if is_instance_valid(_active_echo):
@@ -299,6 +303,34 @@ func _on_piece_built(piece: BuildingPiece) -> void:
 		_ward_zones.append(ward)
 
 
+func _on_build_mode_changed(active: bool) -> void:
+	interaction_controller.set_enabled(not active and not _interface_open)
+
+
+func _on_construction_failed(reason: StringName) -> void:
+	var key: String = "NOTICE_BUILD_%s" % String(reason).to_upper()
+	var message: String = tr(key)
+	if message == key:
+		message = tr("NOTICE_BUILD_INVALID")
+	notification_requested.emit(message)
+
+
+func _on_functional_piece_used(piece: BuildingPiece, interactor: MagePlayer) -> void:
+	match piece.piece_data.functional_kind:
+		BuildingPieceData.FunctionalKind.DOOR:
+			notification_requested.emit(
+				tr("NOTICE_DOOR_OPEN") if piece.is_door_open() else tr("NOTICE_DOOR_CLOSED")
+			)
+		BuildingPieceData.FunctionalKind.STORAGE:
+			survival_hud.open_storage(piece)
+		BuildingPieceData.FunctionalKind.CRAFTING:
+			survival_hud.open_crafting_station(piece.piece_data.display_name)
+		BuildingPieceData.FunctionalKind.HEARTH, BuildingPieceData.FunctionalKind.BED_ALTAR:
+			_rest_player_at(piece.global_position, piece.persistent_id, interactor, true)
+		BuildingPieceData.FunctionalKind.WARD:
+			notification_requested.emit(tr("NOTICE_WARD_FUEL") % piece.get_ward_fuel())
+
+
 func _on_hunt_started() -> void:
 	notification_requested.emit(tr("NOTICE_HUNT_STARTED"))
 
@@ -343,14 +375,25 @@ func _apply_ritual_world_effect(flag_id: StringName) -> void:
 
 
 func _on_rest_requested(hearth: WitchfireHearth, interactor: MagePlayer) -> void:
-	world_state.last_hearth_id = hearth.persistent_id
-	_respawn_transform = Transform3D(Basis.IDENTITY, hearth.global_position + Vector3(0, 0.1, 3.0))
+	var protected_rest: bool = is_instance_valid(hearth.ward_zone) \
+		and hearth.ward_zone.protects(interactor.global_position)
+	_rest_player_at(hearth.global_position, hearth.persistent_id, interactor, protected_rest)
+
+
+func _rest_player_at(
+	world_position: Vector3,
+	persistent_id: StringName,
+	interactor: MagePlayer,
+	apply_rested: bool
+) -> void:
+	world_state.last_hearth_id = persistent_id
+	_respawn_transform = Transform3D(Basis.IDENTITY, world_position + Vector3(0, 0.1, 3.0))
 	interactor.set_respawn_transform(_respawn_transform)
 	interactor.get_health_component().heal(interactor.get_health_component().max_health)
 	interactor.get_mana_component().restore(interactor.get_mana_component().max_mana)
 	interactor.get_stamina_component().restore(interactor.get_stamina_component().max_stamina)
 	interactor.get_corruption_component().cleanse(100.0, &"rest")
-	if is_instance_valid(hearth.ward_zone) and hearth.ward_zone.protects(interactor.global_position):
+	if apply_rested:
 		interactor.get_status_effect_component().apply_effect_by_id(&"rested")
 	notification_requested.emit(tr("NOTICE_HEARTH_BOUND"))
 	if is_instance_valid(_save_game_service):

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BuildingCatalog" load_steps=26 format=3]
+[gd_resource type="Resource" script_class="BuildingCatalog" load_steps=27 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/building_catalog.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/resources/building_piece_data.gd" id="2"]
@@ -47,73 +47,110 @@ script = ExtResource("2")
 piece_id = &"foundation"
 display_name = "Рунический фундамент"
 size = Vector3(4, 0.4, 4)
+snap_sockets = PackedVector3Array(4, 0, 0, -4, 0, 0, 0, 0, 4, 0, 0, -4, 2, 0.4, 0, -2, 0.4, 0, 0, 0.4, 2, 0, 0.4, -2)
 ingredients = Array[ExtResource("3")]([SubResource("Wood3")])
 accent_color = Color(0.22, 0.13, 0.26, 1)
+maximum_durability = 180.0
 [sub_resource type="Resource" id="P_wall"]
 script = ExtResource("2")
 piece_id = &"wall"
 display_name = "Стена из могильного дерева"
 size = Vector3(4, 3, 0.35)
+snap_sockets = PackedVector3Array(4, 0, 0, -4, 0, 0, 0, 3, 0)
+category = 1
 ingredients = Array[ExtResource("3")]([SubResource("Prepared2")])
 accent_color = Color(0.19, 0.1, 0.22, 1)
+maximum_durability = 140.0
 [sub_resource type="Resource" id="P_door"]
 script = ExtResource("2")
 piece_id = &"door"
 display_name = "Дверь с печатью"
 size = Vector3(2, 3, 0.3)
+snap_sockets = PackedVector3Array(3, 0, 0, -3, 0, 0, 0, 3, 0)
+category = 1
 ingredients = Array[ExtResource("3")]([SubResource("Prepared2"), SubResource("Moon1")])
+functional_kind = 6
 accent_color = Color(0.3, 0.14, 0.34, 1)
+maximum_durability = 120.0
 [sub_resource type="Resource" id="P_roof"]
 script = ExtResource("2")
 piece_id = &"roof"
 display_name = "Кровля из чар-ткани"
 size = Vector3(4, 0.35, 4)
-snap_offset = Vector3(0, 3, 0)
+snap_sockets = PackedVector3Array(4, 0, 0, -4, 0, 0, 0, 0, 4, 0, 0, -4)
+category = 2
 ingredients = Array[ExtResource("3")]([SubResource("Wood2"), SubResource("Prepared2")])
 accent_color = Color(0.16, 0.1, 0.24, 1)
+maximum_durability = 110.0
 [sub_resource type="Resource" id="P_chest"]
 script = ExtResource("2")
 piece_id = &"chest"
 display_name = "Зачарованный сундук"
 size = Vector3(1.8, 1.2, 1.1)
+snap_sockets = PackedVector3Array(2.2, 0, 0, -2.2, 0, 0)
+category = 3
 ingredients = Array[ExtResource("3")]([SubResource("Prepared2"), SubResource("Moon1")])
 functional_kind = 1
 accent_color = Color(0.28, 0.16, 0.38, 1)
+maximum_durability = 90.0
+storage_capacity = 24
 [sub_resource type="Resource" id="P_cauldron"]
 script = ExtResource("2")
 piece_id = &"cauldron"
 display_name = "Алхимический котёл"
 size = Vector3(1.8, 1.4, 1.8)
+snap_sockets = PackedVector3Array(2.4, 0, 0, -2.4, 0, 0, 0, 0, 2.4, 0, 0, -2.4)
+category = 3
 ingredients = Array[ExtResource("3")]([SubResource("Prepared3"), SubResource("Moon2")])
 functional_kind = 2
 accent_color = Color(0.18, 0.38, 0.31, 1)
+maximum_durability = 100.0
 [sub_resource type="Resource" id="P_rune"]
 script = ExtResource("2")
 piece_id = &"rune_table"
 display_name = "Стол рун"
 size = Vector3(2.4, 1.3, 1.4)
+snap_sockets = PackedVector3Array(2.8, 0, 0, -2.8, 0, 0)
+category = 3
 ingredients = Array[ExtResource("3")]([SubResource("Prepared3"), SubResource("Moon2")])
 functional_kind = 2
 accent_color = Color(0.38, 0.2, 0.52, 1)
+maximum_durability = 100.0
+[sub_resource type="Resource" id="P_bed"]
+script = ExtResource("2")
+piece_id = &"bed_altar"
+display_name = "Алтарь сна"
+size = Vector3(2.4, 0.8, 3.2)
+snap_sockets = PackedVector3Array(3, 0, 0, -3, 0, 0, 0, 0, 3.4, 0, 0, -3.4)
+category = 3
+ingredients = Array[ExtResource("3")]([SubResource("Prepared3"), SubResource("Ward2")])
+functional_kind = 7
+accent_color = Color(0.34, 0.18, 0.46, 1)
+maximum_durability = 100.0
 [sub_resource type="Resource" id="P_hearth"]
 script = ExtResource("2")
 piece_id = &"witchfire_hearth"
 display_name = "Малый ведьмин огонь"
 size = Vector3(2.2, 1.2, 2.2)
+category = 4
 ingredients = Array[ExtResource("3")]([SubResource("Prepared3"), SubResource("Core1")])
 functional_kind = 3
 accent_color = Color(0.08, 0.8, 0.66, 1)
 ward_radius = 7.0
+maximum_durability = 140.0
 [sub_resource type="Resource" id="P_ward"]
 script = ExtResource("2")
 piece_id = &"ward_obelisk"
 display_name = "Защитный обелиск"
 size = Vector3(1.4, 3.8, 1.4)
+category = 4
 ingredients = Array[ExtResource("3")]([SubResource("Prepared3"), SubResource("Ward2"), SubResource("Moon2")])
 functional_kind = 4
 accent_color = Color(0.18, 0.72, 0.82, 1)
 ward_radius = 10.0
+maximum_durability = 160.0
+ward_fuel_capacity = 10
 
 [resource]
 script = ExtResource("1")
-pieces = Array[ExtResource("2")]([SubResource("P_floor"), SubResource("P_wall"), SubResource("P_door"), SubResource("P_roof"), SubResource("P_chest"), SubResource("P_cauldron"), SubResource("P_rune"), SubResource("P_hearth"), SubResource("P_ward")])
+pieces = Array[ExtResource("2")]([SubResource("P_floor"), SubResource("P_wall"), SubResource("P_door"), SubResource("P_roof"), SubResource("P_chest"), SubResource("P_cauldron"), SubResource("P_rune"), SubResource("P_bed"), SubResource("P_hearth"), SubResource("P_ward")])

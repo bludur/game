@@ -15,6 +15,8 @@ var _hurt_sound: AudioStreamWAV
 var _death_sound: AudioStreamWAV
 var _dash_sound: AudioStreamWAV
 var _ward_sound: AudioStreamWAV
+var _controls_enabled: bool = true
+var _build_mode: bool = false
 
 @onready var _controller: PlayerController = get_node("PlayerController") as PlayerController
 @onready var _health: HealthComponent = get_node("HealthComponent") as HealthComponent
@@ -155,13 +157,24 @@ func request_dash(direction: Vector3 = Vector3.ZERO) -> bool:
 
 
 func set_controls_enabled(enabled: bool) -> void:
-	_controller.set_enabled(enabled)
-	_spell_caster.set_enabled(enabled)
-	_spell_loadout.set_enabled(enabled)
-	_dash.set_enabled(enabled)
-	_combat_state.set_enabled(enabled)
-	_ward.set_enabled(enabled)
-	_update_range_preview(enabled)
+	_controls_enabled = enabled
+	_refresh_control_modules()
+
+
+func set_build_mode(active: bool) -> void:
+	_build_mode = active
+	_refresh_control_modules()
+
+
+func _refresh_control_modules() -> void:
+	_controller.set_enabled(_controls_enabled)
+	_dash.set_enabled(_controls_enabled)
+	_combat_state.set_enabled(_controls_enabled)
+	var combat_enabled: bool = _controls_enabled and not _build_mode
+	_spell_caster.set_enabled(combat_enabled)
+	_spell_loadout.set_enabled(combat_enabled)
+	_ward.set_enabled(combat_enabled)
+	_update_range_preview(combat_enabled)
 
 
 func set_auto_respawn(enabled: bool) -> void:

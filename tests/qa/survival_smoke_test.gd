@@ -24,8 +24,8 @@ func _run_checks() -> void:
 		failures.append("Expected twenty-nine authored recipes including equipment.")
 	if session.ritual_system.catalog.rituals.size() != 6:
 		failures.append("Expected six authored rituals.")
-	if session.construction_system.catalog.pieces.size() != 9:
-		failures.append("Expected nine authored building pieces.")
+	if session.construction_system.catalog.pieces.size() != 10:
+		failures.append("Expected ten authored building pieces.")
 	for starter_id: StringName in [&"novice_wand", &"ashweave_mantle", &"quicksilver_knot"]:
 		if session.get_player_inventory().get_item_count(starter_id) != 1:
 			failures.append("New survival session is missing starter equipment: %s." % starter_id)
