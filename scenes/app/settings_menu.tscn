@@ -216,6 +216,10 @@ text = "SETTINGS_REBIND_CAST"
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "SETTINGS_REBIND_DASH"
+[node name="RebindWard" type="Button" parent="Center/Card/Scroll/Content"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "SETTINGS_REBIND_WARD"
 [node name="Reset" type="Button" parent="Center/Card/Scroll/Content"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2

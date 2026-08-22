@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/chaser_enemy.gd" id="1_enemy"]
 [ext_resource type="PackedScene" path="res://scenes/components/health_component.tscn" id="2_health"]
@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" path="res://scenes/components/movement_modifier_component.tscn" id="5_modifier"]
 [ext_resource type="PackedScene" path="res://assets/models/shadow_chaser.glb" id="6_model"]
 [ext_resource type="PackedScene" path="res://scenes/components/character_animator.tscn" id="7_animator"]
+[ext_resource type="PackedScene" path="res://scenes/components/enemy_telegraph_component.tscn" id="8_telegraph"]
+[ext_resource type="Resource" path="res://resources/enemy_telegraphs/shadow_lunge.tres" id="9_telegraph_data"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_enemy"]
 radius = 0.46
@@ -17,6 +19,7 @@ collision_layer = 4
 collision_mask = 1
 floor_snap_length = 0.25
 script = ExtResource("1_enemy")
+attack_telegraph = ExtResource("9_telegraph_data")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 position = Vector3(0, 0.75, 0)
@@ -55,6 +58,9 @@ omni_range = 3.2
 shadow_enabled = false
 
 [node name="CharacterAnimator" parent="." instance=ExtResource("7_animator")]
+
+[node name="EnemyTelegraphComponent" parent="." instance=ExtResource("8_telegraph")]
+definition = ExtResource("9_telegraph_data")
 
 [node name="AttackTimer" type="Timer" parent="."]
 one_shot = true

@@ -12,6 +12,7 @@ func test_dash_moves_player_and_grants_temporary_invulnerability() -> void:
 	var start_x: float = player.global_position.x
 
 	assert_true(player.request_dash(Vector3.RIGHT))
+	assert_true(player.get_combat_state_component().is_dodging())
 	assert_true(player.get_hurtbox_component().is_invulnerable())
 	assert_false(player.get_hurtbox_component().receive_hit(10.0))
 

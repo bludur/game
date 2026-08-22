@@ -267,6 +267,7 @@ func _capture_default_bindings() -> void:
 		&"primary_spell", &"dash", &"jump", &"sprint", &"spell_slot_1", &"spell_slot_2",
 		&"spell_slot_3", &"pause", &"aim_left", &"aim_right", &"aim_up", &"aim_down",
 		&"camera_swap_shoulder",
+		&"ward",
 	]:
 		if not InputMap.has_action(action):
 			continue
@@ -289,6 +290,7 @@ func _ensure_gamepad_actions() -> void:
 	_add_joy_button(&"dash", JOY_BUTTON_B)
 	_add_joy_button(&"jump", JOY_BUTTON_A)
 	_add_joy_button(&"sprint", JOY_BUTTON_LEFT_STICK)
+	_add_joy_axis(&"ward", JOY_AXIS_TRIGGER_LEFT, 1.0)
 	_add_joy_button(&"pause", JOY_BUTTON_START)
 
 
@@ -386,7 +388,7 @@ func _install_translations() -> void:
 		"SETTINGS_MUSIC": "Music", "SETTINGS_SFX": "Sound Effects",
 		"SETTINGS_LANGUAGE": "Language", "SETTINGS_WINDOW": "Window Mode",
 		"SETTINGS_GRAPHICS": "Graphics", "SETTINGS_REBIND_CAST": "Rebind Cast",
-		"SETTINGS_REBIND_DASH": "Rebind Dash", "SETTINGS_RESET": "Reset Controls",
+		"SETTINGS_REBIND_DASH": "Rebind Dodge", "SETTINGS_REBIND_WARD": "Rebind Ward", "SETTINGS_RESET": "Reset Controls",
 		"SETTINGS_UI_SCALE": "Interface Scale", "SETTINGS_FLASH": "Flash Intensity",
 		"SETTINGS_SHAKE": "Screen Shake", "SETTINGS_HOLD_INTERACT": "Hold to Interact",
 		"SETTINGS_CAMERA_SENSITIVITY": "Camera Sensitivity", "SETTINGS_CAMERA_FOV": "Field of View",
@@ -404,7 +406,7 @@ func _install_translations() -> void:
 		"SETTINGS_MUSIC": "Музыка", "SETTINGS_SFX": "Эффекты",
 		"SETTINGS_LANGUAGE": "Язык", "SETTINGS_WINDOW": "Режим окна",
 		"SETTINGS_GRAPHICS": "Графика", "SETTINGS_REBIND_CAST": "Назначить атаку",
-		"SETTINGS_REBIND_DASH": "Назначить рывок", "SETTINGS_RESET": "Сбросить управление",
+		"SETTINGS_REBIND_DASH": "Назначить уклонение", "SETTINGS_REBIND_WARD": "Назначить оберег", "SETTINGS_RESET": "Сбросить управление",
 		"SETTINGS_UI_SCALE": "Масштаб интерфейса", "SETTINGS_FLASH": "Интенсивность вспышек",
 		"SETTINGS_SHAKE": "Тряска экрана", "SETTINGS_HOLD_INTERACT": "Удерживать для взаимодействия",
 		"SETTINGS_CAMERA_SENSITIVITY": "Чувствительность камеры", "SETTINGS_CAMERA_FOV": "Угол обзора",

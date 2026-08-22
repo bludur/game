@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/cultist_enemy.gd" id="1_cultist"]
 [ext_resource type="PackedScene" path="res://scenes/components/health_component.tscn" id="2_health"]
@@ -8,6 +8,8 @@
 [ext_resource type="PackedScene" path="res://scenes/combat/cultist_bolt.tscn" id="6_bolt"]
 [ext_resource type="PackedScene" path="res://assets/models/ember_cultist.glb" id="7_model"]
 [ext_resource type="PackedScene" path="res://scenes/components/character_animator.tscn" id="8_animator"]
+[ext_resource type="PackedScene" path="res://scenes/components/enemy_telegraph_component.tscn" id="9_telegraph"]
+[ext_resource type="Resource" path="res://resources/enemy_telegraphs/ember_bolt.tres" id="10_telegraph_data"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_cultist"]
 radius = 0.44
@@ -19,6 +21,7 @@ collision_mask = 1
 floor_snap_length = 0.25
 script = ExtResource("1_cultist")
 projectile_scene = ExtResource("6_bolt")
+attack_telegraph = ExtResource("10_telegraph_data")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 position = Vector3(0, 0.82, 0)
@@ -61,6 +64,9 @@ omni_range = 3.0
 shadow_enabled = false
 
 [node name="CharacterAnimator" parent="." instance=ExtResource("8_animator")]
+
+[node name="EnemyTelegraphComponent" parent="." instance=ExtResource("9_telegraph")]
+definition = ExtResource("10_telegraph_data")
 
 [node name="AttackTimer" type="Timer" parent="."]
 one_shot = true

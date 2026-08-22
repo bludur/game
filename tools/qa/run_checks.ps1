@@ -42,6 +42,18 @@ if ($LASTEXITCODE -ne 0) {
     throw "Third-person locomotion course failed with exit code $LASTEXITCODE."
 }
 
+Write-Host 'Running three-dimensional spell aim regression...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_combat_aim.log') --script 'res://tests/qa/three_dimensional_aim_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Three-dimensional spell aim test failed with exit code $LASTEXITCODE."
+}
+
+Write-Host 'Running authored third-person combat room regression...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_combat_room.log') --script 'res://tests/qa/third_person_combat_room_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Third-person combat room test failed with exit code $LASTEXITCODE."
+}
+
 Write-Host 'Running enemy chase integration test...'
 & $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_enemy_chase.log') --script 'res://tests/qa/enemy_chase_test.gd'
 if ($LASTEXITCODE -ne 0) {

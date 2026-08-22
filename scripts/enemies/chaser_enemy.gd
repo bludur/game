@@ -21,6 +21,7 @@ enum State {
 @export_range(1.0, 30.0, 0.5) var turn_speed: float = 10.0
 
 @export_group("Combat")
+@export var attack_telegraph: EnemyTelegraphData
 @export_range(1.0, 100.0, 1.0) var attack_damage: float = 8.0
 @export_range(0.2, 5.0, 0.05) var attack_cooldown: float = 1.0
 @export_range(0.5, 10.0, 0.1) var respawn_delay: float = 3.5
@@ -47,6 +48,7 @@ var _glow_tween: Tween
 @onready var _attack_timer: Timer = get_node("AttackTimer") as Timer
 @onready var _target_refresh_timer: Timer = get_node("TargetRefreshTimer") as Timer
 @onready var _respawn_timer: Timer = get_node("RespawnTimer") as Timer
+@onready var _telegraph: EnemyTelegraphComponent = get_node("EnemyTelegraphComponent") as EnemyTelegraphComponent
 
 
 func _ready() -> void:
@@ -56,6 +58,8 @@ func _ready() -> void:
 	_hurt_sound = SyntheticAudio.create_hurt()
 	_death_sound = SyntheticAudio.create_death()
 	_attack_sound = SyntheticAudio.create_enemy_attack()
+	_telegraph.bind(_sfx_pool)
+	_telegraph.danger_started.connect(_on_telegraph_danger_started)
 	_health.damaged.connect(_on_damaged)
 	_health.died.connect(_on_died)
 	_target_refresh_timer.timeout.connect(_refresh_navigation_target)
@@ -193,7 +197,7 @@ func _update_attack(delta: float) -> void:
 	target_direction.y = 0.0
 	_face_direction(target_direction.normalized(), delta)
 	if _attack_timer.is_stopped():
-		try_attack()
+		_request_telegraphed_attack()
 
 
 func _face_direction(direction: Vector3, delta: float) -> void:
@@ -237,7 +241,7 @@ func _enter_state(state: State) -> void:
 			_animator.set_moving(true)
 		State.ATTACK:
 			if _attack_timer.is_stopped():
-				try_attack()
+				_request_telegraphed_attack()
 		State.DEAD:
 			velocity = Vector3.ZERO
 			_animator.play_death()
@@ -246,7 +250,19 @@ func _enter_state(state: State) -> void:
 
 
 func _exit_state(_state: State) -> void:
-	pass
+	if _state == State.ATTACK:
+		_telegraph.finish()
+
+
+func _request_telegraphed_attack() -> bool:
+	if attack_telegraph == null or not is_instance_valid(_target) \
+			or global_position.distance_to(_target.global_position) > attack_range:
+		return false
+	return _telegraph.begin_at(global_position, attack_telegraph)
+
+
+func _on_telegraph_danger_started(_definition: EnemyTelegraphData) -> void:
+	try_attack()
 
 
 func _on_damaged(_amount: float) -> void:
@@ -262,6 +278,7 @@ func _on_damaged(_amount: float) -> void:
 
 
 func _on_died() -> void:
+	_telegraph.finish()
 	_sfx_pool.play_sfx(_death_sound)
 	_transition_to(State.DEAD)
 	collision_layer = 0
@@ -273,6 +290,7 @@ func _on_died() -> void:
 
 
 func _on_respawn_timeout() -> void:
+	_telegraph.finish()
 	global_transform = _spawn_transform
 	reset_physics_interpolation()
 	_health.reset()

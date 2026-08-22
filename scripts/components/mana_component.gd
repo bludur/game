@@ -42,6 +42,20 @@ func try_spend(amount: float) -> bool:
 	return true
 
 
+func spend_continuous(amount_per_second: float, delta: float) -> bool:
+	if amount_per_second <= 0.0 or delta <= 0.0:
+		return current_mana > 0.0
+	if current_mana <= 0.0:
+		spend_failed.emit(amount_per_second * delta, current_mana)
+		return false
+	var amount: float = minf(current_mana, amount_per_second * delta)
+	current_mana -= amount
+	set_process(regeneration_per_second > 0.0)
+	mana_spent.emit(amount)
+	mana_changed.emit(current_mana, max_mana)
+	return current_mana > 0.0
+
+
 func restore(amount: float) -> bool:
 	if amount <= 0.0 or current_mana >= max_mana:
 		return false

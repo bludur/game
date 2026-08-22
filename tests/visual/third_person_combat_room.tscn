@@ -1,0 +1,121 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scripts/tests/third_person_combat_room.gd" id="1_room"]
+[ext_resource type="PackedScene" path="res://scenes/characters/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/cameras/third_person_camera_rig.tscn" id="3_camera"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/chaser_enemy.tscn" id="4_chaser"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/cultist_enemy.tscn" id="5_cultist"]
+[ext_resource type="PackedScene" path="res://scenes/boss/boss_encounter.tscn" id="6_boss"]
+
+[sub_resource type="Environment" id="Environment_room"]
+background_mode = 1
+background_color = Color(0.018, 0.012, 0.03, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.22, 0.15, 0.36, 1)
+ambient_light_energy = 0.72
+fog_enabled = true
+fog_light_color = Color(0.12, 0.06, 0.2, 1)
+fog_density = 0.018
+
+[sub_resource type="StandardMaterial3D" id="Material_floor"]
+albedo_color = Color(0.075, 0.06, 0.09, 1)
+roughness = 0.92
+
+[sub_resource type="StandardMaterial3D" id="Material_cover"]
+albedo_color = Color(0.16, 0.1, 0.22, 1)
+roughness = 0.78
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+material = SubResource("Material_floor")
+size = Vector3(30, 0.4, 34)
+
+[sub_resource type="BoxShape3D" id="BoxShape_floor"]
+size = Vector3(30, 0.4, 34)
+
+[sub_resource type="BoxMesh" id="BoxMesh_platform"]
+material = SubResource("Material_cover")
+size = Vector3(9, 2, 7)
+
+[sub_resource type="BoxShape3D" id="BoxShape_platform"]
+size = Vector3(9, 2, 7)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cover"]
+material = SubResource("Material_cover")
+size = Vector3(1.4, 2.8, 4.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape_cover"]
+size = Vector3(1.4, 2.8, 4.2)
+
+[node name="ThirdPersonCombatRoom" type="Node3D"]
+script = ExtResource("1_room")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_room")
+
+[node name="MoonLight" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-52, -28, 0)
+light_color = Color(0.5, 0.36, 0.82, 1)
+light_energy = 1.25
+shadow_enabled = true
+
+[node name="Floor" type="StaticBody3D" parent="." groups=["combat_room_world"]]
+position = Vector3(0, -0.2, -7)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape_floor")
+
+[node name="ElevatedPlatform" type="StaticBody3D" parent="." groups=["combat_room_height"]]
+position = Vector3(3.5, 1, -12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ElevatedPlatform"]
+mesh = SubResource("BoxMesh_platform")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ElevatedPlatform"]
+shape = SubResource("BoxShape_platform")
+
+[node name="CoverLeft" type="StaticBody3D" parent="." groups=["combat_room_cover"]]
+position = Vector3(-3.5, 1.4, -4.5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CoverLeft"]
+mesh = SubResource("BoxMesh_cover")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CoverLeft"]
+shape = SubResource("BoxShape_cover")
+
+[node name="CoverRight" type="StaticBody3D" parent="." groups=["combat_room_cover"]]
+position = Vector3(3.8, 1.4, -3)
+rotation_degrees = Vector3(0, 32, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CoverRight"]
+mesh = SubResource("BoxMesh_cover")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CoverRight"]
+shape = SubResource("BoxShape_cover")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector3(0, 0, 5)
+
+[node name="ThirdPersonCameraRig" parent="." instance=ExtResource("3_camera")]
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="ChaserEnemy" parent="Enemies" instance=ExtResource("4_chaser")]
+position = Vector3(-1.5, 0, -6.5)
+respawns = false
+
+[node name="CultistEnemy" parent="Enemies" instance=ExtResource("5_cultist")]
+position = Vector3(4.5, 2.05, -12)
+
+[node name="BossEncounter" parent="Enemies" instance=ExtResource("6_boss")]
+position = Vector3(-7, 0, -6)

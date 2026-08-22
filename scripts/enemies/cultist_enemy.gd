@@ -23,6 +23,7 @@ enum State {
 
 @export_group("Combat")
 @export var projectile_scene: PackedScene
+@export var attack_telegraph: EnemyTelegraphData
 @export_range(1.0, 100.0, 1.0) var attack_damage: float = 7.0
 @export_range(0.2, 5.0, 0.05) var attack_cooldown: float = 1.65
 @export_range(2.0, 30.0, 0.5) var attack_range: float = 10.0
@@ -47,6 +48,7 @@ var _glow_tween: Tween
 @onready var _attack_timer: Timer = get_node("AttackTimer") as Timer
 @onready var _target_refresh_timer: Timer = get_node("TargetRefreshTimer") as Timer
 @onready var _sfx_pool: SfxPool3D = get_node("SfxPool3D") as SfxPool3D
+@onready var _telegraph: EnemyTelegraphComponent = get_node("EnemyTelegraphComponent") as EnemyTelegraphComponent
 
 
 func _ready() -> void:
@@ -54,6 +56,8 @@ func _ready() -> void:
 	_hurt_sound = SyntheticAudio.create_hurt()
 	_death_sound = SyntheticAudio.create_death()
 	_attack_sound = SyntheticAudio.create_enemy_attack()
+	_telegraph.bind(_sfx_pool)
+	_telegraph.danger_started.connect(_on_telegraph_danger_started)
 	_health.damaged.connect(_on_damaged)
 	_health.died.connect(_on_died)
 	_target_refresh_timer.timeout.connect(_refresh_navigation_target)
@@ -86,7 +90,7 @@ func _physics_process(delta: float) -> void:
 		facing.y = 0.0
 		_face_direction(facing.normalized(), delta)
 	if current_state == State.KEEP_DISTANCE and _attack_timer.is_stopped():
-		try_attack()
+		_request_telegraphed_attack()
 	move_and_slide()
 
 
@@ -142,6 +146,17 @@ func try_attack() -> bool:
 	_attack_timer.start(attack_cooldown)
 	attacked.emit(attack_damage)
 	return true
+
+
+func _request_telegraphed_attack() -> bool:
+	if attack_telegraph == null or not is_instance_valid(_target) \
+			or global_position.distance_to(_target.global_position) > attack_range:
+		return false
+	return _telegraph.begin_at(_target.global_position, attack_telegraph)
+
+
+func _on_telegraph_danger_started(_definition: EnemyTelegraphData) -> void:
+	try_attack()
 
 
 func _update_state_from_distance() -> void:
@@ -248,6 +263,7 @@ func _on_damaged(_amount: float) -> void:
 
 
 func _on_died() -> void:
+	_telegraph.finish()
 	_sfx_pool.play_sfx(_death_sound)
 	_transition_to(State.DEAD)
 	collision_layer = 0

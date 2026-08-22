@@ -25,10 +25,13 @@ func test_arcane_bolt_spends_mana_and_damages_target() -> void:
 		player.get_node("CastOrigin") as Marker3D,
 		mana,
 		world,
-		&"player"
+		&"player",
+		player.get_combat_state_component()
 	)
-	assert_true(caster.cast_at(target.global_position))
+	var target_hurtbox: HurtboxComponent = target.get_node("HurtboxComponent") as HurtboxComponent
+	assert_true(caster.cast_at(target_hurtbox.global_position))
 	assert_eq(mana.current_mana, mana_before - caster.spell_data.mana_cost)
+	assert_eq(player.get_combat_state_component().get_state_name(), &"casting")
 
 	for _frame: int in 30:
 		await get_tree().physics_frame

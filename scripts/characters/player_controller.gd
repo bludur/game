@@ -35,6 +35,7 @@ var _body: CharacterBody3D
 var _visuals: Node3D
 var _dash: DashComponent
 var _stamina: StaminaComponent
+var _combat_state: CombatStateComponent
 var _enabled: bool = true
 var _state: State = State.MOVE
 var _last_move_direction: Vector3 = Vector3.FORWARD
@@ -55,12 +56,14 @@ func bind(
 	body: CharacterBody3D,
 	visuals: Node3D,
 	dash: DashComponent = null,
-	stamina: StaminaComponent = null
+	stamina: StaminaComponent = null,
+	combat_state: CombatStateComponent = null
 ) -> void:
 	_body = body
 	_visuals = visuals
 	_dash = dash
 	_stamina = stamina
+	_combat_state = combat_state
 	if is_instance_valid(_dash) and not _dash.dash_requested.is_connected(_on_dash_requested):
 		_dash.dash_requested.connect(_on_dash_requested)
 		_dash.dash_started.connect(_on_dash_started)
@@ -159,6 +162,8 @@ func _physics_process(delta: float) -> void:
 
 func request_dash(direction: Vector3 = Vector3.ZERO) -> bool:
 	if not _enabled or not is_instance_valid(_dash):
+		return false
+	if is_instance_valid(_combat_state) and not _combat_state.can_dodge():
 		return false
 	var requested_direction: Vector3 = direction
 	if requested_direction.length_squared() <= 0.001:

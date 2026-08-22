@@ -71,7 +71,7 @@ layout_mode = 0
 offset_left = 24.0
 offset_top = 24.0
 offset_right = 414.0
-offset_bottom = 314.0
+offset_bottom = 342.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBox_panel")
 
@@ -177,6 +177,13 @@ theme_override_styles/background = SubResource("StyleBox_health_bg")
 theme_override_styles/fill = SubResource("StyleBox_mana_fill")
 show_percentage = false
 step = 0.0
+
+[node name="WardLabel" type="Label" parent="Root/StatusPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+text = "WARD  RMB / LT"
+theme_override_colors/font_color = Color(0.78, 0.52, 1, 1)
 
 [node name="Instructions" type="Label" parent="Root"]
 layout_mode = 0

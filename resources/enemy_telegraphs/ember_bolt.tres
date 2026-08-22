@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyTelegraphData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/enemy_telegraph_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+telegraph_id = &"ember_bolt"
+warning_color = Color(1, 0.32, 0.04, 0.46)
+danger_color = Color(1, 0.04, 0.08, 0.68)
+warning_seconds = 0.72
+danger_seconds = 0.18
+danger_radius = 1.1
+sound_cue = &"enemy_warning"

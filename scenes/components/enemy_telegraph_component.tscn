@@ -1,0 +1,45 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/enemy_telegraph_component.gd" id="1_component"]
+
+[sub_resource type="StandardMaterial3D" id="Material_disc"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.72, 0.2, 1, 0.42)
+emission_enabled = true
+emission = Color(0.72, 0.2, 1, 1)
+emission_energy_multiplier = 2.8
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_disc"]
+top_radius = 1.0
+bottom_radius = 1.0
+height = 0.035
+radial_segments = 40
+
+[sub_resource type="CylinderShape3D" id="CylinderShape_danger"]
+radius = 1.0
+height = 0.2
+
+[node name="EnemyTelegraphComponent" type="Node3D"]
+position = Vector3(0, 0.04, 0)
+script = ExtResource("1_component")
+
+[node name="DangerDisc" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_disc")
+material_override = SubResource("Material_disc")
+
+[node name="WarningLight" type="OmniLight3D" parent="."]
+position = Vector3(0, 0.45, 0)
+light_energy = 2.5
+omni_range = 3.0
+shadow_enabled = false
+
+[node name="DangerArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DangerArea"]
+shape = SubResource("CylinderShape_danger")

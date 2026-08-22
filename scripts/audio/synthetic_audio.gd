@@ -13,7 +13,9 @@ static var _arcane_impact_cache: AudioStreamWAV
 static var _hurt_cache: AudioStreamWAV
 static var _death_cache: AudioStreamWAV
 static var _enemy_attack_cache: AudioStreamWAV
+static var _enemy_warning_cache: AudioStreamWAV
 static var _dash_cache: AudioStreamWAV
+static var _ward_cache: AudioStreamWAV
 static var _chain_lightning_cache: AudioStreamWAV
 static var _victory_cache: AudioStreamWAV
 static var _defeat_result_cache: AudioStreamWAV
@@ -27,7 +29,9 @@ static func release_cached_streams() -> void:
 	_hurt_cache = null
 	_death_cache = null
 	_enemy_attack_cache = null
+	_enemy_warning_cache = null
 	_dash_cache = null
+	_ward_cache = null
 	_chain_lightning_cache = null
 	_victory_cache = null
 	_defeat_result_cache = null
@@ -93,10 +97,22 @@ static func create_enemy_attack() -> AudioStreamWAV:
 	return _enemy_attack_cache
 
 
+static func create_enemy_warning() -> AudioStreamWAV:
+	if _enemy_warning_cache == null:
+		_enemy_warning_cache = _create_sequence(PackedFloat32Array([196.0, 246.94]), 0.13, 0.19)
+	return _enemy_warning_cache
+
+
 static func create_dash() -> AudioStreamWAV:
 	if _dash_cache == null:
 		_dash_cache = _create_chirp(260.0, 1180.0, 0.18, 0.22)
 	return _dash_cache
+
+
+static func create_ward() -> AudioStreamWAV:
+	if _ward_cache == null:
+		_ward_cache = _create_chirp(210.0, 760.0, 0.28, 0.2)
+	return _ward_cache
 
 
 static func create_chain_lightning() -> AudioStreamWAV:

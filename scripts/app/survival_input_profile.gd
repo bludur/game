@@ -10,6 +10,7 @@ static func ensure_actions() -> void:
 		_legacy_dash_migrated = true
 	_add_key_action(&"jump", KEY_SPACE, JOY_BUTTON_A)
 	_add_key_action(&"sprint", KEY_SHIFT, JOY_BUTTON_LEFT_STICK)
+	_add_mouse_joy_axis_action(&"ward", MOUSE_BUTTON_RIGHT, JOY_AXIS_TRIGGER_LEFT, 1.0)
 	_add_key_action(&"interact", KEY_E, JOY_BUTTON_A)
 	_add_key_action(&"inventory", KEY_TAB, JOY_BUTTON_BACK)
 	_add_key_action(&"crafting", KEY_C, JOY_BUTTON_Y)
@@ -89,6 +90,25 @@ static func _add_mouse_action(action: StringName, button: MouseButton) -> void:
 	var event: InputEventMouseButton = InputEventMouseButton.new()
 	event.button_index = button
 	InputMap.action_add_event(action, event)
+
+
+static func _add_mouse_joy_axis_action(
+	action: StringName,
+	button: MouseButton,
+	axis: JoyAxis,
+	axis_value: float
+) -> void:
+	if not InputMap.has_action(action):
+		InputMap.add_action(action, 0.2)
+	var mouse_event: InputEventMouseButton = InputEventMouseButton.new()
+	mouse_event.button_index = button
+	if not _action_has_event(action, mouse_event):
+		InputMap.action_add_event(action, mouse_event)
+	var joy_event: InputEventJoypadMotion = InputEventJoypadMotion.new()
+	joy_event.axis = axis
+	joy_event.axis_value = axis_value
+	if not _action_has_event(action, joy_event):
+		InputMap.action_add_event(action, joy_event)
 
 
 static func _add_joy_axis_action(action: StringName, axis: JoyAxis, value: float) -> void:

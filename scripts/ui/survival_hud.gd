@@ -17,6 +17,7 @@ var _notification_tween: Tween
 @onready var _mana_label: Label = get_node("Root/Status/Content/ManaLabel") as Label
 @onready var _stamina_bar: ProgressBar = get_node("Root/Status/Content/StaminaBar") as ProgressBar
 @onready var _stamina_label: Label = get_node("Root/Status/Content/StaminaLabel") as Label
+@onready var _ward_label: Label = get_node("Root/Status/Content/WardLabel") as Label
 @onready var _corruption_bar: ProgressBar = get_node("Root/Status/Content/CorruptionBar") as ProgressBar
 @onready var _corruption_label: Label = get_node("Root/Status/Content/CorruptionLabel") as Label
 @onready var _corruption_reason: Label = get_node("Root/Status/Content/CorruptionReason") as Label
@@ -66,6 +67,7 @@ func bind(session: WorldSession) -> void:
 	session.player.get_health_component().health_changed.connect(_on_health_changed)
 	session.player.get_mana_component().mana_changed.connect(_on_mana_changed)
 	session.player.get_stamina_component().stamina_changed.connect(_on_stamina_changed)
+	session.player.get_ward_component().active_changed.connect(_on_ward_active_changed)
 	session.player.get_corruption_component().corruption_changed.connect(_on_corruption_changed)
 	session.world_clock.time_changed.connect(_on_time_changed)
 	session.threat_director.threat_changed.connect(_on_threat_changed)
@@ -80,6 +82,7 @@ func bind(session: WorldSession) -> void:
 	_on_health_changed(health.current_health, health.max_health)
 	_on_mana_changed(mana.current_mana, mana.max_mana)
 	_on_stamina_changed(stamina.current_stamina, stamina.max_stamina)
+	_on_ward_active_changed(session.player.get_ward_component().is_active)
 	_on_corruption_changed(corruption.current_corruption, corruption.maximum_corruption, &"safe")
 	_on_time_changed(session.world_clock.normalized_time, session.world_clock.day_number)
 	_refresh_inventory()
@@ -249,6 +252,12 @@ func _on_stamina_changed(current: float, maximum: float) -> void:
 	_stamina_bar.max_value = maximum
 	_stamina_bar.value = current
 	_stamina_label.text = tr("SURVIVAL_STAMINA") % [floori(current), floori(maximum)]
+
+
+func _on_ward_active_changed(active: bool) -> void:
+	_ward_label.text = tr("HUD_WARD_ACTIVE") if active else tr("HUD_WARD_READY")
+	_ward_label.modulate = Color(0.82, 0.56, 1.0, 1.0) if active else Color.WHITE
+	_crosshair.modulate = Color(0.82, 0.56, 1.0, 1.0) if active else Color.WHITE
 
 
 func _on_corruption_changed(current: float, maximum: float, reason: StringName) -> void:

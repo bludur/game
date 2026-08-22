@@ -22,6 +22,7 @@ var _capture_action: StringName
 @onready var _left_shoulder: CheckButton = get_node("Center/Card/Scroll/Content/CameraToggleRow/LeftShoulder") as CheckButton
 @onready var _cast_button: Button = get_node("Center/Card/Scroll/Content/RebindCast") as Button
 @onready var _dash_button: Button = get_node("Center/Card/Scroll/Content/RebindDash") as Button
+@onready var _ward_button: Button = get_node("Center/Card/Scroll/Content/RebindWard") as Button
 @onready var _status: Label = get_node("Center/Card/Scroll/Content/Status") as Label
 @onready var _save_button: Button = get_node("Center/Card/Scroll/Content/Save") as Button
 
@@ -36,6 +37,7 @@ func _ready() -> void:
 	_graphics.add_item(tr("QUALITY_HIGH"), 1)
 	_cast_button.pressed.connect(_begin_capture.bind(&"primary_spell"))
 	_dash_button.pressed.connect(_begin_capture.bind(&"dash"))
+	_ward_button.pressed.connect(_begin_capture.bind(&"ward"))
 	(get_node("Center/Card/Scroll/Content/Reset") as Button).pressed.connect(_reset_bindings)
 	_save_button.pressed.connect(_save_and_close)
 	refresh_text()
@@ -51,7 +53,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible or _capture_action == &"":
 		return
 	if event is not InputEventKey and event is not InputEventMouseButton \
-		and event is not InputEventJoypadButton:
+		and event is not InputEventJoypadButton and event is not InputEventJoypadMotion:
+		return
+	if event is InputEventJoypadMotion and absf((event as InputEventJoypadMotion).axis_value) < 0.8:
 		return
 	if not event.is_pressed() or event.is_echo():
 		return
@@ -137,6 +141,7 @@ func refresh_text() -> void:
 	_left_shoulder.text = tr("SETTINGS_LEFT_SHOULDER")
 	_cast_button.text = tr("SETTINGS_REBIND_CAST")
 	_dash_button.text = tr("SETTINGS_REBIND_DASH")
+	_ward_button.text = tr("SETTINGS_REBIND_WARD")
 	(get_node("Center/Card/Scroll/Content/Reset") as Button).text = tr("SETTINGS_RESET")
 	_save_button.text = tr("SETTINGS_SAVE")
 	if _window_mode.item_count == 2:

@@ -64,6 +64,7 @@ func test_rebinding_resolves_conflict_and_reset_restores_defaults() -> void:
 	assert_true(InputMap.action_get_events(&"primary_spell").is_empty())
 	store.reset_input_bindings()
 	assert_false(InputMap.action_get_events(&"primary_spell").is_empty())
+	assert_false(InputMap.action_get_events(&"ward").is_empty())
 
 
 func _create_store() -> SettingsStore:

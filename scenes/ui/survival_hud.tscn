@@ -111,7 +111,7 @@ layout_mode = 0
 offset_left = 20.0
 offset_top = 20.0
 offset_right = 352.0
-offset_bottom = 294.0
+offset_bottom = 320.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("Panel")
 
@@ -158,6 +158,11 @@ theme_override_styles/fill = SubResource("StaminaFill")
 show_percentage = false
 step = 0.0
 value = 100.0
+
+[node name="WardLabel" type="Label" parent="Root/Status/Content"]
+layout_mode = 2
+text = "HUD_WARD_READY"
+theme_override_colors/font_color = Color(0.78, 0.52, 1, 1)
 
 [node name="CorruptionLabel" type="Label" parent="Root/Status/Content"]
 layout_mode = 2

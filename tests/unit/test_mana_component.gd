@@ -33,3 +33,10 @@ func test_restore_clamps_to_maximum() -> void:
 	_mana.try_spend(25.0)
 	assert_true(_mana.restore(100.0))
 	assert_eq(_mana.current_mana, 100.0)
+
+
+func test_continuous_spend_drains_deterministically_and_reports_empty() -> void:
+	assert_true(_mana.spend_continuous(25.0, 2.0))
+	assert_almost_eq(_mana.current_mana, 50.0, 0.001)
+	assert_false(_mana.spend_continuous(40.0, 2.0))
+	assert_almost_eq(_mana.current_mana, 0.0, 0.001)

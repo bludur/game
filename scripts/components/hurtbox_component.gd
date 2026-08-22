@@ -8,6 +8,7 @@ signal hit_received(damage: float)
 
 var health_component: HealthComponent
 var _invulnerable: bool = false
+var _damage_filter: Callable
 
 @onready var _invulnerability_timer: Timer = get_node("InvulnerabilityTimer") as Timer
 
@@ -18,6 +19,10 @@ func _ready() -> void:
 
 func bind_health(component: HealthComponent) -> void:
 	health_component = component
+
+
+func set_damage_filter(filter: Callable) -> void:
+	_damage_filter = filter
 
 
 func belongs_to(source_faction: StringName) -> bool:
@@ -43,10 +48,13 @@ func clear_invulnerability() -> void:
 func receive_hit(damage: float) -> bool:
 	if _invulnerable or damage <= 0.0 or not is_instance_valid(health_component):
 		return false
-	if not health_component.take_damage(damage):
+	var resolved_damage: float = damage
+	if _damage_filter.is_valid():
+		resolved_damage = maxf(0.0, float(_damage_filter.call(damage)))
+	if resolved_damage <= 0.0 or not health_component.take_damage(resolved_damage):
 		return false
 
-	hit_received.emit(damage)
+	hit_received.emit(resolved_damage)
 	if invulnerability_seconds > 0.0:
 		grant_invulnerability(invulnerability_seconds)
 	return true
