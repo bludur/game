@@ -9,6 +9,7 @@ func test_complete_run_reaches_upgrade_victory_and_clean_restart() -> void:
 	await get_tree().process_frame
 	var director: RunDirector = main.get_node("RunDirector") as RunDirector
 	var waves: WaveDirector = main.get_node("WaveDirector") as WaveDirector
+	var boss_encounter: BossEncounter = main.get_node("BossEncounter") as BossEncounter
 	var player: MagePlayer = get_tree().get_first_node_in_group(&"player") as MagePlayer
 	var session_ui: SessionUi = main.get_node("SessionUi") as SessionUi
 	director.intermission_duration = 0.01
@@ -34,7 +35,11 @@ func test_complete_run_reaches_upgrade_victory_and_clean_restart() -> void:
 	_assert_upgrade_effect(player, offered[0], base_damage, base_regeneration, base_max_health, base_max_mana, base_chain_damage, base_dash_cooldown)
 	assert_eq(director.get_applied_upgrade_ids(), [offered[0].upgrade_id])
 
-	await _defeat_current_wave(waves)
+	await get_tree().process_frame
+	var boss: ArenaWarden = boss_encounter.get_boss()
+	assert_not_null(boss)
+	boss.get_health_component().take_damage(1000.0)
+	await get_tree().process_frame
 	assert_eq(director.current_state, RunDirector.State.VICTORY)
 	assert_true(session_ui.is_result_visible())
 

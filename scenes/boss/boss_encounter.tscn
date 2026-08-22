@@ -1,0 +1,34 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/boss/boss_encounter.gd" id="1_encounter"]
+[ext_resource type="PackedScene" path="res://scenes/boss/arena_warden.tscn" id="2_boss"]
+[ext_resource type="PackedScene" path="res://scenes/boss/boss_hazard.tscn" id="3_hazard"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/chaser_enemy.tscn" id="4_chaser"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/cultist_enemy.tscn" id="5_cultist"]
+
+[node name="BossEncounter" type="Node3D" groups=["boss_encounter"]]
+script = ExtResource("1_encounter")
+boss_scene = ExtResource("2_boss")
+hazard_scene = ExtResource("3_hazard")
+chaser_scene = ExtResource("4_chaser")
+cultist_scene = ExtResource("5_cultist")
+
+[node name="BossHost" type="Node3D" parent="."]
+
+[node name="SummonedEnemies" type="Node3D" parent="."]
+
+[node name="HazardHost" type="Node3D" parent="."]
+
+[node name="BossSpawn" type="Marker3D" parent="."]
+position = Vector3(0, 0, -5.5)
+
+[node name="SummonPoints" type="Node3D" parent="."]
+
+[node name="Left" type="Marker3D" parent="SummonPoints"]
+position = Vector3(-5.5, 0, 1.5)
+
+[node name="Right" type="Marker3D" parent="SummonPoints"]
+position = Vector3(5.5, 0, 1.5)
+
+[node name="CleanupTimer" type="Timer" parent="."]
+one_shot = true

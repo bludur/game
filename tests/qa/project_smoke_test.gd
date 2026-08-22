@@ -64,6 +64,10 @@ func _run_checks() -> void:
 		var wave_director: WaveDirector = main_instance.get_node_or_null("WaveDirector") as WaveDirector
 		if wave_director == null or wave_director.get_wave_count() != 3:
 			failures.append("Wave director with three waves is missing.")
+		if main_instance.get_node_or_null("BossEncounter") == null:
+			failures.append("Boss encounter is missing.")
+		if main_instance.get_node_or_null("BossHud") == null:
+			failures.append("Boss HUD is missing.")
 		if main_instance.get_node_or_null("SessionUi") == null:
 			failures.append("Session UI is missing.")
 		if get_nodes_in_group(&"training_target").size() != 3:

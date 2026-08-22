@@ -19,6 +19,7 @@ enum State {
 
 @export_group("Scene Links")
 @export var wave_director_path: NodePath = ^"../WaveDirector"
+@export var boss_encounter_path: NodePath = ^"../BossEncounter"
 
 @export_group("Upgrade Definitions")
 @export var upgrade_pool: Array[UpgradeData] = []
@@ -31,6 +32,7 @@ enum State {
 
 var current_state: State = State.INTRO
 var _wave_director: WaveDirector
+var _boss_encounter: BossEncounter
 var _player: MagePlayer
 var _upgrade_options: Array[UpgradeData] = []
 var _applied_upgrade_ids: Array[StringName] = []
@@ -50,14 +52,17 @@ var _run_serial: int = -1
 
 func _ready() -> void:
 	_wave_director = get_node_or_null(wave_director_path) as WaveDirector
+	_boss_encounter = get_node_or_null(boss_encounter_path) as BossEncounter
 	_player = get_tree().get_first_node_in_group(&"player") as MagePlayer
-	if not is_instance_valid(_wave_director) or not is_instance_valid(_player):
-		push_error("RunDirector requires a WaveDirector and MagePlayer.")
+	if not is_instance_valid(_wave_director) or not is_instance_valid(_boss_encounter) \
+		or not is_instance_valid(_player):
+		push_error("RunDirector requires WaveDirector, BossEncounter, and MagePlayer.")
 		return
 	_wave_director.auto_start = false
 	_wave_director.auto_advance = false
 	_wave_director.wave_completed.connect(_on_wave_completed)
 	_player.defeated.connect(_on_player_defeated)
+	_boss_encounter.boss_defeated.connect(_on_boss_defeated)
 	_intro_timer.timeout.connect(_on_intro_timeout)
 	_intermission_timer.timeout.connect(_on_intermission_timeout)
 	_capture_base_stats()
@@ -72,6 +77,7 @@ func start_new_run(skip_intro: bool = false) -> bool:
 	_intro_timer.stop()
 	_intermission_timer.stop()
 	_wave_director.stop_and_clear()
+	_boss_encounter.stop_and_clear()
 	_clear_transient_effects()
 	_restore_base_stats()
 	_player.set_auto_respawn(false)
@@ -210,6 +216,10 @@ func _start_wave(wave_index: int) -> void:
 	_next_wave_index = wave_index
 	_set_state(State.FINAL if wave_index == 2 else State.COMBAT)
 	_player.set_controls_enabled(true)
+	if wave_index == 2:
+		if not _boss_encounter.start_encounter(_player):
+			push_error("RunDirector could not start the boss encounter.")
+		return
 	if not _wave_director.start_wave(wave_index):
 		push_error("RunDirector could not start wave %d." % (wave_index + 1))
 
@@ -228,8 +238,8 @@ func _on_wave_completed(wave_number: int) -> void:
 			_player.set_controls_enabled(false)
 			_set_state(State.UPGRADE)
 			upgrade_requested.emit(get_upgrade_options())
-		3:
-			_finish_victory()
+		_:
+			pass
 
 
 func _on_intermission_timeout() -> void:
@@ -242,6 +252,7 @@ func _on_player_defeated() -> void:
 	_intro_timer.stop()
 	_intermission_timer.stop()
 	_wave_director.stop_and_clear(false)
+	_boss_encounter.stop_and_clear()
 	_player.set_controls_enabled(false)
 	_set_state(State.DEFEAT)
 	defeat_reached.emit()
@@ -251,6 +262,11 @@ func _finish_victory() -> void:
 	_player.set_controls_enabled(false)
 	_set_state(State.VICTORY)
 	victory_reached.emit()
+
+
+func _on_boss_defeated() -> void:
+	if current_state == State.FINAL:
+		_finish_victory()
 
 
 func _clear_transient_effects() -> void:

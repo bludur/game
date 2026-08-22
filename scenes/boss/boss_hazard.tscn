@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/boss/boss_hazard.gd" id="1_hazard"]
+
+[node name="BossHazard" type="Area3D" groups=["boss_hazard"]]
+collision_layer = 0
+collision_mask = 16
+monitoring = false
+monitorable = false
+script = ExtResource("1_hazard")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+
+[node name="TelegraphVisual" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+
+[node name="ActivationTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="LifetimeTimer" type="Timer" parent="."]
+one_shot = true

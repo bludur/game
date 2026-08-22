@@ -26,7 +26,11 @@ func _prepare_upgrade_preview() -> void:
 	await _defeat_wave(waves)
 	if continue_to_victory:
 		director.choose_upgrade(0)
-		await _defeat_wave(waves)
+		await get_tree().process_frame
+		var encounter: BossEncounter = main.get_node("BossEncounter") as BossEncounter
+		var boss: ArenaWarden = encounter.get_boss()
+		if is_instance_valid(boss):
+			boss.get_health_component().take_damage(1000.0)
 
 
 func _defeat_wave(waves: WaveDirector) -> void:

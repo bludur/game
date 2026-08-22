@@ -1,0 +1,118 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scripts/boss/arena_warden.gd" id="1_boss"]
+[ext_resource type="PackedScene" path="res://scenes/components/health_component.tscn" id="2_health"]
+[ext_resource type="PackedScene" path="res://scenes/components/hurtbox_component.tscn" id="3_hurtbox"]
+[ext_resource type="PackedScene" path="res://scenes/components/movement_modifier_component.tscn" id="4_modifier"]
+[ext_resource type="PackedScene" path="res://scenes/components/character_animator.tscn" id="5_animator"]
+[ext_resource type="PackedScene" path="res://scenes/components/sfx_pool_3d.tscn" id="6_sfx"]
+[ext_resource type="Resource" path="res://resources/boss_attacks/directed_strike.tres" id="7_line"]
+[ext_resource type="Resource" path="res://resources/boss_attacks/expanding_wave.tres" id="8_wave"]
+[ext_resource type="Resource" path="res://resources/boss_attacks/summon_guard.tres" id="9_summon"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape_boss"]
+radius = 0.8
+height = 2.8
+
+[sub_resource type="StandardMaterial3D" id="Material_armor"]
+albedo_color = Color(0.13, 0.08, 0.22, 1)
+metallic = 0.45
+roughness = 0.34
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_body"]
+material = SubResource("Material_armor")
+top_radius = 0.58
+bottom_radius = 0.9
+height = 2.3
+radial_segments = 8
+
+[sub_resource type="StandardMaterial3D" id="Material_rune"]
+albedo_color = Color(1, 0.12, 0.28, 1)
+emission_enabled = true
+emission = Color(1, 0.03, 0.15, 1)
+emission_energy_multiplier = 3.8
+
+[sub_resource type="SphereMesh" id="SphereMesh_core"]
+material = SubResource("Material_rune")
+radius = 0.33
+height = 0.66
+radial_segments = 12
+rings = 6
+
+[sub_resource type="PrismMesh" id="PrismMesh_crown"]
+material = SubResource("Material_rune")
+size = Vector3(0.52, 1.2, 0.42)
+
+[node name="ArenaWarden" type="CharacterBody3D" groups=["boss", "enemy"]]
+collision_layer = 4
+collision_mask = 1
+floor_snap_length = 0.25
+script = ExtResource("1_boss")
+directed_strike = ExtResource("7_line")
+expanding_wave = ExtResource("8_wave")
+summon_guard = ExtResource("9_summon")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 1.4, 0)
+shape = SubResource("CapsuleShape_boss")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.5
+target_desired_distance = 4.8
+radius = 0.8
+height = 2.8
+navigation_layers = 1
+
+[node name="HealthComponent" parent="." instance=ExtResource("2_health")]
+max_health = 360.0
+
+[node name="HurtboxComponent" parent="." instance=ExtResource("3_hurtbox")]
+position = Vector3(0, 1.45, 0)
+faction = &"enemy"
+
+[node name="MovementModifierComponent" parent="." instance=ExtResource("4_modifier")]
+
+[node name="SfxPool3D" parent="." instance=ExtResource("6_sfx")]
+position = Vector3(0, 1.5, 0)
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="ModelRoot" type="Node3D" parent="Visuals"]
+
+[node name="Body" type="MeshInstance3D" parent="Visuals/ModelRoot"]
+position = Vector3(0, 1.2, 0)
+mesh = SubResource("CylinderMesh_body")
+
+[node name="Core" type="MeshInstance3D" parent="Visuals/ModelRoot"]
+position = Vector3(0, 1.5, -0.62)
+mesh = SubResource("SphereMesh_core")
+
+[node name="CrownLeft" type="MeshInstance3D" parent="Visuals/ModelRoot"]
+position = Vector3(-0.38, 2.65, 0)
+rotation_degrees = Vector3(0, 0, -18)
+mesh = SubResource("PrismMesh_crown")
+
+[node name="CrownCenter" type="MeshInstance3D" parent="Visuals/ModelRoot"]
+position = Vector3(0, 2.85, 0)
+mesh = SubResource("PrismMesh_crown")
+
+[node name="CrownRight" type="MeshInstance3D" parent="Visuals/ModelRoot"]
+position = Vector3(0.38, 2.65, 0)
+rotation_degrees = Vector3(0, 0, 18)
+mesh = SubResource("PrismMesh_crown")
+
+[node name="TelegraphGlow" type="OmniLight3D" parent="Visuals"]
+position = Vector3(0, 1.5, 0)
+light_color = Color(0.75, 0.15, 1, 1)
+light_energy = 2.0
+omni_range = 5.5
+shadow_enabled = false
+
+[node name="CharacterAnimator" parent="." instance=ExtResource("5_animator")]
+
+[node name="StateTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="TargetRefreshTimer" type="Timer" parent="."]
+wait_time = 0.3
+autostart = true

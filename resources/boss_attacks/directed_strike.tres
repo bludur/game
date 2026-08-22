@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BossAttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/boss_attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+attack_id = &"directed_strike"
+display_name = "Runic Cleave"
+attack_type = 0
+telegraph_duration = 0.9
+damage = 24.0
+length = 11.0
+width = 2.25
