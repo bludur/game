@@ -111,7 +111,7 @@ func _on_cooldown_changed(remaining: float, total: float) -> void:
 func _on_active_spell_changed(spell: SpellData, slot_index: int) -> void:
 	_active_spell = spell
 	_slot_label.text = tr("HUD_SLOTS") % (slot_index + 1)
-	_on_cooldown_changed(_spell_caster.get_cooldown_remaining(), spell.cooldown_seconds)
+	_on_cooldown_changed(_spell_caster.get_cooldown_remaining(), _spell_caster.get_effective_cooldown(spell))
 
 
 func _on_dash_cooldown_changed(remaining: float, total: float) -> void:

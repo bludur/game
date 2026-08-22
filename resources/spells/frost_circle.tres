@@ -8,6 +8,7 @@ script = ExtResource("1_spell")
 spell_id = &"frost_circle"
 display_name = "Frost Circle"
 description = "Creates a chilling field that slows hostile movement."
+school = 1
 targeting_type = 1
 mana_cost = 24.0
 cooldown_seconds = 2.8

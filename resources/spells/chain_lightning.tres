@@ -8,6 +8,7 @@ script = ExtResource("1_spell")
 spell_id = &"chain_lightning"
 display_name = "Chain Lightning"
 description = "Strike the aimed foe and arc to two nearby enemies."
+school = 2
 targeting_type = 3
 mana_cost = 26.0
 cooldown_seconds = 2.2

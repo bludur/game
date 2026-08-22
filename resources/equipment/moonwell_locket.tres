@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/equipment_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+equipment_id = &"moonwell_locket"
+display_name = "Медальон лунного колодца"
+description = "При мане выше 80% ускоряет каст; поля контроля шире и долговечнее."
+slot = 2
+tier = 1
+accent_color = Color(0.54, 0.7, 1, 1)
+area_radius_multiplier = 1.2
+effect_duration_multiplier = 1.2
+condition = 1
+condition_threshold = 0.8
+conditional_cooldown_multiplier = 0.85
+visual_variant = 1

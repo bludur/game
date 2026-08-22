@@ -337,6 +337,43 @@ layout_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 10
 
+[node name="Equipment" type="VBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Equipment"]
+layout_mode = 2
+text = "SURVIVAL_EQUIPMENT"
+theme_override_colors/font_color = Color(0.82, 0.66, 1, 1)
+
+[node name="Slots" type="HBoxContainer" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Equipment"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="Focus" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Equipment/Slots"]
+custom_minimum_size = Vector2(218, 42)
+layout_mode = 2
+text = "EQUIPMENT_FOCUS"
+
+[node name="Robe" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Equipment/Slots"]
+custom_minimum_size = Vector2(218, 42)
+layout_mode = 2
+text = "EQUIPMENT_ROBE"
+
+[node name="Talisman" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Equipment/Slots"]
+custom_minimum_size = Vector2(218, 42)
+layout_mode = 2
+text = "EQUIPMENT_TALISMAN"
+
+[node name="Comparison" type="Label" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Equipment"]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+text = "EQUIPMENT_SELECT_HINT"
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.76, 0.84, 1)
+theme_override_font_sizes/font_size = 13
+
 [node name="Grid" type="GridContainer" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -352,13 +389,18 @@ custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 text = "SURVIVAL_USE"
 
+[node name="Equip" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions"]
+custom_minimum_size = Vector2(150, 44)
+layout_mode = 2
+text = "SURVIVAL_EQUIP"
+
 [node name="Split" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions"]
-custom_minimum_size = Vector2(160, 44)
+custom_minimum_size = Vector2(150, 44)
 layout_mode = 2
 text = "SURVIVAL_SPLIT"
 
 [node name="Drop" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions"]
-custom_minimum_size = Vector2(160, 44)
+custom_minimum_size = Vector2(150, 44)
 layout_mode = 2
 text = "SURVIVAL_DROP"
 

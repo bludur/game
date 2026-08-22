@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3]
+[gd_scene load_steps=38 format=3]
 
 [ext_resource type="Script" path="res://scripts/characters/player.gd" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/components/player_controller.tscn" id="2_controller"]
@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" path="res://scenes/components/combat_state_component.tscn" id="15_combat_state"]
 [ext_resource type="PackedScene" path="res://scenes/components/ward_component.tscn" id="16_ward"]
 [ext_resource type="PackedScene" path="res://scenes/components/status_effect_component.tscn" id="17_status"]
+[ext_resource type="PackedScene" path="res://scenes/components/equipment_component.tscn" id="18_equipment"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
 radius = 0.42
@@ -113,6 +114,24 @@ height = 0.08
 radial_segments = 5
 rings = 3
 
+[sub_resource type="CylinderMesh" id="CylinderMesh_focus"]
+top_radius = 0.055
+bottom_radius = 0.08
+height = 1.05
+radial_segments = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_robe_shoulders"]
+size = Vector3(1.05, 0.14, 0.34)
+
+[sub_resource type="BoxMesh" id="BoxMesh_robe_cape"]
+size = Vector3(0.76, 1.05, 0.08)
+
+[sub_resource type="SphereMesh" id="SphereMesh_robe_hood"]
+radius = 0.34
+height = 0.58
+radial_segments = 12
+rings = 6
+
 [node name="Player" type="CharacterBody3D" groups=["player"]]
 collision_layer = 2
 collision_mask = 1
@@ -136,6 +155,8 @@ regeneration_per_second = 14.0
 [node name="WardComponent" parent="." instance=ExtResource("16_ward")]
 
 [node name="StatusEffectComponent" parent="." instance=ExtResource("17_status")]
+
+[node name="EquipmentComponent" parent="." instance=ExtResource("18_equipment")]
 
 [node name="HurtboxComponent" parent="." instance=ExtResource("6_hurtbox")]
 position = Vector3(0, 0.9, 0)
@@ -167,6 +188,30 @@ shape = SubResource("CapsuleShape_player")
 [node name="ModelRoot" type="Node3D" parent="Visuals"]
 
 [node name="MageModel" parent="Visuals/ModelRoot" instance=ExtResource("10_model")]
+
+[node name="EquipmentVisuals" type="Node3D" parent="Visuals"]
+
+[node name="Focus" type="MeshInstance3D" parent="Visuals/EquipmentVisuals"]
+visible = false
+position = Vector3(0.48, 0.98, -0.08)
+rotation_degrees = Vector3(7, 0, -12)
+mesh = SubResource("CylinderMesh_focus")
+
+[node name="RobeShoulders" type="MeshInstance3D" parent="Visuals/EquipmentVisuals"]
+visible = false
+position = Vector3(0, 1.42, 0)
+mesh = SubResource("BoxMesh_robe_shoulders")
+
+[node name="RobeCape" type="MeshInstance3D" parent="Visuals/EquipmentVisuals"]
+visible = false
+position = Vector3(0, 0.93, 0.29)
+rotation_degrees = Vector3(-8, 0, 0)
+mesh = SubResource("BoxMesh_robe_cape")
+
+[node name="RobeHood" type="MeshInstance3D" parent="Visuals/EquipmentVisuals"]
+visible = false
+position = Vector3(0, 1.72, 0.02)
+mesh = SubResource("SphereMesh_robe_hood")
 
 [node name="CharacterAnimator" parent="." instance=ExtResource("11_animator")]
 

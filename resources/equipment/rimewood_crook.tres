@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/equipment_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+equipment_id = &"rimewood_crook"
+display_name = "Крюк инеевого древа"
+description = "Расширяет и продлевает Морозные круги ценой более размеренного каста."
+slot = 0
+tier = 1
+accent_color = Color(0.32, 0.78, 1, 1)
+cooldown_multiplier = 1.05
+mana_cost_multiplier = 0.95
+area_radius_multiplier = 1.3
+effect_duration_multiplier = 1.35
+school_affinity = 1
+visual_variant = 1

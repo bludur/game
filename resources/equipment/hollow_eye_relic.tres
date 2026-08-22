@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/equipment_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+equipment_id = &"hollow_eye_relic"
+display_name = "Реликвия Пустого Ока"
+description = "При Порче выше 50% резко усиливает магию, но делает ведьму уязвимее."
+slot = 2
+tier = 2
+accent_color = Color(0.9, 0.12, 0.68, 1)
+corruption_per_cast = 1.0
+condition = 3
+condition_threshold = 0.5
+conditional_damage_multiplier = 1.4
+conditional_incoming_damage_multiplier = 1.25
+visual_variant = 3

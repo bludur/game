@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/equipment_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+equipment_id = &"rimebound_robes"
+display_name = "Инеевые одежды"
+description = "Холодные нити снижают входящий урон и стоимость заклинаний."
+slot = 1
+tier = 1
+accent_color = Color(0.5, 0.82, 0.94, 1)
+mana_cost_multiplier = 0.92
+incoming_damage_multiplier = 0.88
+visual_variant = 1

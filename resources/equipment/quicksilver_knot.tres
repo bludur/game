@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/equipment_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+equipment_id = &"quicksilver_knot"
+display_name = "Ртутный узел"
+description = "При выносливости выше 75% ускоряет повторный каст."
+slot = 2
+tier = 0
+accent_color = Color(0.78, 0.82, 0.9, 1)
+condition = 4
+condition_threshold = 0.75
+conditional_cooldown_multiplier = 0.82
+visual_variant = 0

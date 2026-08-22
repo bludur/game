@@ -12,6 +12,7 @@ enum TargetingType {
 @export var spell_id: StringName
 @export var display_name: String = "New Spell"
 @export_multiline var description: String
+@export var school: SpellModifierData.School = SpellModifierData.School.ARCANE
 @export var targeting_type: TargetingType = TargetingType.PROJECTILE
 
 @export_group("Costs")

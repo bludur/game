@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/equipment_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+equipment_id = &"wardkeeper_raiment"
+display_name = "Облачение хранительницы"
+description = "Тяжёлые печати заметно гасят урон, но замедляют повторный каст."
+slot = 1
+tier = 1
+accent_color = Color(0.72, 0.56, 0.9, 1)
+cooldown_multiplier = 1.12
+incoming_damage_multiplier = 0.78
+visual_variant = 2

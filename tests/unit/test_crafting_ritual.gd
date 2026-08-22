@@ -34,8 +34,8 @@ func test_nine_authored_preparation_recipes_have_typed_effects() -> void:
 		&"simmer_gravecap_broth", &"brew_frostward_tonic", &"brew_antivenom",
 		&"brew_courage_tonic", &"inscribe_storm_binding", &"weave_witchfire_charm",
 	]
-	assert_eq(ITEM_CATALOG.items.size(), 24)
-	assert_eq(RECIPE_CATALOG.recipes.size(), 20)
+	assert_eq(ITEM_CATALOG.items.size(), 36)
+	assert_eq(RECIPE_CATALOG.recipes.size(), 29)
 	for recipe_id: StringName in preparation_recipe_ids:
 		var recipe: RecipeData = RECIPE_CATALOG.get_recipe(recipe_id)
 		assert_not_null(recipe)

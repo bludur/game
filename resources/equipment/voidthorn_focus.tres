@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/equipment_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+equipment_id = &"voidthorn_focus"
+display_name = "Фокус пустотного шипа"
+description = "Запретная мощь ускоряет и усиливает магию, но каждый каст растит Порчу."
+slot = 0
+tier = 2
+accent_color = Color(0.86, 0.16, 0.58, 1)
+cooldown_multiplier = 0.9
+mana_cost_multiplier = 1.2
+damage_multiplier = 1.35
+school_affinity = 3
+affinity_damage_multiplier = 1.2
+corruption_per_cast = 3.0
+visual_variant = 3

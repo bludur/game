@@ -50,6 +50,8 @@ func _ready() -> void:
 	third_person_camera.set_target(player)
 	interaction_controller.bind(player)
 	player.get_inventory_component().drop_requested.connect(_on_drop_requested)
+	player.get_equipment_component().drop_requested.connect(_on_drop_requested)
+	_grant_starter_equipment()
 	player.defeated.connect(_on_player_defeated)
 	_respawn_timer.timeout.connect(_on_respawn_timeout)
 	witchfire_hearth.rest_requested.connect(_on_rest_requested)
@@ -192,6 +194,7 @@ func serialize_game() -> Dictionary:
 			"inventory": player.get_inventory_component().serialize(),
 			"corruption": player.get_corruption_component().serialize_state(),
 			"status_effects": player.get_status_effect_component().serialize_state(),
+			"equipment": player.get_equipment_component().serialize_state(),
 			"health": player.get_health_component().current_health,
 		},
 		"clock": world_clock.serialize_state(),
@@ -208,6 +211,10 @@ func apply_game(snapshot: Dictionary) -> bool:
 	player.global_position = _data_to_vector3(player_data.get("position", {}) as Dictionary)
 	player.reset_physics_interpolation()
 	player.get_inventory_component().deserialize(player_data.get("inventory", []) as Array, item_catalog)
+	player.get_equipment_component().apply_state(
+		player_data.get("equipment", {}) as Dictionary,
+		item_catalog
+	)
 	player.get_corruption_component().apply_state(player_data.get("corruption", {}) as Dictionary)
 	player.get_status_effect_component().apply_state(player_data.get("status_effects", []) as Array)
 	var health: HealthComponent = player.get_health_component()
@@ -235,6 +242,14 @@ func _spawn_pickup(item: ItemData, quantity: int, world_position: Vector3) -> vo
 	pickup.configure(item, quantity)
 	pickup.position = world_position
 	pickups.add_child(pickup)
+
+
+func _grant_starter_equipment() -> void:
+	var inventory: InventoryComponent = player.get_inventory_component()
+	for item_id: StringName in [&"novice_wand", &"ashweave_mantle", &"quicksilver_knot"]:
+		var item: ItemData = item_catalog.get_item(item_id) if item_catalog != null else null
+		if item != null:
+			inventory.add_item(item, 1)
 
 
 func _on_drop_requested(item: ItemData, quantity: int) -> void:

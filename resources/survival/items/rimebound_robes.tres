@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/equipment/rimebound_robes.tres" id="2"]
+[resource]
+script = ExtResource("1")
+item_id = &"rimebound_robes"
+display_name = "Инеевые одежды"
+description = "Защита для морозной сборки."
+item_type = 4
+max_stack_size = 1
+accent_color = Color(0.5, 0.82, 0.94, 1)
+equipment = ExtResource("2")

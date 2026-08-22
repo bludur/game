@@ -23,6 +23,7 @@ var _ward_sound: AudioStreamWAV
 @onready var _combat_state: CombatStateComponent = get_node("CombatStateComponent") as CombatStateComponent
 @onready var _ward: WardComponent = get_node("WardComponent") as WardComponent
 @onready var _status_effects: StatusEffectComponent = get_node("StatusEffectComponent") as StatusEffectComponent
+@onready var _equipment: EquipmentComponent = get_node("EquipmentComponent") as EquipmentComponent
 @onready var _hurtbox: HurtboxComponent = get_node("HurtboxComponent") as HurtboxComponent
 @onready var _spell_caster: SpellCaster = get_node("SpellCaster") as SpellCaster
 @onready var _spell_loadout: SpellLoadout = get_node("SpellLoadout") as SpellLoadout
@@ -39,6 +40,10 @@ var _ward_sound: AudioStreamWAV
 @onready var _ward_bubble: MeshInstance3D = get_node("WardVisuals/WardBubble") as MeshInstance3D
 @onready var _ward_particles: GPUParticles3D = get_node("WardVisuals/WardParticles") as GPUParticles3D
 @onready var _ward_glow: OmniLight3D = get_node("WardVisuals/WardGlow") as OmniLight3D
+@onready var _focus_visual: MeshInstance3D = get_node("Visuals/EquipmentVisuals/Focus") as MeshInstance3D
+@onready var _robe_shoulders: MeshInstance3D = get_node("Visuals/EquipmentVisuals/RobeShoulders") as MeshInstance3D
+@onready var _robe_cape: MeshInstance3D = get_node("Visuals/EquipmentVisuals/RobeCape") as MeshInstance3D
+@onready var _robe_hood: MeshInstance3D = get_node("Visuals/EquipmentVisuals/RobeHood") as MeshInstance3D
 
 
 func _ready() -> void:
@@ -46,14 +51,24 @@ func _ready() -> void:
 	_original_collision_layer = collision_layer
 	_controller.bind(self, _visuals, _dash, _stamina, _combat_state)
 	_hurtbox.bind_health(_health)
-	_hurtbox.set_damage_filter(_ward.filter_damage)
 	_ward.bind(_stamina, _mana, _combat_state)
 	_status_effects.bind(_health, _mana, _stamina)
+	_equipment.bind(
+		_inventory,
+		_health,
+		_mana,
+		_stamina,
+		_corruption,
+		_focus_visual,
+		[_robe_shoulders, _robe_cape, _robe_hood]
+	)
+	_hurtbox.set_damage_filter(_filter_incoming_damage)
 	_corruption.set_external_resistance_provider(_get_status_corruption_resistance)
 	var spawn_parent: Node = get_tree().current_scene
 	if not is_instance_valid(spawn_parent):
 		spawn_parent = get_parent()
 	_spell_caster.bind(self, _cast_origin, _mana, spawn_parent, &"player", _combat_state)
+	_spell_caster.set_modifier_provider(_equipment.get_spell_profile)
 	_spell_loadout.bind(_spell_caster)
 	_spell_loadout.active_spell_changed.connect(_on_active_spell_changed)
 	_on_active_spell_changed(_spell_loadout.get_active_spell(), _spell_loadout.active_slot_index)
@@ -95,6 +110,10 @@ func get_ward_component() -> WardComponent:
 
 func get_status_effect_component() -> StatusEffectComponent:
 	return _status_effects
+
+
+func get_equipment_component() -> EquipmentComponent:
+	return _equipment
 
 
 func get_hurtbox_component() -> HurtboxComponent:
@@ -156,7 +175,8 @@ func reset_for_new_run() -> void:
 	_restore_player()
 
 
-func _on_spell_cast(_spell: SpellData) -> void:
+func _on_spell_cast(spell: SpellData) -> void:
+	_equipment.notify_spell_cast(spell)
 	_sfx_pool.play_sfx(_cast_sound, -2.0)
 	_animator.play_cast()
 
@@ -215,6 +235,10 @@ func _on_ward_active_changed(active: bool) -> void:
 
 func _get_status_corruption_resistance() -> float:
 	return _status_effects.get_resistance(StatusEffectData.ResistanceType.CORRUPTION)
+
+
+func _filter_incoming_damage(damage: float) -> float:
+	return _equipment.filter_incoming_damage(_ward.filter_damage(damage))
 
 
 func _on_died() -> void:

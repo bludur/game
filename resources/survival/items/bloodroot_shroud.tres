@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/equipment/bloodroot_shroud.tres" id="2"]
+[resource]
+script = ExtResource("1")
+item_id = &"bloodroot_shroud"
+display_name = "Саван кровавого корня"
+description = "Реликтовое одеяние для боя на грани."
+item_type = 4
+max_stack_size = 1
+accent_color = Color(0.58, 0.12, 0.2, 1)
+equipment = ExtResource("2")

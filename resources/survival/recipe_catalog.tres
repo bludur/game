@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RecipeCatalog" load_steps=56 format=3]
+[gd_resource type="Resource" script_class="RecipeCatalog" load_steps=77 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/recipe_catalog.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/resources/recipe_data.gd" id="2"]
@@ -27,6 +27,15 @@
 [ext_resource type="Resource" path="res://resources/survival/items/courage_tonic.tres" id="25"]
 [ext_resource type="Resource" path="res://resources/survival/items/storm_binding_scroll.tres" id="26"]
 [ext_resource type="Resource" path="res://resources/survival/items/witchfire_charm.tres" id="27"]
+[ext_resource type="Resource" path="res://resources/survival/items/rimewood_crook.tres" id="28"]
+[ext_resource type="Resource" path="res://resources/survival/items/stormglass_rod.tres" id="29"]
+[ext_resource type="Resource" path="res://resources/survival/items/voidthorn_focus.tres" id="30"]
+[ext_resource type="Resource" path="res://resources/survival/items/rimebound_robes.tres" id="31"]
+[ext_resource type="Resource" path="res://resources/survival/items/wardkeeper_raiment.tres" id="32"]
+[ext_resource type="Resource" path="res://resources/survival/items/bloodroot_shroud.tres" id="33"]
+[ext_resource type="Resource" path="res://resources/survival/items/moonwell_locket.tres" id="34"]
+[ext_resource type="Resource" path="res://resources/survival/items/last_ember_charm.tres" id="35"]
+[ext_resource type="Resource" path="res://resources/survival/items/hollow_eye_relic.tres" id="36"]
 
 [sub_resource type="Resource" id="A_grave1"]
 script = ExtResource("3")
@@ -95,6 +104,18 @@ quantity = 1
 [sub_resource type="Resource" id="A_core1"]
 script = ExtResource("3")
 item = ExtResource("17")
+quantity = 1
+[sub_resource type="Resource" id="A_prepared1"]
+script = ExtResource("3")
+item = ExtResource("13")
+quantity = 1
+[sub_resource type="Resource" id="A_arcane_rune1"]
+script = ExtResource("3")
+item = ExtResource("14")
+quantity = 1
+[sub_resource type="Resource" id="A_frost_rune1"]
+script = ExtResource("3")
+item = ExtResource("15")
 quantity = 1
 
 [sub_resource type="Resource" id="R01"]
@@ -246,6 +267,70 @@ station = 2
 ingredients = Array[ExtResource("3")]([SubResource("A_core1"), SubResource("A_thread1")])
 result_item = ExtResource("27")
 
+[sub_resource type="Resource" id="R21"]
+script = ExtResource("2")
+recipe_id = &"shape_rimewood_crook"
+display_name = "Крюк инеевого древа"
+station = 2
+ingredients = Array[ExtResource("3")]([SubResource("A_prepared1"), SubResource("A_frost_rune1"), SubResource("A_moon2")])
+result_item = ExtResource("28")
+[sub_resource type="Resource" id="R22"]
+script = ExtResource("2")
+recipe_id = &"shape_stormglass_rod"
+display_name = "Жезл грозового стекла"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_prepared1"), SubResource("A_storm1"), SubResource("A_soul2")])
+result_item = ExtResource("29")
+[sub_resource type="Resource" id="R23"]
+script = ExtResource("2")
+recipe_id = &"bind_voidthorn_focus"
+display_name = "Фокус пустотного шипа"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_heart1"), SubResource("A_arcane_rune1"), SubResource("A_soul2")])
+result_item = ExtResource("30")
+[sub_resource type="Resource" id="R24"]
+script = ExtResource("2")
+recipe_id = &"weave_rimebound_robes"
+display_name = "Инеевые одежды"
+station = 2
+ingredients = Array[ExtResource("3")]([SubResource("A_frost_rune1"), SubResource("A_thread4")])
+result_item = ExtResource("31")
+[sub_resource type="Resource" id="R25"]
+script = ExtResource("2")
+recipe_id = &"weave_wardkeeper_raiment"
+display_name = "Облачение хранительницы"
+station = 2
+ingredients = Array[ExtResource("3")]([SubResource("A_ward4"), SubResource("A_thread4")])
+result_item = ExtResource("32")
+[sub_resource type="Resource" id="R26"]
+script = ExtResource("2")
+recipe_id = &"weave_bloodroot_shroud"
+display_name = "Саван кровавого корня"
+station = 2
+ingredients = Array[ExtResource("3")]([SubResource("A_heart1"), SubResource("A_thread4"), SubResource("A_dusk2")])
+result_item = ExtResource("33")
+[sub_resource type="Resource" id="R27"]
+script = ExtResource("2")
+recipe_id = &"set_moonwell_locket"
+display_name = "Медальон лунного колодца"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_moon2"), SubResource("A_thread1")])
+result_item = ExtResource("34")
+[sub_resource type="Resource" id="R28"]
+script = ExtResource("2")
+recipe_id = &"bind_last_ember_charm"
+display_name = "Оберег последнего угля"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_core1"), SubResource("A_soul1")])
+result_item = ExtResource("35")
+[sub_resource type="Resource" id="R29"]
+script = ExtResource("2")
+recipe_id = &"awaken_hollow_eye_relic"
+display_name = "Реликвия Пустого Ока"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_heart1"), SubResource("A_storm1"), SubResource("A_ward2")])
+result_item = ExtResource("36")
+
 [resource]
 script = ExtResource("1")
-recipes = Array[ExtResource("2")]([SubResource("R01"), SubResource("R02"), SubResource("R03"), SubResource("R04"), SubResource("R05"), SubResource("R06"), SubResource("R07"), SubResource("R08"), SubResource("R09"), SubResource("R10"), SubResource("R11"), SubResource("R12"), SubResource("R13"), SubResource("R14"), SubResource("R15"), SubResource("R16"), SubResource("R17"), SubResource("R18"), SubResource("R19"), SubResource("R20")])
+recipes = Array[ExtResource("2")]([SubResource("R01"), SubResource("R02"), SubResource("R03"), SubResource("R04"), SubResource("R05"), SubResource("R06"), SubResource("R07"), SubResource("R08"), SubResource("R09"), SubResource("R10"), SubResource("R11"), SubResource("R12"), SubResource("R13"), SubResource("R14"), SubResource("R15"), SubResource("R16"), SubResource("R17"), SubResource("R18"), SubResource("R19"), SubResource("R20"), SubResource("R21"), SubResource("R22"), SubResource("R23"), SubResource("R24"), SubResource("R25"), SubResource("R26"), SubResource("R27"), SubResource("R28"), SubResource("R29")])

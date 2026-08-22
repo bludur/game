@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/equipment_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+equipment_id = &"bloodroot_shroud"
+display_name = "Саван кровавого корня"
+description = "Ниже 35% здоровья становится прочнее и усиливает магию."
+slot = 1
+tier = 2
+accent_color = Color(0.58, 0.12, 0.2, 1)
+incoming_damage_multiplier = 0.82
+condition = 2
+condition_threshold = 0.35
+conditional_damage_multiplier = 1.25
+conditional_incoming_damage_multiplier = 0.75
+visual_variant = 3

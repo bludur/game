@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EquipmentData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/equipment_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+equipment_id = &"stormglass_rod"
+display_name = "Жезл грозового стекла"
+description = "Молния бьёт сильнее и ищет следующую цель дальше."
+slot = 0
+tier = 1
+accent_color = Color(0.42, 0.56, 1, 1)
+mana_cost_multiplier = 1.1
+damage_multiplier = 1.1
+chain_jump_multiplier = 1.4
+school_affinity = 2
+affinity_damage_multiplier = 1.15
+visual_variant = 2

@@ -7,6 +7,7 @@ signal interface_open_changed(open: bool)
 
 var _session: WorldSession
 var _inventory: InventoryComponent
+var _equipment: EquipmentComponent
 var _selected_slot: int = -1
 var _slot_buttons: Array[Button] = []
 var _notification_tween: Tween
@@ -34,6 +35,11 @@ var _notification_tween: Tween
 @onready var _split_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions/Split") as Button
 @onready var _drop_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions/Drop") as Button
 @onready var _use_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions/Use") as Button
+@onready var _equip_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions/Equip") as Button
+@onready var _focus_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Equipment/Slots/Focus") as Button
+@onready var _robe_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Equipment/Slots/Robe") as Button
+@onready var _talisman_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Equipment/Slots/Talisman") as Button
+@onready var _equipment_comparison: Label = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Equipment/Comparison") as Label
 @onready var _map_panel: PanelContainer = get_node("Root/MapPanel") as PanelContainer
 @onready var _map: SurvivalMap = get_node("Root/MapPanel/Map") as SurvivalMap
 @onready var _build_label: Label = get_node("Root/BuildInfo") as Label
@@ -56,6 +62,10 @@ func _ready() -> void:
 	_split_button.pressed.connect(_split_selected_stack)
 	_drop_button.pressed.connect(_drop_selected_item)
 	_use_button.pressed.connect(_use_selected_preparation)
+	_equip_button.pressed.connect(_equip_selected_item)
+	_focus_button.pressed.connect(_unequip_slot.bind(EquipmentData.Slot.FOCUS))
+	_robe_button.pressed.connect(_unequip_slot.bind(EquipmentData.Slot.ROBE))
+	_talisman_button.pressed.connect(_unequip_slot.bind(EquipmentData.Slot.TALISMAN))
 	(get_node("Root/SurvivalWindow/Layout/Header/Close") as Button).pressed.connect(_close_interfaces)
 	_notification_timer.timeout.connect(_hide_notification)
 
@@ -63,11 +73,13 @@ func _ready() -> void:
 func bind(session: WorldSession) -> void:
 	_session = session
 	_inventory = session.player.get_inventory_component()
+	_equipment = session.player.get_equipment_component()
 	_build_inventory_grid()
 	_build_recipe_list()
 	_build_ritual_list()
 	_map.bind(session.player, session.world_state)
 	_inventory.inventory_changed.connect(_refresh_inventory)
+	_equipment.equipment_changed.connect(_on_equipment_changed)
 	session.player.get_health_component().health_changed.connect(_on_health_changed)
 	session.player.get_mana_component().mana_changed.connect(_on_mana_changed)
 	session.player.get_stamina_component().stamina_changed.connect(_on_stamina_changed)
@@ -92,6 +104,7 @@ func bind(session: WorldSession) -> void:
 	_on_corruption_changed(corruption.current_corruption, corruption.maximum_corruption, &"safe")
 	_on_time_changed(session.world_clock.normalized_time, session.world_clock.day_number)
 	_refresh_inventory()
+	_refresh_equipment()
 	_refresh_objective()
 
 
@@ -175,6 +188,10 @@ func _refresh_inventory() -> void:
 	_use_button.disabled = _selected_slot < 0 \
 		or _inventory.slots[_selected_slot].is_empty() \
 		or _inventory.slots[_selected_slot].item.preparation_effect == null
+	_equip_button.disabled = _selected_slot < 0 \
+		or _inventory.slots[_selected_slot].is_empty() \
+		or _inventory.slots[_selected_slot].item.equipment == null
+	_refresh_equipment_comparison()
 	_refresh_recipe_availability()
 
 
@@ -220,6 +237,79 @@ func _use_selected_preparation() -> void:
 	if _selected_slot >= 0 and _session.use_preparation_from_slot(_selected_slot):
 		_selected_slot = -1
 		_refresh_inventory()
+
+
+func _equip_selected_item() -> void:
+	if _selected_slot >= 0 and _equipment.equip_from_inventory(_selected_slot):
+		_selected_slot = -1
+		_refresh_inventory()
+
+
+func _unequip_slot(slot: EquipmentData.Slot) -> void:
+	if _equipment.unequip(slot, true):
+		_refresh_inventory()
+
+
+func _on_equipment_changed(_slot: EquipmentData.Slot, _item: ItemData) -> void:
+	_refresh_equipment()
+	_refresh_equipment_comparison()
+
+
+func _refresh_equipment() -> void:
+	if _equipment == null:
+		return
+	_focus_button.text = _equipment_slot_text(
+		tr("EQUIPMENT_FOCUS"),
+		_equipment.get_equipped_item(EquipmentData.Slot.FOCUS)
+	)
+	_robe_button.text = _equipment_slot_text(
+		tr("EQUIPMENT_ROBE"),
+		_equipment.get_equipped_item(EquipmentData.Slot.ROBE)
+	)
+	_talisman_button.text = _equipment_slot_text(
+		tr("EQUIPMENT_TALISMAN"),
+		_equipment.get_equipped_item(EquipmentData.Slot.TALISMAN)
+	)
+
+
+func _refresh_equipment_comparison() -> void:
+	if _equipment == null or _selected_slot < 0 or _inventory.slots[_selected_slot].is_empty():
+		_equipment_comparison.text = tr("EQUIPMENT_SELECT_HINT")
+		return
+	var candidate: ItemData = _inventory.slots[_selected_slot].item
+	if candidate.equipment == null:
+		_equipment_comparison.text = tr("EQUIPMENT_SELECT_HINT")
+		return
+	var current: ItemData = _equipment.get_equipped_item(candidate.equipment.slot)
+	var current_name: String = tr("EQUIPMENT_EMPTY") if current == null else _item_name(current)
+	_equipment_comparison.text = tr("EQUIPMENT_COMPARE") % [
+		_item_name(candidate),
+		current_name,
+		_equipment_summary(candidate.equipment),
+	]
+
+
+func _equipment_slot_text(slot_name: String, item: ItemData) -> String:
+	return "%s\n%s" % [slot_name, tr("EQUIPMENT_EMPTY") if item == null else _item_name(item)]
+
+
+func _equipment_summary(equipment: EquipmentData) -> String:
+	var parts: PackedStringArray = PackedStringArray()
+	if not is_equal_approx(equipment.cooldown_multiplier, 1.0):
+		parts.append(tr("EQUIPMENT_STAT_COOLDOWN") % roundi((equipment.cooldown_multiplier - 1.0) * 100.0))
+	if not is_equal_approx(equipment.damage_multiplier, 1.0):
+		parts.append(tr("EQUIPMENT_STAT_DAMAGE") % roundi((equipment.damage_multiplier - 1.0) * 100.0))
+	if not is_equal_approx(equipment.incoming_damage_multiplier, 1.0):
+		parts.append(tr("EQUIPMENT_STAT_DEFENSE") % roundi((1.0 - equipment.incoming_damage_multiplier) * 100.0))
+	if not is_equal_approx(equipment.area_radius_multiplier, 1.0):
+		parts.append(tr("EQUIPMENT_STAT_AREA") % roundi((equipment.area_radius_multiplier - 1.0) * 100.0))
+	if not is_equal_approx(equipment.effect_duration_multiplier, 1.0):
+		parts.append(tr("EQUIPMENT_STAT_DURATION") % roundi((equipment.effect_duration_multiplier - 1.0) * 100.0))
+	if equipment.corruption_per_cast > 0.0:
+		parts.append(tr("EQUIPMENT_STAT_CORRUPTION") % equipment.corruption_per_cast)
+	if equipment.condition != EquipmentData.Condition.ALWAYS:
+		parts.append(tr("EQUIPMENT_CONDITIONAL"))
+	return tr("EQUIPMENT_NO_DIRECT_STATS") if parts.is_empty() else ", ".join(parts)
 
 
 func _toggle_survival_window(tab_index: int) -> void:

@@ -66,6 +66,20 @@ func remove_by_id(item_id: StringName, quantity: int = 1) -> int:
 	return removed
 
 
+func remove_from_slot(slot_index: int, quantity: int = 1) -> int:
+	if not _is_valid_index(slot_index) or quantity <= 0:
+		return 0
+	var slot: InventorySlot = slots[slot_index]
+	if slot.is_empty():
+		return 0
+	var removed_item: ItemData = slot.item
+	var removed: int = slot.remove_from_stack(quantity)
+	if removed > 0:
+		item_removed.emit(removed_item, removed)
+		inventory_changed.emit()
+	return removed
+
+
 func has_item_id(item_id: StringName, quantity: int = 1) -> bool:
 	return get_item_count(item_id) >= quantity
 

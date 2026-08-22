@@ -18,14 +18,17 @@ func _run_checks() -> void:
 	if session.get_player_inventory().capacity != 24:
 		failures.append("Survival inventory does not expose 24 slots.")
 	if session.item_catalog == null or not session.item_catalog.is_valid_catalog() \
-			or session.item_catalog.items.size() != 24:
+			or session.item_catalog.items.size() != 36:
 		failures.append("Survival item catalog is invalid or incomplete.")
-	if session.crafting_system.catalog.recipes.size() != 20:
-		failures.append("Expected twenty authored recipes including nine preparations.")
+	if session.crafting_system.catalog.recipes.size() != 29:
+		failures.append("Expected twenty-nine authored recipes including equipment.")
 	if session.ritual_system.catalog.rituals.size() != 6:
 		failures.append("Expected six authored rituals.")
 	if session.construction_system.catalog.pieces.size() != 9:
 		failures.append("Expected nine authored building pieces.")
+	for starter_id: StringName in [&"novice_wand", &"ashweave_mantle", &"quicksilver_knot"]:
+		if session.get_player_inventory().get_item_count(starter_id) != 1:
+			failures.append("New survival session is missing starter equipment: %s." % starter_id)
 	var resources: Array[ResourceNode] = session.region.get_persistent_resources()
 	if resources.size() < 10:
 		failures.append("Ashen Grove has too few authored resource nodes.")

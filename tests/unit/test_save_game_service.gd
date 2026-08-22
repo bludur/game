@@ -35,6 +35,11 @@ func test_three_save_cycles_and_backup_recovery_preserve_world_state() -> void:
 	var saved_remaining: float = status_effects.get_active_effect(&"rested").remaining_seconds
 	status_effects.serialize_state()
 	assert_almost_eq(status_effects.get_active_effect(&"rested").remaining_seconds, saved_remaining, 0.001)
+	session.player.get_equipment_component().apply_state({
+		"focus": "stormglass_rod",
+		"robe": "wardkeeper_raiment",
+		"talisman": "last_ember_charm",
+	}, session.item_catalog)
 	assert_true(_service.save_game(session, 0))
 	session.player.global_position = Vector3(21, 0.1, 22)
 	inventory.add_item(gravewood, 4)
@@ -56,3 +61,23 @@ func test_three_save_cycles_and_backup_recovery_preserve_world_state() -> void:
 		saved_remaining,
 		0.01
 	)
+	assert_eq(
+		session.player.get_equipment_component().serialize_state(),
+		{"focus": "stormglass_rod", "robe": "wardkeeper_raiment", "talisman": "last_ember_charm"}
+	)
+
+
+func test_version_two_migration_grants_one_safe_starter_loadout() -> void:
+	var legacy_snapshot: Dictionary = {
+		"version": 2,
+		"player": {"inventory": [], "status_effects": []},
+		"world_state": {},
+	}
+	var migrated: Dictionary = _service.call("_migrate", legacy_snapshot) as Dictionary
+	assert_eq(migrated["version"], 3)
+	assert_eq(
+		(migrated["player"] as Dictionary)["equipment"],
+		{"focus": "novice_wand", "robe": "ashweave_mantle", "talisman": "quicksilver_knot"}
+	)
+	var migrated_again: Dictionary = _service.call("_migrate", migrated) as Dictionary
+	assert_eq((migrated_again["player"] as Dictionary)["equipment"], (migrated["player"] as Dictionary)["equipment"])

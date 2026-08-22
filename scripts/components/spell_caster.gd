@@ -33,6 +33,7 @@ var _cast_request_pending: bool = false
 var _pending_screen_position: Vector2 = Vector2.ZERO
 var _pending_gamepad_request: bool = false
 var _aim_assist_resolver: AimAssistResolver = AimAssistResolver.new()
+var _modifier_provider: Callable
 
 @onready var _cooldown_timer: Timer = get_node("CooldownTimer") as Timer
 
@@ -77,8 +78,12 @@ func set_spell(spell: SpellData) -> bool:
 	if spell == null or not spell.is_valid_definition():
 		return false
 	spell_data = spell
-	cooldown_changed.emit(_cooldown_timer.time_left, spell_data.cooldown_seconds)
+	cooldown_changed.emit(_cooldown_timer.time_left, get_effective_cooldown(spell_data))
 	return true
+
+
+func set_modifier_provider(provider: Callable) -> void:
+	_modifier_provider = provider
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -147,66 +152,67 @@ func _cast_at_resolved(target_position: Vector3, surface_normal: Vector3) -> boo
 		cast_failed.emit(FAILURE_BUSY)
 		return false
 
+	var resolved_spell: SpellData = _resolve_runtime_spell()
 	var direction: Vector3 = target_position - cast_origin.global_position
-	if spell_data.targeting_type == SpellData.TargetingType.PROJECTILE \
+	if resolved_spell.targeting_type == SpellData.TargetingType.PROJECTILE \
 			and direction.length_squared() < 0.001:
 		_cancel_combat_cast()
 		cast_failed.emit(FAILURE_INVALID_TARGET)
 		return false
 	var resolved_target: Vector3 = target_position
-	if direction.length() > spell_data.range_meters:
-		resolved_target = cast_origin.global_position + direction.normalized() * spell_data.range_meters
+	if direction.length() > resolved_spell.range_meters:
+		resolved_target = cast_origin.global_position + direction.normalized() * resolved_spell.range_meters
 		direction = resolved_target - cast_origin.global_position
-	if not mana_component.try_spend(spell_data.mana_cost):
+	if not mana_component.try_spend(resolved_spell.mana_cost):
 		_cancel_combat_cast()
 		cast_failed.emit(FAILURE_MANA)
 		return false
 
-	var effect_node: Node = spell_data.projectile_scene.instantiate()
+	var effect_node: Node = resolved_spell.projectile_scene.instantiate()
 	var spawn_parent: Node = projectile_parent
 	if not is_instance_valid(spawn_parent):
 		spawn_parent = get_tree().current_scene
 	if not is_instance_valid(spawn_parent):
-		mana_component.restore(spell_data.mana_cost)
+		mana_component.restore(resolved_spell.mana_cost)
 		effect_node.queue_free()
 		_cancel_combat_cast()
 		cast_failed.emit(FAILURE_NOT_CONFIGURED)
 		return false
 	spawn_parent.add_child(effect_node)
-	match spell_data.targeting_type:
+	match resolved_spell.targeting_type:
 		SpellData.TargetingType.PROJECTILE:
 			if effect_node is not ArcaneBolt:
-				_refund_invalid_effect(effect_node)
+				_refund_invalid_effect(effect_node, resolved_spell.mana_cost)
 				return false
 			var projectile: ArcaneBolt = effect_node as ArcaneBolt
 			projectile.global_position = cast_origin.global_position
-			projectile.configure(direction.normalized(), spell_data, caster_body, caster_faction)
+			projectile.configure(direction.normalized(), resolved_spell, caster_body, caster_faction)
 		SpellData.TargetingType.AREA:
 			if effect_node is not FrostCircle:
-				_refund_invalid_effect(effect_node)
+				_refund_invalid_effect(effect_node, resolved_spell.mana_cost)
 				return false
 			var area_effect: FrostCircle = effect_node as FrostCircle
 			var normal: Vector3 = surface_normal.normalized() if surface_normal.length_squared() > 0.001 \
 				else Vector3.UP
 			area_effect.global_position = resolved_target + normal * 0.04
-			area_effect.configure(spell_data, caster_faction)
+			area_effect.configure(resolved_spell, caster_faction)
 		SpellData.TargetingType.CHAIN:
 			if effect_node is not ChainLightning:
-				_refund_invalid_effect(effect_node)
+				_refund_invalid_effect(effect_node, resolved_spell.mana_cost)
 				return false
 			var chain_effect: ChainLightning = effect_node as ChainLightning
 			chain_effect.global_position = cast_origin.global_position
-			if not chain_effect.configure(spell_data, caster_faction, caster_body, resolved_target):
-				mana_component.restore(spell_data.mana_cost)
+			if not chain_effect.configure(resolved_spell, caster_faction, caster_body, resolved_target):
+				mana_component.restore(resolved_spell.mana_cost)
 				chain_effect.queue_free()
 				_cancel_combat_cast()
 				cast_failed.emit(FAILURE_INVALID_TARGET)
 				return false
 		_:
-			_refund_invalid_effect(effect_node)
+			_refund_invalid_effect(effect_node, resolved_spell.mana_cost)
 			return false
 
-	_cooldown_timer.start(spell_data.cooldown_seconds)
+	_cooldown_timer.start(resolved_spell.cooldown_seconds)
 	set_process(true)
 	cooldown_changed.emit(_cooldown_timer.time_left, _cooldown_timer.wait_time)
 	cast_direction_resolved.emit(direction.normalized())
@@ -216,6 +222,17 @@ func _cast_at_resolved(target_position: Vector3, surface_normal: Vector3) -> boo
 
 func get_cooldown_remaining() -> float:
 	return _cooldown_timer.time_left
+
+
+func get_effective_cooldown(spell: SpellData = null) -> float:
+	var definition: SpellData = spell if spell != null else spell_data
+	if definition == null:
+		return 0.0
+	var multiplier: float = 1.0
+	if _modifier_provider.is_valid():
+		var profile: Dictionary = _modifier_provider.call(definition) as Dictionary
+		multiplier = float(profile.get("cooldown_multiplier", 1.0))
+	return maxf(0.05, definition.cooldown_seconds * multiplier)
 
 
 func has_pending_cast_request() -> bool:
@@ -358,8 +375,8 @@ func _cancel_combat_cast() -> void:
 		combat_state.cancel_cast()
 
 
-func _refund_invalid_effect(effect_node: Node) -> void:
-	mana_component.restore(spell_data.mana_cost)
+func _refund_invalid_effect(effect_node: Node, spent_mana: float) -> void:
+	mana_component.restore(spent_mana)
 	effect_node.queue_free()
 	_cancel_combat_cast()
 	cast_failed.emit(FAILURE_NOT_CONFIGURED)
@@ -368,3 +385,39 @@ func _refund_invalid_effect(effect_node: Node) -> void:
 func _on_cooldown_finished() -> void:
 	set_process(false)
 	cooldown_changed.emit(0.0, _cooldown_timer.wait_time)
+
+
+func _resolve_runtime_spell() -> SpellData:
+	var resolved: SpellData = spell_data.duplicate(false) as SpellData
+	if not _modifier_provider.is_valid():
+		return resolved
+	var profile: Dictionary = _modifier_provider.call(spell_data) as Dictionary
+	resolved.cooldown_seconds = maxf(
+		0.05,
+		spell_data.cooldown_seconds * float(profile.get("cooldown_multiplier", 1.0))
+	)
+	resolved.mana_cost = maxf(
+		0.0,
+		spell_data.mana_cost * float(profile.get("mana_cost_multiplier", 1.0))
+	)
+	resolved.damage = maxf(
+		0.0,
+		spell_data.damage * float(profile.get("damage_multiplier", 1.0))
+	)
+	resolved.projectile_speed = maxf(
+		0.0,
+		spell_data.projectile_speed * float(profile.get("projectile_speed_multiplier", 1.0))
+	)
+	resolved.area_radius = maxf(
+		0.25,
+		spell_data.area_radius * float(profile.get("area_radius_multiplier", 1.0))
+	)
+	resolved.effect_duration = maxf(
+		0.1,
+		spell_data.effect_duration * float(profile.get("effect_duration_multiplier", 1.0))
+	)
+	resolved.chain_jump_range = maxf(
+		0.5,
+		spell_data.chain_jump_range * float(profile.get("chain_jump_multiplier", 1.0))
+	)
+	return resolved
