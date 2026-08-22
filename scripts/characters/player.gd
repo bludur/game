@@ -22,6 +22,7 @@ var _ward_sound: AudioStreamWAV
 @onready var _stamina: StaminaComponent = get_node("StaminaComponent") as StaminaComponent
 @onready var _combat_state: CombatStateComponent = get_node("CombatStateComponent") as CombatStateComponent
 @onready var _ward: WardComponent = get_node("WardComponent") as WardComponent
+@onready var _status_effects: StatusEffectComponent = get_node("StatusEffectComponent") as StatusEffectComponent
 @onready var _hurtbox: HurtboxComponent = get_node("HurtboxComponent") as HurtboxComponent
 @onready var _spell_caster: SpellCaster = get_node("SpellCaster") as SpellCaster
 @onready var _spell_loadout: SpellLoadout = get_node("SpellLoadout") as SpellLoadout
@@ -47,6 +48,8 @@ func _ready() -> void:
 	_hurtbox.bind_health(_health)
 	_hurtbox.set_damage_filter(_ward.filter_damage)
 	_ward.bind(_stamina, _mana, _combat_state)
+	_status_effects.bind(_health, _mana, _stamina)
+	_corruption.set_external_resistance_provider(_get_status_corruption_resistance)
 	var spawn_parent: Node = get_tree().current_scene
 	if not is_instance_valid(spawn_parent):
 		spawn_parent = get_parent()
@@ -88,6 +91,10 @@ func get_combat_state_component() -> CombatStateComponent:
 
 func get_ward_component() -> WardComponent:
 	return _ward
+
+
+func get_status_effect_component() -> StatusEffectComponent:
+	return _status_effects
 
 
 func get_hurtbox_component() -> HurtboxComponent:
@@ -204,6 +211,10 @@ func _on_ward_active_changed(active: bool) -> void:
 	if active:
 		_ward_particles.restart()
 		_sfx_pool.play_sfx(_ward_sound, -4.0)
+
+
+func _get_status_corruption_resistance() -> float:
+	return _status_effects.get_resistance(StatusEffectData.ResistanceType.CORRUPTION)
 
 
 func _on_died() -> void:

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RecipeCatalog" load_steps=38 format=3]
+[gd_resource type="Resource" script_class="RecipeCatalog" load_steps=56 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/recipe_catalog.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/resources/recipe_data.gd" id="2"]
@@ -19,6 +19,14 @@
 [ext_resource type="Resource" path="res://resources/survival/items/witchfire_core.tres" id="17"]
 [ext_resource type="Resource" path="res://resources/survival/items/matriarch_heart.tres" id="18"]
 [ext_resource type="Resource" path="res://resources/survival/items/portal_focus.tres" id="19"]
+[ext_resource type="Resource" path="res://resources/survival/items/ember_stew.tres" id="20"]
+[ext_resource type="Resource" path="res://resources/survival/items/moonbread.tres" id="21"]
+[ext_resource type="Resource" path="res://resources/survival/items/gravecap_broth.tres" id="22"]
+[ext_resource type="Resource" path="res://resources/survival/items/frostward_tonic.tres" id="23"]
+[ext_resource type="Resource" path="res://resources/survival/items/antivenom_draught.tres" id="24"]
+[ext_resource type="Resource" path="res://resources/survival/items/courage_tonic.tres" id="25"]
+[ext_resource type="Resource" path="res://resources/survival/items/storm_binding_scroll.tres" id="26"]
+[ext_resource type="Resource" path="res://resources/survival/items/witchfire_charm.tres" id="27"]
 
 [sub_resource type="Resource" id="A_grave1"]
 script = ExtResource("3")
@@ -79,6 +87,14 @@ quantity = 4
 [sub_resource type="Resource" id="A_heart1"]
 script = ExtResource("3")
 item = ExtResource("18")
+quantity = 1
+[sub_resource type="Resource" id="A_storm1"]
+script = ExtResource("3")
+item = ExtResource("16")
+quantity = 1
+[sub_resource type="Resource" id="A_core1"]
+script = ExtResource("3")
+item = ExtResource("17")
 quantity = 1
 
 [sub_resource type="Resource" id="R01"]
@@ -173,6 +189,63 @@ result_item = ExtResource("19")
 craft_seconds = 12.0
 knowledge_id = &"great_portal"
 
+[sub_resource type="Resource" id="R13"]
+script = ExtResource("2")
+recipe_id = &"cook_ember_stew"
+display_name = "Угольное рагу"
+station = 0
+ingredients = Array[ExtResource("3")]([SubResource("A_dusk2"), SubResource("A_resin1")])
+result_item = ExtResource("20")
+[sub_resource type="Resource" id="R14"]
+script = ExtResource("2")
+recipe_id = &"bake_moonbread"
+display_name = "Лунный хлеб"
+station = 0
+ingredients = Array[ExtResource("3")]([SubResource("A_moon2"), SubResource("A_grave1")])
+result_item = ExtResource("21")
+[sub_resource type="Resource" id="R15"]
+script = ExtResource("2")
+recipe_id = &"simmer_gravecap_broth"
+display_name = "Бульон из могильников"
+station = 0
+ingredients = Array[ExtResource("3")]([SubResource("A_dusk2"), SubResource("A_grave1")])
+result_item = ExtResource("22")
+[sub_resource type="Resource" id="R16"]
+script = ExtResource("2")
+recipe_id = &"brew_frostward_tonic"
+display_name = "Настой инеевой кожи"
+station = 0
+ingredients = Array[ExtResource("3")]([SubResource("A_moon2"), SubResource("A_ward2")])
+result_item = ExtResource("23")
+[sub_resource type="Resource" id="R17"]
+script = ExtResource("2")
+recipe_id = &"brew_antivenom"
+display_name = "Зелье чёрного противоядия"
+station = 0
+ingredients = Array[ExtResource("3")]([SubResource("A_dusk2"), SubResource("A_resin1")])
+result_item = ExtResource("24")
+[sub_resource type="Resource" id="R18"]
+script = ExtResource("2")
+recipe_id = &"brew_courage_tonic"
+display_name = "Настой бесстрашия"
+station = 0
+ingredients = Array[ExtResource("3")]([SubResource("A_soul1"), SubResource("A_dusk2")])
+result_item = ExtResource("25")
+[sub_resource type="Resource" id="R19"]
+script = ExtResource("2")
+recipe_id = &"inscribe_storm_binding"
+display_name = "Свиток уз бури"
+station = 1
+ingredients = Array[ExtResource("3")]([SubResource("A_storm1"), SubResource("A_thread1")])
+result_item = ExtResource("26")
+[sub_resource type="Resource" id="R20"]
+script = ExtResource("2")
+recipe_id = &"weave_witchfire_charm"
+display_name = "Чары ведьминого огня"
+station = 2
+ingredients = Array[ExtResource("3")]([SubResource("A_core1"), SubResource("A_thread1")])
+result_item = ExtResource("27")
+
 [resource]
 script = ExtResource("1")
-recipes = Array[ExtResource("2")]([SubResource("R01"), SubResource("R02"), SubResource("R03"), SubResource("R04"), SubResource("R05"), SubResource("R06"), SubResource("R07"), SubResource("R08"), SubResource("R09"), SubResource("R10"), SubResource("R11"), SubResource("R12")])
+recipes = Array[ExtResource("2")]([SubResource("R01"), SubResource("R02"), SubResource("R03"), SubResource("R04"), SubResource("R05"), SubResource("R06"), SubResource("R07"), SubResource("R08"), SubResource("R09"), SubResource("R10"), SubResource("R11"), SubResource("R12"), SubResource("R13"), SubResource("R14"), SubResource("R15"), SubResource("R16"), SubResource("R17"), SubResource("R18"), SubResource("R19"), SubResource("R20")])

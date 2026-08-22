@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/status_effects/witchfire_charm.tres" id="2"]
+[resource]
+script = ExtResource("1")
+item_id = &"witchfire_charm"
+display_name = "Чары ведьминого огня"
+description = "Защитное заклятие укрепляет тело и сдерживает Порчу и страх."
+item_type = 1
+max_stack_size = 5
+accent_color = Color(0.94, 0.32, 0.82, 1)
+preparation_effect = ExtResource("2")

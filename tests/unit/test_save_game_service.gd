@@ -28,6 +28,13 @@ func test_three_save_cycles_and_backup_recovery_preserve_world_state() -> void:
 	assert_true(_service.save_game(session, 0))
 	session.player.global_position = Vector3(11, 0.1, 12)
 	inventory.add_item(gravewood, 2)
+	var status_effects: StatusEffectComponent = session.player.get_status_effect_component()
+	assert_true(status_effects.apply_effect_by_id(&"rested"))
+	status_effects.set_physics_process(false)
+	status_effects.advance(37.5)
+	var saved_remaining: float = status_effects.get_active_effect(&"rested").remaining_seconds
+	status_effects.serialize_state()
+	assert_almost_eq(status_effects.get_active_effect(&"rested").remaining_seconds, saved_remaining, 0.001)
 	assert_true(_service.save_game(session, 0))
 	session.player.global_position = Vector3(21, 0.1, 22)
 	inventory.add_item(gravewood, 4)
@@ -44,3 +51,8 @@ func test_three_save_cycles_and_backup_recovery_preserve_world_state() -> void:
 	assert_almost_eq(session.player.global_position.x, 11.0, 0.01)
 	assert_almost_eq(session.player.global_position.z, 12.0, 0.01)
 	assert_eq(session.get_player_inventory().get_item_count(&"gravewood"), 5)
+	assert_almost_eq(
+		session.player.get_status_effect_component().get_active_effect(&"rested").remaining_seconds,
+		saved_remaining,
+		0.01
+	)

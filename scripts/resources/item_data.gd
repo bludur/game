@@ -15,6 +15,7 @@ enum ItemType {
 @export_range(1, 99, 1) var max_stack_size: int = 30
 @export var accent_color: Color = Color(0.65, 0.4, 0.9, 1.0)
 @export_range(0.0, 1.0, 0.05) var corruption_resistance: float = 0.0
+@export var preparation_effect: StatusEffectData
 
 
 func is_valid_definition() -> bool:

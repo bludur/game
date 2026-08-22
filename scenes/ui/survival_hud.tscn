@@ -195,6 +195,27 @@ grow_horizontal = 0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("Panel")
 
+[node name="ActiveEffects" type="PanelContainer" parent="Root"]
+visible = false
+layout_mode = 0
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -350.0
+offset_top = 128.0
+offset_right = -20.0
+offset_bottom = 286.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Content" type="Label" parent="Root/ActiveEffects"]
+layout_mode = 2
+text = "SURVIVAL_ACTIVE_EFFECTS"
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.84, 0.72, 1, 1)
+theme_override_font_sizes/font_size = 14
+
 [node name="Content" type="VBoxContainer" parent="Root/WorldInfo"]
 layout_mode = 2
 
@@ -326,13 +347,18 @@ layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 12
 
+[node name="Use" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions"]
+custom_minimum_size = Vector2(160, 44)
+layout_mode = 2
+text = "SURVIVAL_USE"
+
 [node name="Split" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions"]
-custom_minimum_size = Vector2(180, 44)
+custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 text = "SURVIVAL_SPLIT"
 
 [node name="Drop" type="Button" parent="Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions"]
-custom_minimum_size = Vector2(180, 44)
+custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 text = "SURVIVAL_DROP"
 

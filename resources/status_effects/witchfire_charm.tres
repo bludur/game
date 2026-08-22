@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StatusEffectData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/status_effect_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+effect_id = &"witchfire_charm"
+display_name = "Чары ведьминого огня"
+source_id = &"rune_table"
+duration_seconds = 480.0
+stack_policy = 3
+preparation_slot = 3
+accent_color = Color(0.94, 0.32, 0.82, 1)
+maximum_health_bonus = 15.0
+maximum_stamina_bonus = 15.0
+corruption_resistance = 0.2
+fear_resistance = 0.2

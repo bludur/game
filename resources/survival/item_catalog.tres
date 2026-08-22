@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ItemCatalog" load_steps=19 format=3]
+[gd_resource type="Resource" script_class="ItemCatalog" load_steps=27 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/item_catalog.gd" id="1"]
 [ext_resource type="Resource" path="res://resources/survival/items/gravewood.tres" id="2"]
@@ -18,7 +18,15 @@
 [ext_resource type="Resource" path="res://resources/survival/items/storm_rune.tres" id="16"]
 [ext_resource type="Resource" path="res://resources/survival/items/witchfire_core.tres" id="17"]
 [ext_resource type="Resource" path="res://resources/survival/items/portal_focus.tres" id="18"]
+[ext_resource type="Resource" path="res://resources/survival/items/ember_stew.tres" id="19"]
+[ext_resource type="Resource" path="res://resources/survival/items/moonbread.tres" id="20"]
+[ext_resource type="Resource" path="res://resources/survival/items/gravecap_broth.tres" id="21"]
+[ext_resource type="Resource" path="res://resources/survival/items/frostward_tonic.tres" id="22"]
+[ext_resource type="Resource" path="res://resources/survival/items/antivenom_draught.tres" id="23"]
+[ext_resource type="Resource" path="res://resources/survival/items/courage_tonic.tres" id="24"]
+[ext_resource type="Resource" path="res://resources/survival/items/storm_binding_scroll.tres" id="25"]
+[ext_resource type="Resource" path="res://resources/survival/items/witchfire_charm.tres" id="26"]
 
 [resource]
 script = ExtResource("1")
-items = Array[ExtResource("12")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("11"), ExtResource("13"), ExtResource("14"), ExtResource("15"), ExtResource("16"), ExtResource("17"), ExtResource("18")])
+items = Array[ExtResource("12")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("11"), ExtResource("13"), ExtResource("14"), ExtResource("15"), ExtResource("16"), ExtResource("17"), ExtResource("18"), ExtResource("19"), ExtResource("20"), ExtResource("21"), ExtResource("22"), ExtResource("23"), ExtResource("24"), ExtResource("25"), ExtResource("26")])

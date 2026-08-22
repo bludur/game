@@ -191,6 +191,7 @@ func serialize_game() -> Dictionary:
 			"position": _vector3_to_data(player.global_position),
 			"inventory": player.get_inventory_component().serialize(),
 			"corruption": player.get_corruption_component().serialize_state(),
+			"status_effects": player.get_status_effect_component().serialize_state(),
 			"health": player.get_health_component().current_health,
 		},
 		"clock": world_clock.serialize_state(),
@@ -208,6 +209,7 @@ func apply_game(snapshot: Dictionary) -> bool:
 	player.reset_physics_interpolation()
 	player.get_inventory_component().deserialize(player_data.get("inventory", []) as Array, item_catalog)
 	player.get_corruption_component().apply_state(player_data.get("corruption", {}) as Dictionary)
+	player.get_status_effect_component().apply_state(player_data.get("status_effects", []) as Array)
 	var health: HealthComponent = player.get_health_component()
 	health.reset()
 	health.take_damage(maxf(0.0, health.max_health - float(player_data.get("health", health.max_health))))
@@ -333,6 +335,8 @@ func _on_rest_requested(hearth: WitchfireHearth, interactor: MagePlayer) -> void
 	interactor.get_mana_component().restore(interactor.get_mana_component().max_mana)
 	interactor.get_stamina_component().restore(interactor.get_stamina_component().max_stamina)
 	interactor.get_corruption_component().cleanse(100.0, &"rest")
+	if is_instance_valid(hearth.ward_zone) and hearth.ward_zone.protects(interactor.global_position):
+		interactor.get_status_effect_component().apply_effect_by_id(&"rested")
 	notification_requested.emit(tr("NOTICE_HEARTH_BOUND"))
 	if is_instance_valid(_save_game_service):
 		_save_game_service.save_game(self, 0)
@@ -383,14 +387,39 @@ func _on_echo_contents_changed(entries: Array[Dictionary]) -> void:
 
 
 func _use_corruption_draught() -> void:
-	var inventory: InventoryComponent = player.get_inventory_component()
-	if inventory.remove_by_id(&"corruption_draught", 1) <= 0:
+	if not use_preparation_item(&"corruption_draught"):
 		notification_requested.emit(tr("NOTICE_NO_DRAUGHT"))
-		return
-	var corruption: CorruptionComponent = player.get_corruption_component()
-	corruption.cleanse(32.0, &"draught")
-	corruption.apply_temporary_resistance(0.35, 90.0)
-	notification_requested.emit(tr("NOTICE_DRAUGHT_USED"))
+
+
+func use_preparation_from_slot(slot_index: int) -> bool:
+	var inventory: InventoryComponent = player.get_inventory_component()
+	if slot_index < 0 or slot_index >= inventory.slots.size():
+		return false
+	var slot: InventorySlot = inventory.slots[slot_index]
+	if slot.is_empty() or slot.item.preparation_effect == null:
+		return false
+	return use_preparation_item(slot.item.item_id)
+
+
+func use_preparation_item(item_id: StringName) -> bool:
+	var item: ItemData = item_catalog.get_item(item_id) if item_catalog != null else null
+	var inventory: InventoryComponent = player.get_inventory_component()
+	if item == null or item.preparation_effect == null or not inventory.has_item_id(item_id, 1):
+		return false
+	if not player.get_status_effect_component().apply_effect(item.preparation_effect):
+		return false
+	if inventory.remove_by_id(item_id, 1) <= 0:
+		return false
+	if item_id == &"corruption_draught":
+		player.get_corruption_component().cleanse(32.0, &"draught")
+	notification_requested.emit(tr("NOTICE_PREPARATION_USED") % _item_name(item))
+	return true
+
+
+func _item_name(item: ItemData) -> String:
+	var key: String = "ITEM_%s_NAME" % String(item.item_id).to_upper()
+	var translated: String = tr(key)
+	return item.display_name if translated == key else translated
 
 
 func _recipe_name(recipe: RecipeData) -> String:

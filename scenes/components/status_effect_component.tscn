@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/status/status_effect_component.gd" id="1_status"]
+[ext_resource type="Resource" path="res://resources/status_effects/status_effect_catalog.tres" id="2_catalog"]
+
+[node name="StatusEffectComponent" type="Node"]
+script = ExtResource("1_status")
+catalog = ExtResource("2_catalog")

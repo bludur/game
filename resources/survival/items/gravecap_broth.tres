@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/status_effects/gravecap_broth.tres" id="2"]
+[resource]
+script = ExtResource("1")
+item_id = &"gravecap_broth"
+display_name = "Бульон из могильников"
+description = "Горький бульон поддерживает тело, ману и сопротивление яду."
+item_type = 1
+max_stack_size = 5
+accent_color = Color(0.46, 0.82, 0.42, 1)
+preparation_effect = ExtResource("2")

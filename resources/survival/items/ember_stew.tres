@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/status_effects/ember_stew.tres" id="2"]
+[resource]
+script = ExtResource("1")
+item_id = &"ember_stew"
+display_name = "Угольное рагу"
+description = "Сытная пища, укрепляющая здоровье перед холодной вылазкой."
+item_type = 1
+max_stack_size = 5
+accent_color = Color(1, 0.36, 0.12, 1)
+preparation_effect = ExtResource("2")

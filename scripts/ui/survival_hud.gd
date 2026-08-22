@@ -33,10 +33,13 @@ var _notification_tween: Tween
 @onready var _ritual_list: VBoxContainer = get_node("Root/SurvivalWindow/Layout/Tabs/Rituals/Scroll/List") as VBoxContainer
 @onready var _split_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions/Split") as Button
 @onready var _drop_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions/Drop") as Button
+@onready var _use_button: Button = get_node("Root/SurvivalWindow/Layout/Tabs/Inventory/Content/Actions/Use") as Button
 @onready var _map_panel: PanelContainer = get_node("Root/MapPanel") as PanelContainer
 @onready var _map: SurvivalMap = get_node("Root/MapPanel/Map") as SurvivalMap
 @onready var _build_label: Label = get_node("Root/BuildInfo") as Label
 @onready var _crosshair: Label = get_node("Root/Crosshair") as Label
+@onready var _active_effects_panel: PanelContainer = get_node("Root/ActiveEffects") as PanelContainer
+@onready var _active_effects_label: Label = get_node("Root/ActiveEffects/Content") as Label
 @onready var _notification_timer: Timer = get_node("NotificationTimer") as Timer
 
 
@@ -52,6 +55,7 @@ func _ready() -> void:
 	_notification.modulate.a = 0.0
 	_split_button.pressed.connect(_split_selected_stack)
 	_drop_button.pressed.connect(_drop_selected_item)
+	_use_button.pressed.connect(_use_selected_preparation)
 	(get_node("Root/SurvivalWindow/Layout/Header/Close") as Button).pressed.connect(_close_interfaces)
 	_notification_timer.timeout.connect(_hide_notification)
 
@@ -68,6 +72,7 @@ func bind(session: WorldSession) -> void:
 	session.player.get_mana_component().mana_changed.connect(_on_mana_changed)
 	session.player.get_stamina_component().stamina_changed.connect(_on_stamina_changed)
 	session.player.get_ward_component().active_changed.connect(_on_ward_active_changed)
+	session.player.get_status_effect_component().effects_changed.connect(_on_effects_changed)
 	session.player.get_corruption_component().corruption_changed.connect(_on_corruption_changed)
 	session.world_clock.time_changed.connect(_on_time_changed)
 	session.threat_director.threat_changed.connect(_on_threat_changed)
@@ -83,6 +88,7 @@ func bind(session: WorldSession) -> void:
 	_on_mana_changed(mana.current_mana, mana.max_mana)
 	_on_stamina_changed(stamina.current_stamina, stamina.max_stamina)
 	_on_ward_active_changed(session.player.get_ward_component().is_active)
+	_on_effects_changed(session.player.get_status_effect_component().active_effects)
 	_on_corruption_changed(corruption.current_corruption, corruption.maximum_corruption, &"safe")
 	_on_time_changed(session.world_clock.normalized_time, session.world_clock.day_number)
 	_refresh_inventory()
@@ -166,6 +172,9 @@ func _refresh_inventory() -> void:
 			button.tooltip_text = _item_description(slot.item)
 			button.modulate = Color.WHITE.lerp(slot.item.accent_color, 0.18)
 		button.button_pressed = index == _selected_slot
+	_use_button.disabled = _selected_slot < 0 \
+		or _inventory.slots[_selected_slot].is_empty() \
+		or _inventory.slots[_selected_slot].item.preparation_effect == null
 	_refresh_recipe_availability()
 
 
@@ -205,6 +214,12 @@ func _split_selected_stack() -> void:
 func _drop_selected_item() -> void:
 	if _selected_slot >= 0 and _inventory.request_drop(_selected_slot, 1):
 		_selected_slot = -1
+
+
+func _use_selected_preparation() -> void:
+	if _selected_slot >= 0 and _session.use_preparation_from_slot(_selected_slot):
+		_selected_slot = -1
+		_refresh_inventory()
 
 
 func _toggle_survival_window(tab_index: int) -> void:
@@ -258,6 +273,26 @@ func _on_ward_active_changed(active: bool) -> void:
 	_ward_label.text = tr("HUD_WARD_ACTIVE") if active else tr("HUD_WARD_READY")
 	_ward_label.modulate = Color(0.82, 0.56, 1.0, 1.0) if active else Color.WHITE
 	_crosshair.modulate = Color(0.82, 0.56, 1.0, 1.0) if active else Color.WHITE
+
+
+func _on_effects_changed(effects: Array[ActiveStatusEffect]) -> void:
+	_active_effects_panel.visible = not effects.is_empty()
+	if effects.is_empty():
+		_active_effects_label.text = ""
+		return
+	var lines: PackedStringArray = PackedStringArray([tr("SURVIVAL_ACTIVE_EFFECTS")])
+	for active: ActiveStatusEffect in effects:
+		var effect_key: String = "STATUS_%s_NAME" % String(active.definition.effect_id).to_upper()
+		var effect_name: String = tr(effect_key)
+		if effect_name == effect_key:
+			effect_name = active.definition.display_name
+		var source_key: String = "STATUS_SOURCE_%s" % String(active.definition.source_id).to_upper()
+		var source_name: String = tr(source_key)
+		if source_name == source_key:
+			source_name = String(active.definition.source_id)
+		var remaining: int = ceili(active.remaining_seconds)
+		lines.append("%s  %d:%02d  ·  %s" % [effect_name, remaining / 60, remaining % 60, source_name])
+	_active_effects_label.text = "\n".join(lines)
 
 
 func _on_corruption_changed(current: float, maximum: float, reason: StringName) -> void:

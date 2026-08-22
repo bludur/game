@@ -74,3 +74,13 @@ func reset() -> void:
 
 func get_mana_ratio() -> float:
 	return current_mana / max_mana if max_mana > 0.0 else 0.0
+
+
+func set_max_mana(value: float, fill_added_capacity: bool = false) -> void:
+	var previous_maximum: float = max_mana
+	max_mana = maxf(1.0, value)
+	if fill_added_capacity and max_mana > previous_maximum:
+		current_mana += max_mana - previous_maximum
+	current_mana = minf(current_mana, max_mana)
+	mana_changed.emit(current_mana, max_mana)
+	set_process(regeneration_per_second > 0.0 and current_mana < max_mana)

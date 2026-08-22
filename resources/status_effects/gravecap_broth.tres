@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StatusEffectData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/status_effect_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+effect_id = &"gravecap_broth"
+display_name = "Бульон из могильников"
+source_id = &"cauldron"
+duration_seconds = 720.0
+stack_policy = 0
+preparation_slot = 1
+accent_color = Color(0.46, 0.82, 0.42, 1)
+maximum_health_bonus = 15.0
+maximum_mana_bonus = 20.0
+health_regeneration = 0.15
+poison_resistance = 0.25

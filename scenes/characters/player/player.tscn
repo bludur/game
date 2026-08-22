@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3]
+[gd_scene load_steps=33 format=3]
 
 [ext_resource type="Script" path="res://scripts/characters/player.gd" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/components/player_controller.tscn" id="2_controller"]
@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" path="res://scenes/components/stamina_component.tscn" id="14_stamina"]
 [ext_resource type="PackedScene" path="res://scenes/components/combat_state_component.tscn" id="15_combat_state"]
 [ext_resource type="PackedScene" path="res://scenes/components/ward_component.tscn" id="16_ward"]
+[ext_resource type="PackedScene" path="res://scenes/components/status_effect_component.tscn" id="17_status"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
 radius = 0.42
@@ -133,6 +134,8 @@ regeneration_per_second = 14.0
 [node name="CombatStateComponent" parent="." instance=ExtResource("15_combat_state")]
 
 [node name="WardComponent" parent="." instance=ExtResource("16_ward")]
+
+[node name="StatusEffectComponent" parent="." instance=ExtResource("17_status")]
 
 [node name="HurtboxComponent" parent="." instance=ExtResource("6_hurtbox")]
 position = Vector3(0, 0.9, 0)

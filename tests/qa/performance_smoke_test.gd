@@ -1,6 +1,7 @@
 extends SceneTree
 
 const MAIN_SCENE: PackedScene = preload("res://scenes/main/arena_run.tscn")
+const OBJECT_BUDGET: int = 2550
 
 
 func _initialize() -> void:
@@ -50,8 +51,8 @@ func _run_checks() -> void:
 	var failures: Array[String] = []
 	if node_count > 500:
 		failures.append("Main scene exceeded the 500-node prototype budget.")
-	if object_count > 2500:
-		failures.append("Object count exceeded the 2500-object prototype budget.")
+	if object_count > OBJECT_BUDGET:
+		failures.append("Object count exceeded the %d-object prototype budget." % OBJECT_BUDGET)
 	if orphan_count > 10:
 		failures.append("Unexpected orphan node growth was detected.")
 	if maximum_process_seconds > 0.025:

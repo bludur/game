@@ -28,6 +28,21 @@ func test_crafting_is_atomic_and_respects_grimoire() -> void:
 	assert_eq(inventory.serialize(), snapshot)
 
 
+func test_nine_authored_preparation_recipes_have_typed_effects() -> void:
+	var preparation_recipe_ids: Array[StringName] = [
+		&"brew_clear_root", &"cook_ember_stew", &"bake_moonbread",
+		&"simmer_gravecap_broth", &"brew_frostward_tonic", &"brew_antivenom",
+		&"brew_courage_tonic", &"inscribe_storm_binding", &"weave_witchfire_charm",
+	]
+	assert_eq(ITEM_CATALOG.items.size(), 24)
+	assert_eq(RECIPE_CATALOG.recipes.size(), 20)
+	for recipe_id: StringName in preparation_recipe_ids:
+		var recipe: RecipeData = RECIPE_CATALOG.get_recipe(recipe_id)
+		assert_not_null(recipe)
+		assert_not_null(recipe.result_item.preparation_effect)
+		assert_true(recipe.result_item.preparation_effect.is_valid_definition())
+
+
 func test_ritual_consumes_once_sets_world_flag_and_applies_corruption() -> void:
 	var player: MagePlayer = PLAYER_SCENE.instantiate() as MagePlayer
 	add_child_autofree(player)

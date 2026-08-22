@@ -51,3 +51,12 @@ func is_alive() -> bool:
 
 func get_health_ratio() -> float:
 	return current_health / max_health if max_health > 0.0 else 0.0
+
+
+func set_max_health(value: float, fill_added_capacity: bool = false) -> void:
+	var previous_maximum: float = max_health
+	max_health = maxf(1.0, value)
+	if fill_added_capacity and max_health > previous_maximum:
+		current_health += max_health - previous_maximum
+	current_health = minf(current_health, max_health)
+	health_changed.emit(current_health, max_health)

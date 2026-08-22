@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatusEffectData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/status_effect_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+effect_id = &"storm_binding"
+display_name = "Узы бури"
+source_id = &"rune_table"
+duration_seconds = 480.0
+stack_policy = 3
+preparation_slot = 3
+accent_color = Color(0.48, 0.62, 1, 1)
+maximum_mana_bonus = 30.0
+mana_regeneration_bonus = 4.0
+frost_resistance = 0.1

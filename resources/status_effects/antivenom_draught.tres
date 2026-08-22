@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StatusEffectData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/status_effect_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+effect_id = &"antivenom_draught"
+display_name = "Зелье чёрного противоядия"
+source_id = &"cauldron"
+duration_seconds = 300.0
+stack_policy = 1
+preparation_slot = 2
+accent_color = Color(0.54, 0.92, 0.32, 1)
+poison_resistance = 0.6

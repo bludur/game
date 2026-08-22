@@ -88,6 +88,15 @@ func get_regeneration_delay_remaining() -> float:
 	return _regeneration_delay_remaining
 
 
+func set_max_stamina(value: float, fill_added_capacity: bool = false) -> void:
+	var previous_maximum: float = max_stamina
+	max_stamina = maxf(1.0, value)
+	if fill_added_capacity and max_stamina > previous_maximum:
+		current_stamina += max_stamina - previous_maximum
+	current_stamina = minf(current_stamina, max_stamina)
+	stamina_changed.emit(current_stamina, max_stamina)
+
+
 func _apply_spend(amount: float) -> void:
 	current_stamina = maxf(0.0, current_stamina - amount)
 	_regeneration_delay_remaining = regeneration_delay_seconds

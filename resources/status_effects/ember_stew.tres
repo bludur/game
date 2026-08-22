@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatusEffectData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/status_effect_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+effect_id = &"ember_stew"
+display_name = "Угольное рагу"
+source_id = &"cauldron"
+duration_seconds = 720.0
+stack_policy = 0
+preparation_slot = 1
+accent_color = Color(1, 0.36, 0.12, 1)
+maximum_health_bonus = 30.0
+health_regeneration = 0.25
+frost_resistance = 0.15

@@ -14,6 +14,7 @@ var current_corruption: float = 0.0
 var _temporary_resistance: float = 0.0
 var _resistance_remaining: float = 0.0
 var _threshold: int = 0
+var _external_resistance_provider: Callable
 
 
 func update_exposure(delta: float, is_night: bool, in_ward: bool, in_cursed_zone: bool) -> void:
@@ -39,7 +40,14 @@ func update_exposure(delta: float, is_night: bool, in_ward: bool, in_cursed_zone
 func add_corruption(amount: float, reason: StringName) -> bool:
 	if amount <= 0.0 or current_corruption >= maximum_corruption:
 		return false
-	var resistance: float = clampf(base_resistance + _temporary_resistance, 0.0, 0.9)
+	var external_resistance: float = 0.0
+	if _external_resistance_provider.is_valid():
+		external_resistance = float(_external_resistance_provider.call())
+	var resistance: float = clampf(
+		base_resistance + _temporary_resistance + external_resistance,
+		0.0,
+		0.9
+	)
 	var previous: float = current_corruption
 	current_corruption = minf(maximum_corruption, current_corruption + amount * (1.0 - resistance))
 	if not is_equal_approx(previous, current_corruption):
@@ -62,6 +70,10 @@ func cleanse(amount: float, reason: StringName = &"cleansed") -> bool:
 func apply_temporary_resistance(amount: float, duration: float) -> void:
 	_temporary_resistance = clampf(amount, 0.0, 0.9)
 	_resistance_remaining = maxf(0.0, duration)
+
+
+func set_external_resistance_provider(provider: Callable) -> void:
+	_external_resistance_provider = provider
 
 
 func get_threshold() -> int:

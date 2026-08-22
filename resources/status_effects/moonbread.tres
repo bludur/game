@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatusEffectData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/status_effect_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+effect_id = &"moonbread"
+display_name = "Лунный хлеб"
+source_id = &"cauldron"
+duration_seconds = 720.0
+stack_policy = 0
+preparation_slot = 1
+accent_color = Color(0.68, 0.75, 1, 1)
+maximum_stamina_bonus = 30.0
+stamina_regeneration_bonus = 4.0
+fear_resistance = 0.15

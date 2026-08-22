@@ -3,4 +3,4 @@
 [resource]
 script = ExtResource("1")
 starting_knowledge = Array[StringName]([&"first_witchfire", &"ashen_botany"])
-starting_recipes = Array[StringName]([&"brew_clear_root", &"distill_ward_essence", &"grind_ritual_chalk", &"spin_arcane_thread", &"prepare_gravewood", &"etch_arcane_rune", &"etch_frost_rune", &"etch_storm_rune", &"weave_soul_lattice", &"bind_witchfire_core", &"temper_ward", &"great_portal_focus"])
+starting_recipes = Array[StringName]([&"brew_clear_root", &"cook_ember_stew", &"bake_moonbread", &"simmer_gravecap_broth", &"brew_frostward_tonic", &"brew_antivenom", &"brew_courage_tonic", &"inscribe_storm_binding", &"weave_witchfire_charm", &"distill_ward_essence", &"grind_ritual_chalk", &"spin_arcane_thread", &"prepare_gravewood", &"etch_arcane_rune", &"etch_frost_rune", &"etch_storm_rune", &"weave_soul_lattice", &"bind_witchfire_core", &"temper_ward", &"great_portal_focus"])

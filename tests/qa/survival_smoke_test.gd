@@ -18,10 +18,10 @@ func _run_checks() -> void:
 	if session.get_player_inventory().capacity != 24:
 		failures.append("Survival inventory does not expose 24 slots.")
 	if session.item_catalog == null or not session.item_catalog.is_valid_catalog() \
-			or session.item_catalog.items.size() != 16:
+			or session.item_catalog.items.size() != 24:
 		failures.append("Survival item catalog is invalid or incomplete.")
-	if session.crafting_system.catalog.recipes.size() != 12:
-		failures.append("Expected twelve authored recipes.")
+	if session.crafting_system.catalog.recipes.size() != 20:
+		failures.append("Expected twenty authored recipes including nine preparations.")
 	if session.ritual_system.catalog.rituals.size() != 6:
 		failures.append("Expected six authored rituals.")
 	if session.construction_system.catalog.pieces.size() != 9:
@@ -49,6 +49,9 @@ func _run_checks() -> void:
 		failures.append("Starting survival recipe could not be crafted.")
 	if inventory.get_item_count(&"corruption_draught") != 1:
 		failures.append("Crafted result was not placed in inventory.")
+	if not session.use_preparation_item(&"corruption_draught") \
+			or session.player.get_status_effect_component().get_active_effect(&"clear_root") == null:
+		failures.append("Crafted preparation could not be consumed into its typed status slot.")
 	var encoded_snapshot: String = JSON.stringify(session.serialize_game())
 	var decoded_snapshot: Variant = JSON.parse_string(encoded_snapshot)
 	if decoded_snapshot is not Dictionary:

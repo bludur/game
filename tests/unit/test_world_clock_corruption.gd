@@ -40,3 +40,11 @@ func test_corruption_state_round_trip_is_clamped() -> void:
 	var state: Dictionary = corruption.serialize_state()
 	assert_eq(state["temporary_resistance"], 0.9)
 	assert_eq(state["resistance_remaining"], 0.0)
+
+
+func test_corruption_uses_external_preparation_resistance() -> void:
+	var corruption: CorruptionComponent = CorruptionComponent.new()
+	add_child_autofree(corruption)
+	corruption.set_external_resistance_provider(func() -> float: return 0.35)
+	assert_true(corruption.add_corruption(20.0, &"test_preparation"))
+	assert_almost_eq(corruption.current_corruption, 13.0, 0.001)

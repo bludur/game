@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/status_effects/moonbread.tres" id="2"]
+[resource]
+script = ExtResource("1")
+item_id = &"moonbread"
+display_name = "Лунный хлеб"
+description = "Лёгкая пища для долгого бега и спокойствия во тьме."
+item_type = 1
+max_stack_size = 5
+accent_color = Color(0.68, 0.75, 1, 1)
+preparation_effect = ExtResource("2")

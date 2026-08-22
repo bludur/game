@@ -5,7 +5,7 @@ signal save_completed(slot_index: int)
 signal load_completed(slot_index: int)
 signal save_failed(slot_index: int, reason: String)
 
-const CURRENT_VERSION: int = 1
+const CURRENT_VERSION: int = 2
 const SLOT_COUNT: int = 2
 
 @export var save_directory: String = "user://saves/witchroot/"
@@ -126,6 +126,12 @@ func _migrate(snapshot: Dictionary) -> Dictionary:
 		if not snapshot.has("world_state"):
 			snapshot["world_state"] = {}
 		version = 1
+	if version < 2:
+		var player_data: Dictionary = snapshot.get("player", {}) as Dictionary
+		if not player_data.has("status_effects"):
+			player_data["status_effects"] = []
+		snapshot["player"] = player_data
+		version = 2
 	snapshot["version"] = version
 	return snapshot
 

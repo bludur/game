@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/resources/item_data.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/status_effects/storm_binding.tres" id="2"]
+[resource]
+script = ExtResource("1")
+item_id = &"storm_binding_scroll"
+display_name = "Свиток уз бури"
+description = "Временное заклятие увеличивает запас и восстановление маны."
+item_type = 1
+max_stack_size = 5
+accent_color = Color(0.48, 0.62, 1, 1)
+preparation_effect = ExtResource("2")
