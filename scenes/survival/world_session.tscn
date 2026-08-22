@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3]
+[gd_scene load_steps=37 format=3]
 
 [ext_resource type="Script" path="res://scripts/survival/world_session.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/regions/ashen_grove.tscn" id="2"]
@@ -29,6 +29,7 @@
 [ext_resource type="Script" path="res://scripts/survival/region_discovery.gd" id="27"]
 [ext_resource type="Script" path="res://scripts/survival/weather_director.gd" id="28"]
 [ext_resource type="Script" path="res://scripts/audio/region_audio_director.gd" id="29"]
+[ext_resource type="Resource" path="res://resources/survival/encounters/ashen_grove_encounters.tres" id="30"]
 
 [sub_resource type="TorusMesh" id="RitualMesh"]
 inner_radius = 5.7
@@ -101,6 +102,7 @@ script = ExtResource("23")
 arena_half_extent = 90.0
 cell_size = 4.0
 obstacle_clearance = 0.8
+use_cell_grid = false
 
 [node name="StarlessCrypt" parent="RegionHost" instance=ExtResource("24")]
 
@@ -165,6 +167,7 @@ catalog = ExtResource("18")
 script = ExtResource("20")
 chaser_scene = ExtResource("21")
 cultist_scene = ExtResource("22")
+encounter_table = ExtResource("30")
 
 [node name="EvaluationTimer" type="Timer" parent="ThreatDirector"]
 wait_time = 2.0

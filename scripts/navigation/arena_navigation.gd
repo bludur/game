@@ -4,6 +4,7 @@ extends NavigationRegion3D
 @export_range(4.0, 128.0, 0.5) var arena_half_extent: float = 11.0
 @export_range(0.5, 4.0, 0.25) var cell_size: float = 1.0
 @export_range(0.0, 3.0, 0.05) var obstacle_clearance: float = 0.55
+@export var use_cell_grid: bool = true
 
 
 func _ready() -> void:
@@ -15,24 +16,31 @@ func rebuild_navigation_mesh() -> void:
 	var vertices: PackedVector3Array = PackedVector3Array()
 	var vertex_indices: Dictionary[Vector2i, int] = {}
 	var polygons: Array[PackedInt32Array] = []
-	var cell_count: int = floori(arena_half_extent * 2.0 / cell_size)
-
-	for z_index: int in range(cell_count):
-		for x_index: int in range(cell_count):
-			var center: Vector3 = Vector3(
-				-arena_half_extent + (float(x_index) + 0.5) * cell_size,
-				0.0,
-				-arena_half_extent + (float(z_index) + 0.5) * cell_size
-			)
-			if _is_cell_blocked(center):
-				continue
-
-			var polygon: PackedInt32Array = PackedInt32Array()
-			polygon.append(_get_vertex_index(Vector2i(x_index, z_index), vertices, vertex_indices))
-			polygon.append(_get_vertex_index(Vector2i(x_index, z_index + 1), vertices, vertex_indices))
-			polygon.append(_get_vertex_index(Vector2i(x_index + 1, z_index + 1), vertices, vertex_indices))
-			polygon.append(_get_vertex_index(Vector2i(x_index + 1, z_index), vertices, vertex_indices))
-			polygons.append(polygon)
+	if use_cell_grid:
+		var cell_count: int = floori(arena_half_extent * 2.0 / cell_size)
+		for z_index: int in range(cell_count):
+			for x_index: int in range(cell_count):
+				var center: Vector3 = Vector3(
+					-arena_half_extent + (float(x_index) + 0.5) * cell_size,
+					0.0,
+					-arena_half_extent + (float(z_index) + 0.5) * cell_size
+				)
+				if _is_cell_blocked(center):
+					continue
+				var polygon: PackedInt32Array = PackedInt32Array()
+				polygon.append(_get_vertex_index(Vector2i(x_index, z_index), vertices, vertex_indices))
+				polygon.append(_get_vertex_index(Vector2i(x_index, z_index + 1), vertices, vertex_indices))
+				polygon.append(_get_vertex_index(Vector2i(x_index + 1, z_index + 1), vertices, vertex_indices))
+				polygon.append(_get_vertex_index(Vector2i(x_index + 1, z_index), vertices, vertex_indices))
+				polygons.append(polygon)
+	else:
+		vertices = PackedVector3Array([
+			Vector3(-arena_half_extent, 0.0, arena_half_extent),
+			Vector3(arena_half_extent, 0.0, arena_half_extent),
+			Vector3(arena_half_extent, 0.0, -arena_half_extent),
+			Vector3(-arena_half_extent, 0.0, -arena_half_extent),
+		])
+		polygons.append(PackedInt32Array([0, 1, 2, 3]))
 
 	var navigation_map: RID = get_world_3d().navigation_map
 	NavigationServer3D.map_set_active(navigation_map, true)

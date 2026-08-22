@@ -7,6 +7,7 @@ var resource_states: Dictionary[StringName, Dictionary] = {}
 var ritual_flags: Dictionary[StringName, bool] = {}
 var progression_flags: Dictionary[StringName, bool] = {}
 var building_states: Array[Dictionary] = []
+var raid_state: Dictionary = {}
 var echo_state: Dictionary = {}
 var last_hearth_id: StringName = &"hearth_ashen_clearing"
 var region_tier: int = 1
@@ -50,6 +51,7 @@ func serialize_state() -> Dictionary:
 		"rituals": rituals,
 		"progression": progression,
 		"buildings": building_states.duplicate(true),
+		"raid": raid_state.duplicate(true),
 		"echo": echo_state.duplicate(true),
 		"last_hearth_id": String(last_hearth_id),
 		"region_tier": region_tier,
@@ -70,6 +72,7 @@ func apply_state(state: Dictionary) -> void:
 	for flag_id: String in raw_progression:
 		progression_flags[StringName(flag_id)] = bool(raw_progression[flag_id])
 	building_states.assign(state.get("buildings", []))
+	raid_state = (state.get("raid", {}) as Dictionary).duplicate(true)
 	echo_state = (state.get("echo", {}) as Dictionary).duplicate(true)
 	last_hearth_id = StringName(String(state.get("last_hearth_id", "hearth_ashen_clearing")))
 	region_tier = maxi(1, int(state.get("region_tier", 1)))

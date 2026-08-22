@@ -20,7 +20,7 @@ func _ready() -> void:
 		_players.append(player)
 
 
-func play_sfx(stream: AudioStream, volume_db: float = 0.0) -> bool:
+func play_sfx(stream: AudioStream, volume_db: float = 0.0, pitch_scale: float = 1.0) -> bool:
 	if stream == null or _players.is_empty():
 		return false
 
@@ -35,6 +35,7 @@ func play_sfx(stream: AudioStream, volume_db: float = 0.0) -> bool:
 
 	selected_player.stream = stream
 	selected_player.volume_db = volume_db
+	selected_player.pitch_scale = clampf(pitch_scale, 0.5, 2.0)
 	selected_player.play()
 	return true
 

@@ -1,0 +1,208 @@
+[gd_resource type="Resource" script_class="EncounterTableData" load_steps=24 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/encounter_table_data.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/enemy_role_data.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/resources/enemy_mutation_data.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/resources/encounter_entry_data.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/resources/enemy_lair_data.gd" id="5"]
+
+[sub_resource type="Resource" id="RoleStalker"]
+script = ExtResource("2")
+role_id = &"shadow_stalker"
+display_name = "Теневой преследователь"
+signature_color = Color(1, 0.08, 0.38, 1)
+audio_pitch = 1.05
+trophy_item_id = &"ash_resin"
+
+[sub_resource type="Resource" id="RoleRanger"]
+script = ExtResource("2")
+role_id = &"ember_ranger"
+display_name = "Угольный стрелок"
+controller_kind = 1
+health_multiplier = 0.9
+range_multiplier = 1.15
+silhouette_scale = Vector3(0.92, 1.05, 0.92)
+signature_color = Color(1, 0.2, 0.03, 1)
+audio_pitch = 1.15
+trophy_item_id = &"soul_shard"
+
+[sub_resource type="Resource" id="RoleGuardian"]
+script = ExtResource("2")
+role_id = &"root_guardian"
+display_name = "Корневой защитник"
+health_multiplier = 1.8
+damage_multiplier = 0.9
+speed_multiplier = 0.72
+silhouette_scale = Vector3(1.35, 1.18, 1.35)
+signature_color = Color(0.16, 0.78, 0.4, 1)
+audio_pitch = 0.72
+trophy_item_id = &"prepared_gravewood"
+
+[sub_resource type="Resource" id="RoleRitualist"]
+script = ExtResource("2")
+role_id = &"veil_ritualist"
+display_name = "Ритуалист Завесы"
+controller_kind = 1
+health_multiplier = 1.25
+damage_multiplier = 1.3
+speed_multiplier = 0.78
+range_multiplier = 1.1
+silhouette_scale = Vector3(0.86, 1.22, 0.86)
+signature_color = Color(0.68, 0.16, 1, 1)
+audio_pitch = 0.88
+trophy_item_id = &"ritual_chalk"
+
+[sub_resource type="Resource" id="RoleScout"]
+script = ExtResource("2")
+role_id = &"ash_wisp_scout"
+display_name = "Пепельный разведчик"
+controller_kind = 1
+health_multiplier = 0.65
+damage_multiplier = 0.75
+speed_multiplier = 1.45
+range_multiplier = 1.2
+silhouette_scale = Vector3(0.68, 0.72, 0.68)
+signature_color = Color(0.18, 0.78, 1, 1)
+audio_pitch = 1.4
+flying = true
+trophy_item_id = &"arcane_thread"
+
+[sub_resource type="Resource" id="RoleHunter"]
+script = ExtResource("2")
+role_id = &"hollow_elite_hunter"
+display_name = "Полый охотник"
+tier = 2
+health_multiplier = 1.7
+damage_multiplier = 1.5
+speed_multiplier = 1.25
+range_multiplier = 1.1
+silhouette_scale = Vector3(1.16, 1.28, 1.16)
+signature_color = Color(0.92, 0.18, 0.78, 1)
+audio_pitch = 0.78
+trophy_item_id = &"witchfire_core"
+knowledge_id = &"hollow_hunter_anatomy"
+
+[sub_resource type="Resource" id="MutationAshbound"]
+script = ExtResource("3")
+mutation_id = &"ashbound"
+display_name = "Связанный пеплом"
+signature_color = Color(1, 0.27, 0.04, 1)
+minimum_corruption = 25.0
+health_multiplier = 1.3
+damage_multiplier = 1.12
+speed_multiplier = 0.92
+
+[sub_resource type="Resource" id="MutationVeilmarked"]
+script = ExtResource("3")
+mutation_id = &"veilmarked"
+display_name = "Отмеченный Завесой"
+signature_color = Color(0.36, 0.12, 1, 1)
+minimum_corruption = 50.0
+health_multiplier = 1.15
+damage_multiplier = 1.3
+speed_multiplier = 1.18
+
+[sub_resource type="Resource" id="EntryWildDay"]
+script = ExtResource("4")
+encounter_id = &"wilds_day"
+time_rule = 1
+maximum_corruption = 49.0
+role_ids = Array[StringName]([&"shadow_stalker", &"ash_wisp_scout"])
+minimum_group_size = 1
+maximum_group_size = 2
+
+[sub_resource type="Resource" id="EntryWildNight"]
+script = ExtResource("4")
+encounter_id = &"wilds_night"
+time_rule = 2
+role_ids = Array[StringName]([&"shadow_stalker", &"ember_ranger", &"ash_wisp_scout"])
+minimum_group_size = 2
+maximum_group_size = 4
+
+[sub_resource type="Resource" id="EntryRuins"]
+script = ExtResource("4")
+encounter_id = &"ruins_watch"
+poi_kind = 2
+role_ids = Array[StringName]([&"root_guardian", &"ember_ranger"])
+minimum_group_size = 2
+maximum_group_size = 3
+
+[sub_resource type="Resource" id="EntryBog"]
+script = ExtResource("4")
+encounter_id = &"bog_coven"
+minimum_corruption = 25.0
+poi_kind = 3
+role_ids = Array[StringName]([&"veil_ritualist", &"shadow_stalker"])
+minimum_group_size = 2
+maximum_group_size = 4
+
+[sub_resource type="Resource" id="EntryCrypt"]
+script = ExtResource("4")
+encounter_id = &"crypt_watch"
+time_rule = 2
+poi_kind = 4
+role_ids = Array[StringName]([&"root_guardian", &"veil_ritualist", &"hollow_elite_hunter"])
+minimum_group_size = 3
+maximum_group_size = 5
+
+[sub_resource type="Resource" id="EntryForbidden"]
+script = ExtResource("4")
+encounter_id = &"forbidden_hunt"
+time_rule = 2
+minimum_corruption = 50.0
+minimum_tier = 2
+role_ids = Array[StringName]([&"hollow_elite_hunter", &"ash_wisp_scout", &"veil_ritualist"])
+minimum_group_size = 3
+maximum_group_size = 6
+
+[sub_resource type="Resource" id="LairBog"]
+script = ExtResource("5")
+lair_id = &"whispering_bog_coven"
+poi_id = &"whispering_bog"
+poi_kind = 3
+encounter_id = &"bog_coven"
+world_position = Vector3(-42, 0.1, -35)
+patrol_points = Array[Vector3]([Vector3(-53, 0.1, -27), Vector3(-44, 0.1, -47), Vector3(-31, 0.1, -38)])
+population_budget = 2
+respawn_seconds = 150.0
+
+[sub_resource type="Resource" id="LairTower"]
+script = ExtResource("5")
+lair_id = &"hollow_watch_patrol"
+poi_id = &"hollow_watchtower"
+poi_kind = 2
+encounter_id = &"ruins_watch"
+world_position = Vector3(-61, 0.1, 28)
+patrol_points = Array[Vector3]([Vector3(-70, 0.1, 20), Vector3(-52, 0.1, 16), Vector3(-46, 0.1, 34)])
+population_budget = 2
+respawn_seconds = 180.0
+
+[sub_resource type="Resource" id="LairCrypt"]
+script = ExtResource("5")
+lair_id = &"starless_gate_watch"
+poi_id = &"starless_crypt_gate"
+poi_kind = 4
+encounter_id = &"crypt_watch"
+world_position = Vector3(42, 0.1, -56)
+patrol_points = Array[Vector3]([Vector3(30, 0.1, -49), Vector3(49, 0.1, -43), Vector3(56, 0.1, -64)])
+population_budget = 2
+respawn_seconds = 240.0
+
+[sub_resource type="Resource" id="LairChapel"]
+script = ExtResource("5")
+lair_id = &"drowned_chapel_circle"
+poi_id = &"drowned_chapel"
+poi_kind = 11
+encounter_id = &"wilds_night"
+world_position = Vector3(63, 0.1, -18)
+patrol_points = Array[Vector3]([Vector3(52, 0.1, -9), Vector3(68, 0.1, -5), Vector3(72, 0.1, -31)])
+population_budget = 2
+respawn_seconds = 180.0
+
+[resource]
+script = ExtResource("1")
+region_id = &"ashen_grove"
+roles = Array[ExtResource("2")]([SubResource("RoleStalker"), SubResource("RoleRanger"), SubResource("RoleGuardian"), SubResource("RoleRitualist"), SubResource("RoleScout"), SubResource("RoleHunter")])
+mutations = Array[ExtResource("3")]([SubResource("MutationAshbound"), SubResource("MutationVeilmarked")])
+entries = Array[ExtResource("4")]([SubResource("EntryWildDay"), SubResource("EntryWildNight"), SubResource("EntryRuins"), SubResource("EntryBog"), SubResource("EntryCrypt"), SubResource("EntryForbidden")])
+lairs = Array[ExtResource("5")]([SubResource("LairBog"), SubResource("LairTower"), SubResource("LairCrypt"), SubResource("LairChapel")])

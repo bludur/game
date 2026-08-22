@@ -73,10 +73,20 @@ func _ready() -> void:
 	construction_system.build_mode_changed.connect(_on_build_mode_changed)
 	_respawn_transform = Transform3D(Basis.IDENTITY, region.get_spawn_position())
 	_ward_zones.append(witchfire_hearth.ward_zone)
-	threat_director.bind(player, world_clock, _threat_host, _threat_spawn_points, _ward_zones)
+	threat_director.bind(
+		player,
+		world_clock,
+		_threat_host,
+		_threat_spawn_points,
+		_ward_zones,
+		world_state,
+		construction_system
+	)
 	threat_director.hunt_started.connect(_on_hunt_started)
 	threat_director.hunt_ended.connect(_on_hunt_ended)
+	threat_director.raid_warning.connect(_on_raid_warning)
 	threat_director.enemy_defeated.connect(_on_threat_enemy_defeated)
+	player.get_spell_caster().spell_cast.connect(_on_player_spell_cast)
 	starless_crypt.bind(player, world_state, grimoire, item_catalog)
 	starless_crypt.notification_requested.connect(notification_requested.emit)
 	starless_crypt.boss_defeated.connect(_on_matriarch_defeated)
@@ -242,7 +252,7 @@ func apply_game(snapshot: Dictionary) -> bool:
 	_respawn_transform = Transform3D(Basis.IDENTITY, _hearth_spawn_position())
 	construction_system.restore_buildings(world_state.building_states)
 	_apply_all_ritual_world_effects()
-	threat_director.clear_runtime_enemies()
+	threat_director.sync_from_world_state()
 	starless_crypt.sync_from_state()
 	_restore_saved_echo()
 	return true
@@ -291,7 +301,12 @@ func _on_crafting_failed(_recipe_id: StringName, reason: StringName) -> void:
 
 func _on_ritual_completed(ritual: RitualData) -> void:
 	_apply_ritual_world_effect(ritual.result_flag)
-	threat_director.notify_ritual(10.0 + ritual.corruption_cost)
+	var stimulus_kind: ThreatDirector.StimulusKind = ThreatDirector.StimulusKind.FORBIDDEN_TRACE \
+		if ritual.school == SpellModifierData.School.FORBIDDEN \
+		else ThreatDirector.StimulusKind.NOISE
+	threat_director.notify_stimulus(
+		stimulus_kind, player.global_position, 10.0 + ritual.corruption_cost
+	)
 	notification_requested.emit(tr("NOTICE_RITUAL_COMPLETE") % _ritual_name(ritual))
 
 
@@ -310,6 +325,11 @@ func _on_piece_built(piece: BuildingPiece) -> void:
 	var ward: WardZone = piece.get_node_or_null("WardZone") as WardZone
 	if is_instance_valid(ward) and not _ward_zones.has(ward):
 		_ward_zones.append(ward)
+	if piece.piece_data.functional_kind == BuildingPieceData.FunctionalKind.WARD \
+			or piece.piece_data.functional_kind == BuildingPieceData.FunctionalKind.HEARTH:
+		threat_director.notify_stimulus(
+			ThreatDirector.StimulusKind.MAGIC_LIGHT, piece.global_position, 9.0
+		)
 
 
 func _on_build_mode_changed(active: bool) -> void:
@@ -361,10 +381,32 @@ func _on_hunt_ended() -> void:
 	notification_requested.emit(tr("NOTICE_HUNT_ENDED"))
 
 
-func _on_threat_enemy_defeated(world_position: Vector3) -> void:
-	var trophy: ItemData = item_catalog.get_item(&"soul_shard")
+func _on_raid_warning(raid_type: ThreatDirector.RaidType, seconds: float) -> void:
+	var raid_key: String = "NOTICE_RAID_%s" % ThreatDirector.RaidType.keys()[raid_type]
+	notification_requested.emit(tr("NOTICE_RAID_WARNING") % [tr(raid_key), ceili(seconds)])
+
+
+func _on_player_spell_cast(spell: SpellData) -> void:
+	var stimulus_kind: ThreatDirector.StimulusKind = ThreatDirector.StimulusKind.FORBIDDEN_TRACE \
+		if spell.school == SpellModifierData.School.FORBIDDEN \
+		else ThreatDirector.StimulusKind.MAGIC_LIGHT
+	threat_director.notify_stimulus(
+		stimulus_kind,
+		player.global_position,
+		clampf(6.0 + spell.mana_cost * 0.35, 6.0, 22.0)
+	)
+
+
+func _on_threat_enemy_defeated(
+	world_position: Vector3,
+	trophy_item_id: StringName,
+	knowledge_id: StringName
+) -> void:
+	var trophy: ItemData = item_catalog.get_item(trophy_item_id)
 	if trophy != null:
 		_spawn_pickup(trophy, 1, world_position + Vector3.UP * 0.5)
+	if not knowledge_id.is_empty() and grimoire.unlock_knowledge(knowledge_id):
+		notification_requested.emit(tr("NOTICE_ENEMY_KNOWLEDGE"))
 
 
 func _on_matriarch_defeated() -> void:

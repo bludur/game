@@ -28,6 +28,10 @@ enum State {
 @export var respawns: bool = true
 
 var current_state: State = State.IDLE
+var ecology_role_id: StringName = &"shadow_stalker"
+var mutation_id: StringName = &""
+var trophy_item_id: StringName = &"soul_shard"
+var knowledge_id: StringName = &""
 var _target: MagePlayer
 var _spawn_transform: Transform3D
 var _original_collision_layer: int
@@ -36,6 +40,15 @@ var _hurt_sound: AudioStreamWAV
 var _death_sound: AudioStreamWAV
 var _attack_sound: AudioStreamWAV
 var _glow_tween: Tween
+var _role_audio_pitch: float = 1.0
+var _patrol_points: Array[Vector3] = []
+var _patrol_index: int = 0
+var _investigation_position: Vector3 = Vector3.ZERO
+var _has_investigation: bool = false
+var _base_health: float = 1.0
+var _base_damage: float = 1.0
+var _base_speed: float = 1.0
+var _base_attack_range: float = 1.0
 
 @onready var _navigation_agent: NavigationAgent3D = get_node("NavigationAgent3D") as NavigationAgent3D
 @onready var _health: HealthComponent = get_node("HealthComponent") as HealthComponent
@@ -58,6 +71,10 @@ func _ready() -> void:
 	_hurt_sound = SyntheticAudio.create_hurt()
 	_death_sound = SyntheticAudio.create_death()
 	_attack_sound = SyntheticAudio.create_enemy_attack()
+	_base_health = _health.max_health
+	_base_damage = attack_damage
+	_base_speed = move_speed
+	_base_attack_range = attack_range
 	_telegraph.bind(_sfx_pool)
 	_telegraph.danger_started.connect(_on_telegraph_danger_started)
 	_health.damaged.connect(_on_damaged)
@@ -81,7 +98,7 @@ func _physics_process(delta: float) -> void:
 
 	match current_state:
 		State.IDLE:
-			_update_idle()
+			_update_idle(delta)
 		State.CHASE:
 			_update_chase(delta)
 		State.ATTACK:
@@ -124,6 +141,42 @@ func set_combat_target(target: MagePlayer) -> void:
 	_refresh_navigation_target()
 
 
+func configure_ecology(role: EnemyRoleData, mutation: EnemyMutationData = null) -> void:
+	if role == null:
+		return
+	ecology_role_id = role.role_id
+	trophy_item_id = role.trophy_item_id
+	knowledge_id = role.knowledge_id
+	_role_audio_pitch = role.audio_pitch
+	var mutation_health: float = mutation.health_multiplier if mutation != null else 1.0
+	var mutation_damage: float = mutation.damage_multiplier if mutation != null else 1.0
+	var mutation_speed: float = mutation.speed_multiplier if mutation != null else 1.0
+	move_speed = _base_speed * role.speed_multiplier * mutation_speed
+	attack_damage = _base_damage * role.damage_multiplier * mutation_damage
+	attack_range = _base_attack_range * role.range_multiplier
+	_health.set_max_health(_base_health * role.health_multiplier * mutation_health, true)
+	_visuals.scale = role.silhouette_scale
+	_glow.light_color = mutation.signature_color if mutation != null else role.signature_color
+	mutation_id = mutation.mutation_id if mutation != null else &""
+	if mutation != null:
+		_add_mutation_mark(mutation.signature_color)
+
+
+func set_patrol_route(points: Array[Vector3]) -> void:
+	_patrol_points = points.duplicate()
+	_patrol_index = 0
+	_refresh_navigation_target()
+
+
+func investigate(world_position: Vector3) -> void:
+	if current_state == State.DEAD:
+		return
+	_investigation_position = world_position
+	_has_investigation = true
+	if current_state == State.IDLE:
+		_refresh_navigation_target()
+
+
 func try_attack() -> bool:
 	if current_state == State.DEAD or not is_instance_valid(_target):
 		return false
@@ -136,18 +189,48 @@ func try_attack() -> bool:
 		return false
 
 	_animator.play_cast()
-	_sfx_pool.play_sfx(_attack_sound, -2.0)
+	_sfx_pool.play_sfx(_attack_sound, -2.0, _role_audio_pitch)
 	_attack_timer.start(attack_cooldown)
 	attacked.emit(attack_damage)
 	return true
 
 
-func _update_idle() -> void:
+func _update_idle(delta: float) -> void:
 	var effective_speed: float = move_speed * _movement_modifier.get_multiplier()
-	velocity.x = move_toward(velocity.x, 0.0, effective_speed)
-	velocity.z = move_toward(velocity.z, 0.0, effective_speed)
 	if _target_is_in_range(aggro_range):
 		_transition_to(State.CHASE)
+		return
+	if _has_investigation or not _patrol_points.is_empty():
+		_update_roaming(delta, effective_speed * 0.55)
+		return
+	velocity.x = move_toward(velocity.x, 0.0, effective_speed)
+	velocity.z = move_toward(velocity.z, 0.0, effective_speed)
+
+
+func _update_roaming(delta: float, roaming_speed: float) -> void:
+	var target_position: Vector3 = _investigation_position if _has_investigation \
+		else _patrol_points[_patrol_index]
+	var direction: Vector3 = _navigation_agent.get_next_path_position() - global_position
+	if direction.length_squared() <= 0.01:
+		direction = target_position - global_position
+	direction.y = 0.0
+	if global_position.distance_squared_to(target_position) <= 1.6:
+		if _has_investigation:
+			_has_investigation = false
+		elif not _patrol_points.is_empty():
+			_patrol_index = wrapi(_patrol_index + 1, 0, _patrol_points.size())
+		_refresh_navigation_target()
+		velocity.x = 0.0
+		velocity.z = 0.0
+		_animator.set_moving(false)
+		return
+	if direction.length_squared() <= 0.001:
+		return
+	direction = direction.normalized()
+	velocity.x = move_toward(velocity.x, direction.x * roaming_speed, roaming_speed * 6.0 * delta)
+	velocity.z = move_toward(velocity.z, direction.z * roaming_speed, roaming_speed * 6.0 * delta)
+	_face_direction(direction, delta)
+	_animator.set_moving(true)
 
 
 func _update_chase(delta: float) -> void:
@@ -219,7 +302,13 @@ func _refresh_navigation_target() -> void:
 		var player_node: Node = get_tree().get_first_node_in_group(&"player")
 		if player_node is MagePlayer:
 			_target = player_node as MagePlayer
-	if is_instance_valid(_target) and current_state != State.DEAD:
+	if current_state == State.DEAD:
+		return
+	if current_state == State.IDLE and _has_investigation:
+		_navigation_agent.target_position = _investigation_position
+	elif current_state == State.IDLE and not _patrol_points.is_empty():
+		_navigation_agent.target_position = _patrol_points[_patrol_index]
+	elif is_instance_valid(_target):
 		_navigation_agent.target_position = _target.global_position
 
 
@@ -266,7 +355,7 @@ func _on_telegraph_danger_started(_definition: EnemyTelegraphData) -> void:
 
 
 func _on_damaged(_amount: float) -> void:
-	_sfx_pool.play_sfx(_hurt_sound, -3.0)
+	_sfx_pool.play_sfx(_hurt_sound, -3.0, _role_audio_pitch)
 	_animator.play_hit()
 	if _glow_tween != null:
 		_glow_tween.kill()
@@ -279,7 +368,7 @@ func _on_damaged(_amount: float) -> void:
 
 func _on_died() -> void:
 	_telegraph.finish()
-	_sfx_pool.play_sfx(_death_sound)
+	_sfx_pool.play_sfx(_death_sound, 0.0, _role_audio_pitch)
 	_transition_to(State.DEAD)
 	collision_layer = 0
 	_hurtbox.set_deferred("monitoring", false)
@@ -311,3 +400,23 @@ func _on_animation_finished(animation_name: StringName) -> void:
 			_visuals.visible = false
 		else:
 			queue_free()
+
+
+func _add_mutation_mark(color: Color) -> void:
+	var mark: MeshInstance3D = MeshInstance3D.new()
+	mark.name = "MutationMark"
+	var torus: TorusMesh = TorusMesh.new()
+	torus.inner_radius = 0.5
+	torus.outer_radius = 0.66
+	torus.rings = 16
+	torus.ring_segments = 4
+	var material: StandardMaterial3D = StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.albedo_color = color
+	material.emission_enabled = true
+	material.emission = color
+	material.emission_energy_multiplier = 1.8
+	torus.material = material
+	mark.mesh = torus
+	mark.position.y = 1.7
+	_visuals.add_child(mark)

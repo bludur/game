@@ -66,6 +66,12 @@ if ($LASTEXITCODE -ne 0) {
     throw "Enemy chase test failed with exit code $LASTEXITCODE."
 }
 
+Write-Host 'Running enemy ecology, raid, and eight-agent budget test...'
+& $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_enemy_ecology.log') --script 'res://tests/qa/enemy_ecology_test.gd'
+if ($LASTEXITCODE -ne 0) {
+    throw "Enemy ecology test failed with exit code $LASTEXITCODE."
+}
+
 Write-Host 'Running stylized asset integration test...'
 & $godotRunner -Console --headless --path $projectRoot --log-file (Join-Path $qaLogDirectory 'qa_stylized_assets.log') --script 'res://tests/qa/stylized_assets_test.gd'
 if ($LASTEXITCODE -ne 0) {

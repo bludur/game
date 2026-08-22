@@ -328,6 +328,57 @@ func flush_world_state() -> void:
 	_sync_world_state()
 
 
+func get_building_pieces() -> Array[BuildingPiece]:
+	var pieces: Array[BuildingPiece] = []
+	for child: Node in get_children():
+		if child is BuildingPiece and not child.is_queued_for_deletion():
+			pieces.append(child as BuildingPiece)
+	return pieces
+
+
+func apply_raid_damage(
+	origin: Vector3,
+	radius: float,
+	damage_budget: float,
+	maximum_pieces: int = 3,
+	prefer_wards: bool = false
+) -> Dictionary:
+	var candidates: Array[BuildingPiece] = []
+	for piece: BuildingPiece in get_building_pieces():
+		if piece.global_position.distance_to(origin) <= radius:
+			candidates.append(piece)
+	candidates.sort_custom(func(a: BuildingPiece, b: BuildingPiece) -> bool:
+		var a_ward: bool = a.piece_data.functional_kind == BuildingPieceData.FunctionalKind.WARD
+		var b_ward: bool = b.piece_data.functional_kind == BuildingPieceData.FunctionalKind.WARD
+		if prefer_wards and a_ward != b_ward:
+			return a_ward
+		return a.global_position.distance_squared_to(origin) < b.global_position.distance_squared_to(origin)
+	)
+	var remaining: float = maxf(0.0, damage_budget)
+	var applied: float = 0.0
+	var damaged_pieces: int = 0
+	var breached_wards: Array[Vector3] = []
+	for piece: BuildingPiece in candidates:
+		if remaining <= 0.0 or damaged_pieces >= maximum_pieces:
+			break
+		var previous_durability: float = piece.current_durability
+		var safe_damage: float = minf(remaining, maxf(0.0, previous_durability - 1.0))
+		if safe_damage <= 0.0 or not piece.damage_durability(safe_damage):
+			continue
+		remaining -= safe_damage
+		applied += safe_damage
+		damaged_pieces += 1
+		if piece.piece_data.functional_kind == BuildingPieceData.FunctionalKind.WARD \
+				and previous_durability / piece.piece_data.maximum_durability > 0.25 \
+				and piece.current_durability / piece.piece_data.maximum_durability <= 0.25:
+			breached_wards.append(piece.global_position)
+	return {
+		"applied_damage": applied,
+		"damaged_pieces": damaged_pieces,
+		"breached_wards": breached_wards,
+	}
+
+
 func _register_piece(piece: BuildingPiece) -> void:
 	add_child(piece)
 	piece.state_changed.connect(_on_piece_state_changed)
